@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: java-mem0-test
+
+  # Database configuration for testing
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+# Mem0 Configuration for testing
+mem0:
+  vector-store:
+    type: in-memory
+    url: http://localhost:6333
+    collection: test-memories
+    options:
+      similarity-threshold: 0.7
+
+  llm:
+    type: dashscope
+    api-key: ${DASHSCOPE_API_KEY:test-dashscope-api-key}
+    model: qwen-turbo
+    options:
+      max-tokens: 1000
+      temperature: 0.7
+
+  embeddings:
+    type: dashscope
+    model: text-embedding-v1
+    options:
+      dimensions: 1536
+
+  graph:
+    type: neo4j
+    uri: bolt://localhost:7687
+    username: neo4j
+    password: password
+    options:
+      database: neo4j
+
+  memory-types:
+    factual: "Stores facts and information"
+    episodic: "Stores events and experiences"
+    semantic: "Stores concepts and relationships"
+    procedural: "Stores how-to information"
+    working: "Temporary information for current task"
+
+  max-memories: 100
+  embedding-dimension: 1536
+  similarity-threshold: 0.7
+
+# Logging configuration for testing
+logging:
+  level:
+    com.mem0: DEBUG
+    org.springframework: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Server configuration for testing
+server:
+  port: 8081
+  servlet:
+    context-path: /api/v1
