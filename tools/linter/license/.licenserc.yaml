@@ -70,4 +70,6 @@ header:
     - '**/pom.xml'
     - 'tools/linter/codespell/.codespell.ignorewords'
     - 'tools/linter/codespell/.codespell.skip'
+    - 'env.example'
+
   comment: never
