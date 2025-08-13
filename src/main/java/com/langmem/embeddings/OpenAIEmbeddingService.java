@@ -31,6 +31,7 @@ import java.util.List;
 /**
  * OpenAI implementation of EmbeddingService
  */
+
 @Service
 public class OpenAIEmbeddingService implements EmbeddingService {
 
@@ -41,15 +42,20 @@ public class OpenAIEmbeddingService implements EmbeddingService {
   private final int dimension;
 
   public OpenAIEmbeddingService(MemoryConfig config) {
+
     this.model = config.getEmbeddings().getModel();
     this.dimension = config.getEmbeddingDimension();
+
     this.openAiService = new OpenAiService(
-        config.getLlm().getApiKey(), // Use LLM API key for embeddings
-        Duration.ofSeconds(60));
+        // Use LLM API key for embeddings
+        config.getLlm().getApiKey(),
+        Duration.ofSeconds(60)
+    );
   }
 
   @Override
   public double[] embed(String text) {
+
     try {
       EmbeddingRequest request = EmbeddingRequest.builder()
           .model(model)
@@ -65,6 +71,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 
       throw new RuntimeException("No embedding generated");
     } catch (Exception e) {
+
       logger.error("Error generating embedding", e);
       throw new RuntimeException("Failed to generate embedding", e);
     }
@@ -72,6 +79,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 
   @Override
   public double[][] embed(String[] texts) {
+
     try {
       EmbeddingRequest request = EmbeddingRequest.builder()
           .model(model)
@@ -84,6 +92,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
           .map(data -> data.getEmbedding().stream().mapToDouble(Double::doubleValue).toArray())
           .toArray(double[][]::new);
     } catch (Exception e) {
+
       logger.error("Error generating embeddings", e);
       throw new RuntimeException("Failed to generate embeddings", e);
     }
@@ -96,13 +105,16 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 
   @Override
   public boolean isAvailable() {
+
     try {
       // Simple test to check if service is available
       embed("test");
       return true;
     } catch (Exception e) {
+
       logger.warn("OpenAI embedding service is not available", e);
       return false;
     }
   }
+
 }

@@ -44,7 +44,9 @@ public class Memory {
   public Memory(MemoryConfig config,
       VectorStoreService vectorStoreService,
       LLMService llmService,
-      EmbeddingService embeddingService) {
+      EmbeddingService embeddingService
+  ) {
+
     this.config = config;
     this.vectorStoreService = vectorStoreService;
     this.llmService = llmService;
@@ -61,9 +63,15 @@ public class Memory {
   /**
    * Add memories with custom parameters
    */
-  public void add(List<Message> messages, String userId, Map<String, Object> metadata,
-      boolean infer, MemoryType memoryType) {
+  public void add(
+          List<Message> messages,
+          String userId,
+          Map<String, Object> metadata,
+          boolean infer, MemoryType memoryType
+  ) {
+
     try {
+
       // Extract memories from conversation using LLM
       List<String> extractedMemories = extractMemories(messages, infer);
 
@@ -84,6 +92,7 @@ public class Memory {
       logger.error("Error adding memories for user {}", userId, e);
       throw new RuntimeException("Failed to add memories", e);
     }
+
   }
 
   /**
@@ -96,8 +105,13 @@ public class Memory {
   /**
    * Search with custom parameters
    */
-  public List<MemoryItem> search(String query, String userId, Map<String, Object> filters,
-      int limit, Double threshold) {
+  public List<MemoryItem> search(
+          String query,
+          String userId,
+          Map<String, Object> filters,
+          int limit, Double threshold
+  ) {
+
     try {
       // Generate embedding for query
       double[] queryEmbedding = embeddingService.embed(query);
@@ -112,28 +126,33 @@ public class Memory {
       logger.info("Found {} memories for query: {}", results.size(), query);
       return results;
     } catch (Exception e) {
+
       logger.error("Error searching memories for query: {}", query, e);
       throw new RuntimeException("Failed to search memories", e);
     }
+
   }
 
   /**
    * Get all memories for a user
    */
   public List<MemoryItem> getAll(String userId, Map<String, Object> filters, int limit) {
-    try {
+
+      try {
       Map<String, Object> searchFilters = buildSearchFilters(userId, filters);
       return vectorStoreService.getAll(searchFilters, limit);
     } catch (Exception e) {
       logger.error("Error getting all memories for user {}", userId, e);
       throw new RuntimeException("Failed to get memories", e);
     }
+
   }
 
   /**
    * Update a memory item
    */
   public void update(String memoryId, Map<String, Object> data) {
+
     try {
       MemoryItem item = vectorStoreService.get(memoryId);
       if (item != null) {
@@ -156,12 +175,14 @@ public class Memory {
       logger.error("Error updating memory: {}", memoryId, e);
       throw new RuntimeException("Failed to update memory", e);
     }
+
   }
 
   /**
    * Delete a memory item
    */
   public void delete(String memoryId) {
+
     try {
       vectorStoreService.delete(memoryId);
       logger.info("Deleted memory: {}", memoryId);
@@ -169,12 +190,14 @@ public class Memory {
       logger.error("Error deleting memory: {}", memoryId, e);
       throw new RuntimeException("Failed to delete memory", e);
     }
+
   }
 
   /**
    * Delete all memories for a user
    */
   public void deleteAll(String userId) {
+
     try {
       Map<String, Object> filters = Map.of("user_id", userId);
       vectorStoreService.deleteAll(filters);
@@ -183,12 +206,14 @@ public class Memory {
       logger.error("Error deleting all memories for user {}", userId, e);
       throw new RuntimeException("Failed to delete memories", e);
     }
+
   }
 
   /**
    * Extract memories from conversation using LLM
    */
   private List<String> extractMemories(List<Message> messages, boolean infer) {
+
     if (!infer) {
       // Return raw conversation as single memory
       String conversation = messages.stream()
@@ -229,18 +254,28 @@ public class Memory {
   /**
    * Create a memory item from content
    */
-  private MemoryItem createMemoryItem(String content, String userId,
-      Map<String, Object> metadata, MemoryType memoryType) {
+  private MemoryItem createMemoryItem(
+          String content,
+          String userId,
+          Map<String, Object> metadata,
+          MemoryType memoryType
+  ) {
+
     MemoryItem item = new MemoryItem(content, memoryType.getValue());
     item.setUserId(userId);
     item.setMetadata(metadata);
+
     return item;
   }
 
   /**
    * Build search filters
    */
-  private Map<String, Object> buildSearchFilters(String userId, Map<String, Object> additionalFilters) {
+  private Map<String, Object> buildSearchFilters(
+          String userId,
+          Map<String, Object> additionalFilters
+  ) {
+
     Map<String, Object> filters = new HashMap<>();
     filters.put("user_id", userId);
 
@@ -255,6 +290,7 @@ public class Memory {
    * Get memory by ID
    */
   public MemoryItem get(String memoryId) {
+
     try {
       return vectorStoreService.get(memoryId);
     } catch (Exception e) {
@@ -267,6 +303,7 @@ public class Memory {
    * Reset all memories (for testing)
    */
   public void reset() {
+
     try {
       vectorStoreService.reset();
       logger.info("Reset all memories");
@@ -275,4 +312,5 @@ public class Memory {
       throw new RuntimeException("Failed to reset memories", e);
     }
   }
+
 }

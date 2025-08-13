@@ -18,13 +18,13 @@ package com.langmem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Main Spring Boot application class for Lang Memory
  */
-@SpringBootApplication
-@ComponentScan(basePackages = "com.langmem")
+@SpringBootApplication(
+        scanBasePackages = {"com.langmem"}
+)
 public class LangMemoryApplication {
 
   public static void main(String[] args) {

@@ -36,7 +36,9 @@ import java.util.stream.Collectors;
 
 /**
  * DashScope implementation of LLMService using direct HTTP calls
+ * Todo：替换为 Spring AI Alibaba 的 DashScope Chat Client？
  */
+
 @Service
 public class DashScopeLLMService implements LLMService {
 

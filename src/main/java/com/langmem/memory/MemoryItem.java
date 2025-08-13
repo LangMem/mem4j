@@ -178,4 +178,5 @@ public class MemoryItem {
         ", createdAt=" + createdAt +
         '}';
   }
+
 }

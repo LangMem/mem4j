@@ -31,6 +31,7 @@ import java.util.Map;
 /**
  * REST API controller for memory operations
  */
+
 @RestController
 @RequestMapping("/memory")
 public class MemoryController {
@@ -48,7 +49,9 @@ public class MemoryController {
    */
   @PostMapping("/add")
   public ResponseEntity<Map<String, Object>> addMemories(
-      @RequestBody AddMemoryRequest request) {
+      @RequestBody AddMemoryRequest request
+  ) {
+
     try {
       memory.add(request.getMessages(), request.getUserId(),
           request.getMetadata(), request.isInfer(),
@@ -58,6 +61,7 @@ public class MemoryController {
           "status", "success",
           "message", "Memories added successfully"));
     } catch (Exception e) {
+
       logger.error("Error adding memories", e);
       return ResponseEntity.badRequest().body(Map.of(
           "status", "error",
@@ -74,7 +78,9 @@ public class MemoryController {
       @RequestParam String userId,
       @RequestParam(defaultValue = "10") int limit,
       @RequestParam(required = false) Double threshold,
-      @RequestParam Map<String, Object> filters) {
+      @RequestParam Map<String, Object> filters
+  ) {
+
     try {
       List<MemoryItem> results = memory.search(query, userId, filters, limit, threshold);
 
@@ -97,7 +103,9 @@ public class MemoryController {
   public ResponseEntity<Map<String, Object>> getAllMemories(
       @RequestParam String userId,
       @RequestParam(defaultValue = "100") int limit,
-      @RequestParam Map<String, Object> filters) {
+      @RequestParam Map<String, Object> filters
+  ) {
+
     try {
       List<MemoryItem> results = memory.getAll(userId, filters, limit);
 
@@ -118,6 +126,7 @@ public class MemoryController {
    */
   @GetMapping("/{memoryId}")
   public ResponseEntity<Map<String, Object>> getMemory(@PathVariable String memoryId) {
+
     try {
       MemoryItem item = memory.get(memoryId);
 
@@ -130,6 +139,7 @@ public class MemoryController {
       }
     } catch (Exception e) {
       logger.error("Error getting memory: {}", memoryId, e);
+
       return ResponseEntity.badRequest().body(Map.of(
           "status", "error",
           "message", e.getMessage()));
@@ -142,7 +152,9 @@ public class MemoryController {
   @PutMapping("/{memoryId}")
   public ResponseEntity<Map<String, Object>> updateMemory(
       @PathVariable String memoryId,
-      @RequestBody Map<String, Object> data) {
+      @RequestBody Map<String, Object> data
+  ) {
+
     try {
       memory.update(memoryId, data);
 
@@ -162,6 +174,7 @@ public class MemoryController {
    */
   @DeleteMapping("/{memoryId}")
   public ResponseEntity<Map<String, Object>> deleteMemory(@PathVariable String memoryId) {
+
     try {
       memory.delete(memoryId);
 
@@ -169,6 +182,7 @@ public class MemoryController {
           "status", "success",
           "message", "Memory deleted successfully"));
     } catch (Exception e) {
+
       logger.error("Error deleting memory: {}", memoryId, e);
       return ResponseEntity.badRequest().body(Map.of(
           "status", "error",
@@ -181,6 +195,7 @@ public class MemoryController {
    */
   @DeleteMapping("/user/{userId}")
   public ResponseEntity<Map<String, Object>> deleteAllMemories(@PathVariable String userId) {
+
     try {
       memory.deleteAll(userId);
 
@@ -188,6 +203,7 @@ public class MemoryController {
           "status", "success",
           "message", "All memories deleted successfully"));
     } catch (Exception e) {
+
       logger.error("Error deleting all memories for user: {}", userId, e);
       return ResponseEntity.badRequest().body(Map.of(
           "status", "error",
@@ -200,24 +216,27 @@ public class MemoryController {
    */
   @PostMapping("/reset")
   public ResponseEntity<Map<String, Object>> resetMemories() {
-    try {
-      memory.reset();
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "message", "All memories reset successfully"));
+      try {
+          memory.reset();
+
+          return ResponseEntity.ok(Map.of(
+              "status", "success",
+              "message", "All memories reset successfully"));
     } catch (Exception e) {
       logger.error("Error resetting memories", e);
       return ResponseEntity.badRequest().body(Map.of(
           "status", "error",
           "message", e.getMessage()));
     }
+
   }
 
   /**
    * Request class for adding memories
    */
   public static class AddMemoryRequest {
+
     private List<Message> messages;
     private String userId;
     private Map<String, Object> metadata;
@@ -265,4 +284,5 @@ public class MemoryController {
       this.memoryType = memoryType;
     }
   }
+
 }

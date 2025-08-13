@@ -47,6 +47,7 @@ public class ChatbotExample {
    * Run the chatbot example
    */
   public void run() {
+
     System.out.println("=== Java Mem0 Chatbot Example ===");
     System.out.println("Type 'exit' to quit");
     System.out.println();
@@ -85,6 +86,7 @@ public class ChatbotExample {
    * Generate response using memory context
    */
   private String generateResponse(String userInput, String userId) {
+
     // Search for relevant memories
     List<MemoryItem> memories = memory.search(userInput, userId, null, 5, null);
 
@@ -110,6 +112,7 @@ public class ChatbotExample {
    * Generate a simple response (in real app, this would use LLM)
    */
   private String generateSimpleResponse(String userInput, String context) {
+
     String lowerInput = userInput.toLowerCase();
 
     if (lowerInput.contains("hello") || lowerInput.contains("hi")) {
@@ -143,6 +146,7 @@ public class ChatbotExample {
    * Add some initial memories for demonstration
    */
   private void addInitialMemories(String userId) {
+
     List<List<Message>> initialConversations = Arrays.asList(
         Arrays.asList(
             new Message("user", "Hi, I'm John"),
@@ -168,6 +172,7 @@ public class ChatbotExample {
    * Demonstrate memory search functionality
    */
   public void demonstrateMemorySearch(String userId) {
+
     System.out.println("\n=== Memory Search Demo ===");
 
     String[] testQueries = {
@@ -191,4 +196,5 @@ public class ChatbotExample {
       }
     }
   }
+
 }

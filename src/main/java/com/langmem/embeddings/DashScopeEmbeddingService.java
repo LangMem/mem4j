@@ -35,11 +35,14 @@ import java.util.Map;
 
 /**
  * DashScope implementation of EmbeddingService using direct HTTP calls
+ * todo：直接替换为 Spring AI Alibaba 的 DashScope Embedding Client？
  */
+
 @Service
 public class DashScopeEmbeddingService implements EmbeddingService {
 
   private static final Logger logger = LoggerFactory.getLogger(DashScopeEmbeddingService.class);
+
   private static final String DASHSCOPE_EMBEDDING_API_URL = "https://dashscope.aliyuncs.com/api/v1/services/embeddings/text-embedding/text-embedding";
 
   private final RestTemplate restTemplate;

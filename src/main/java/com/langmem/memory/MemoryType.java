@@ -19,6 +19,7 @@ package com.langmem.memory;
 /**
  * Enumeration of memory types supported by the system
  */
+
 public enum MemoryType {
 
   /**
@@ -69,4 +70,5 @@ public enum MemoryType {
   public String toString() {
     return value;
   }
+
 }

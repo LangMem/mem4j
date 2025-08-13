@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 /**
  * OpenAI implementation of LLMService
  */
+
 @Service
 public class OpenAILLMService implements LLMService {
 
@@ -49,6 +50,7 @@ public class OpenAILLMService implements LLMService {
 
   @Override
   public String generate(String prompt) {
+
     try {
       ChatCompletionRequest request = ChatCompletionRequest.builder()
           .model(model)
@@ -67,6 +69,7 @@ public class OpenAILLMService implements LLMService {
 
   @Override
   public String generate(List<Message> messages) {
+
     try {
       List<ChatMessage> chatMessages = messages.stream()
           .map(msg -> new ChatMessage(msg.getRole(), msg.getContent()))
@@ -89,6 +92,7 @@ public class OpenAILLMService implements LLMService {
 
   @Override
   public String generate(String systemPrompt, String userMessage) {
+
     try {
       List<ChatMessage> messages = List.of(
           new ChatMessage("system", systemPrompt),
@@ -111,6 +115,7 @@ public class OpenAILLMService implements LLMService {
 
   @Override
   public String generateStructured(String prompt, String schema) {
+
     try {
       String structuredPrompt = String.format("""
           %s
@@ -136,6 +141,7 @@ public class OpenAILLMService implements LLMService {
 
   @Override
   public boolean isAvailable() {
+
     try {
       // Simple test to check if service is available
       generate("Hello");
@@ -145,4 +151,5 @@ public class OpenAILLMService implements LLMService {
       return false;
     }
   }
+
 }

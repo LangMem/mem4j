@@ -161,6 +161,7 @@ public class Message {
   }
 
   public static class ToolCall {
+
     private String id;
     private String type;
     private FunctionCall function;
@@ -198,4 +199,5 @@ public class Message {
       this.function = function;
     }
   }
+
 }

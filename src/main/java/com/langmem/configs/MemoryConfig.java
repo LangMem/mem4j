@@ -27,9 +27,12 @@ import java.util.Map;
 /**
  * Configuration class for Lang Memory system
  */
-@ConfigurationProperties(prefix = "langmem")
+
 @Validated
+@ConfigurationProperties(prefix = MemoryConfig.CONFIG_PREFIX)
 public class MemoryConfig {
+
+  public static final String CONFIG_PREFIX = "langmem";
 
   @NotNull
   private VectorStoreConfig vectorStore;
@@ -55,6 +58,7 @@ public class MemoryConfig {
   private Double similarityThreshold = 0.7;
 
   public static class VectorStoreConfig {
+
     @NotBlank
     private String type;
 
@@ -101,6 +105,7 @@ public class MemoryConfig {
   }
 
   public static class LLMConfig {
+
     @NotBlank
     private String type;
 
@@ -147,6 +152,7 @@ public class MemoryConfig {
   }
 
   public static class EmbeddingConfig {
+
     @NotBlank
     private String type;
 
@@ -182,6 +188,7 @@ public class MemoryConfig {
   }
 
   public static class GraphConfig {
+
     private String type;
     private String uri;
     private String username;
@@ -294,4 +301,5 @@ public class MemoryConfig {
   public void setSimilarityThreshold(Double similarityThreshold) {
     this.similarityThreshold = similarityThreshold;
   }
+
 }

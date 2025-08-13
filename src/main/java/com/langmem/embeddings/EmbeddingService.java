@@ -19,6 +19,7 @@ package com.langmem.embeddings;
 /**
  * Interface for embedding operations
  */
+
 public interface EmbeddingService {
 
   /**
@@ -40,4 +41,5 @@ public interface EmbeddingService {
    * Check if the service is available
    */
   boolean isAvailable();
+
 }

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * In-memory implementation of VectorStoreService for testing and development
  */
+
 @Service
 public class InMemoryVectorStoreService implements VectorStoreService {
 
@@ -39,6 +40,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
   @Override
   public void add(MemoryItem item) {
+
     try {
       String id = item.getId() != null ? item.getId() : UUID.randomUUID().toString();
       item.setId(id);
@@ -55,7 +57,8 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
   @Override
   public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
-    try {
+
+      try {
       return memoryStore.values().stream()
           .filter(item -> matchesFilters(item, filters))
           .map(item -> {
@@ -86,11 +89,13 @@ public class InMemoryVectorStoreService implements VectorStoreService {
       logger.error("Error searching memories", e);
       throw new RuntimeException("Failed to search memories", e);
     }
+
   }
 
   @Override
   public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
-    try {
+
+      try {
       return memoryStore.values().stream()
           .filter(item -> matchesFilters(item, filters))
           .limit(limit)
@@ -103,16 +108,19 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
   @Override
   public MemoryItem get(String memoryId) {
-    try {
+
+      try {
       return memoryStore.get(memoryId);
     } catch (Exception e) {
       logger.error("Error getting memory: {}", memoryId, e);
       throw new RuntimeException("Failed to get memory", e);
     }
+
   }
 
   @Override
   public void update(MemoryItem item) {
+
     try {
       if (item.getId() != null && memoryStore.containsKey(item.getId())) {
         memoryStore.put(item.getId(), item);
@@ -127,10 +135,12 @@ public class InMemoryVectorStoreService implements VectorStoreService {
       logger.error("Error updating memory item", e);
       throw new RuntimeException("Failed to update memory item", e);
     }
+
   }
 
   @Override
   public void delete(String memoryId) {
+
     try {
       memoryStore.remove(memoryId);
       embeddings.remove(memoryId);
@@ -143,6 +153,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
   @Override
   public void deleteAll(Map<String, Object> filters) {
+
     try {
       List<String> toDelete = memoryStore.values().stream()
           .filter(item -> matchesFilters(item, filters))
@@ -163,6 +174,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
   @Override
   public void reset() {
+
     try {
       memoryStore.clear();
       embeddings.clear();
@@ -174,6 +186,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
   }
 
   private boolean matchesFilters(MemoryItem item, Map<String, Object> filters) {
+
     if (filters == null || filters.isEmpty()) {
       return true;
     }
@@ -194,6 +207,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
   }
 
   private double cosineSimilarity(double[] a, double[] b) {
+
     if (a.length != b.length) {
       return 0.0;
     }
@@ -214,4 +228,5 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
   }
+
 }

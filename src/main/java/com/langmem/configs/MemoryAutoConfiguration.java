@@ -34,10 +34,11 @@ import org.springframework.context.annotation.Import;
  * included
  * in a Spring Boot application.
  */
+
 @AutoConfiguration
+@Import(ServiceFactory.class)
 @ConditionalOnClass(Memory.class)
 @EnableConfigurationProperties(MemoryConfig.class)
-@Import(ServiceFactory.class)
 public class MemoryAutoConfiguration {
 
   /**
@@ -46,10 +47,13 @@ public class MemoryAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public Memory memory(
+
       MemoryConfig memoryConfig,
       VectorStoreService vectorStoreService,
       LLMService llmService,
       EmbeddingService embeddingService) {
+
     return new Memory(memoryConfig, vectorStoreService, llmService, embeddingService);
   }
+
 }

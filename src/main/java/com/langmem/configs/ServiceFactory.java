@@ -32,17 +32,22 @@ import org.springframework.context.annotation.Primary;
 /**
  * Factory for creating LLM and Embedding services based on configuration
  */
+
 @Configuration
 public class ServiceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(ServiceFactory.class);
 
-  @Autowired
-  private MemoryConfig memoryConfig;
+  private final MemoryConfig memoryConfig;
+
+  public ServiceFactory(MemoryConfig memoryConfig) {
+      this.memoryConfig = memoryConfig;
+  }
 
   @Bean
   @Primary
   public LLMService llmService() {
+
     String llmType = memoryConfig.getLlm().getType();
     logger.info("Creating LLM service of type: {}", llmType);
 
@@ -59,6 +64,7 @@ public class ServiceFactory {
   @Bean
   @Primary
   public EmbeddingService embeddingService() {
+
     String embeddingType = memoryConfig.getEmbeddings().getType();
     logger.info("Creating Embedding service of type: {}", embeddingType);
 
@@ -70,5 +76,7 @@ public class ServiceFactory {
         yield new OpenAIEmbeddingService(memoryConfig);
       }
     };
+
   }
+
 }

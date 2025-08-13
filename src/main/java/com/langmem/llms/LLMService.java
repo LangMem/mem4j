@@ -49,4 +49,5 @@ public interface LLMService {
    * Check if the service is available
    */
   boolean isAvailable();
+
 }
