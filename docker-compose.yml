@@ -12,24 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: '3.8'
-
 services:
-  # Java Mem0 Application
-  java-mem0:
+  # Lang Memory Application
+  lang-memory:
     build: .
     ports:
       - "8080:8080"
     environment:
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
+      - postgres
       - qdrant
       - neo4j
     volumes:
       - ./logs:/app/logs
     networks:
-      - mem0-network
+      - langmem-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=langmem
+      - POSTGRES_USER=langmem
+      - POSTGRES_PASSWORD=langmem_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - langmem-network
 
   # Qdrant Vector Database
   qdrant:
@@ -43,7 +57,7 @@ services:
       - QDRANT__SERVICE__HTTP_PORT=6333
       - QDRANT__SERVICE__GRPC_PORT=6334
     networks:
-      - mem0-network
+      - langmem-network
 
   # Neo4j Graph Database
   neo4j:
@@ -61,7 +75,7 @@ services:
       - neo4j_import:/var/lib/neo4j/import
       - neo4j_plugins:/plugins
     networks:
-      - mem0-network
+      - langmem-network
 
   # Elasticsearch (Optional)
   elasticsearch:
@@ -75,7 +89,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
-      - mem0-network
+      - langmem-network
 
   # Weaviate (Optional)
   weaviate:
@@ -92,9 +106,10 @@ services:
     volumes:
       - weaviate_data:/var/lib/weaviate
     networks:
-      - mem0-network
+      - langmem-network
 
 volumes:
+  postgres_data:
   qdrant_data:
   neo4j_data:
   neo4j_logs:
@@ -104,5 +119,5 @@ volumes:
   weaviate_data:
 
 networks:
-  mem0-network:
+  langmem-network:
     driver: bridge

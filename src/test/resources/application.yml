@@ -1,6 +1,6 @@
 spring:
   application:
-    name: java-mem0-unit-test
+    name: lang-memory-unit-test
 
   # Database configuration for unit testing
   datasource:
@@ -14,8 +14,8 @@ spring:
       ddl-auto: create-drop
     show-sql: false
 
-# Mem0 Configuration for unit testing (no real API keys needed)
-mem0:
+# Lang Memory Configuration for unit testing (no real API keys needed)
+langmem:
   vector-store:
     type: in-memory
     url: http://localhost:6333
@@ -51,7 +51,7 @@ mem0:
 # Logging configuration for unit testing
 logging:
   level:
-    com.mem0: INFO
+    com.langmem: INFO
     org.springframework: WARN
     org.mockito: WARN
   pattern:

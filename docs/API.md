@@ -360,7 +360,7 @@ The application exposes health check endpoints:
 The API behavior can be configured through application properties:
 
 ```yaml
-mem0:
+langmem:
   vector-store:
     type: in-memory
     similarity-threshold: 0.7

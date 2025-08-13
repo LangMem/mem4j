@@ -36,13 +36,13 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Create non-root user
-RUN groupadd -r mem0 && useradd -r -g mem0 mem0
+RUN groupadd -r langmem && useradd -r -g langmem langmem
 
 # Create logs directory
-RUN mkdir -p /app/logs && chown -R mem0:mem0 /app
+RUN mkdir -p /app/logs && chown -R langmem:langmem /app
 
 # Switch to non-root user
-USER mem0
+USER langmem
 
 # Expose port
 EXPOSE 8080
@@ -51,4 +51,4 @@ EXPOSE 8080
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 # Run the application
-CMD ["sh", "-c", "java $JAVA_OPTS -jar target/java-mem0-0.1.0.jar"] 
+CMD ["sh", "-c", "java $JAVA_OPTS -jar target/lang-memory-0.1.0.jar"] 

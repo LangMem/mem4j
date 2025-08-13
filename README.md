@@ -53,9 +53,9 @@ mvn spring-boot:run
 ### Basic Usage
 
 ```java
-import com.mem0.memory.Memory;
-import com.mem0.memory.MemoryItem;
-import com.mem0.memory.Message;
+import com.langmem.memory.Memory;
+import com.langmem.memory.MemoryItem;
+import com.langmem.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,7 +85,7 @@ public class MyService {
 ### Core Components
 
 ```
-src/main/java/com/mem0/
+src/main/java/com/langmem/
 ├── memory/           # Core memory management
 ├── vectorstores/     # Vector database integrations
 ├── llms/            # LLM provider integrations
@@ -127,7 +127,7 @@ src/main/java/com/mem0/
 
 ```yaml
 # Memory Configuration
-mem0:
+langmem:
   vector-store:
     type: qdrant
     url: http://localhost:6333
@@ -300,8 +300,8 @@ public class AIAssistant {
 
 ```bash
 # Clone repository
-git clone https://github.com/mem0ai/java-mem0.git
-cd java-mem0
+git clone https://github.com/LangMem/lang-memory.git
+cd lang-memory
 
 # Configure environment
 export DASHSCOPE_API_KEY="your-dashscope-api-key"
@@ -357,7 +357,7 @@ Java Mem0 now supports **DashScope** (通义千问) as a primary LLM and embeddi
 
 3. **Update Configuration**:
    ```yaml
-   mem0:
+   langmem:
      llm:
        type: dashscope
        api-key: ${DASHSCOPE_API_KEY}

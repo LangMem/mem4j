@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: lang-memory-example
+
+# Lang Memory Configuration
+langmem:
+  # 使用内存向量存储（适合演示）
+  vector-store:
+    type: in-memory
+    collection: example-memories
+    options:
+      similarity-threshold: 0.6
+
+  # LLM配置（Mock模式用于演示）
+  llm:
+    type: mock
+    api-key: mock-api-key
+    model: mock-model
+    options:
+      max-tokens: 1000
+      temperature: 0.7
+
+  # 嵌入配置（Mock模式用于演示）
+  embeddings:
+    type: mock
+    model: mock-embedding-model
+    options:
+      dimensions: 1536
+
+  # 记忆配置
+  max-memories: 100
+  embedding-dimension: 1536
+  similarity-threshold: 0.6
+
+# 日志配置
+logging:
+  level:
+    com.langmem: INFO
+    com.example: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
