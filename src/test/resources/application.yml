@@ -1,10 +1,10 @@
 spring:
   application:
-    name: java-mem0-test
+    name: java-mem0-unit-test
 
-  # Database configuration for testing
+  # Database configuration for unit testing
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:unittestdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -13,40 +13,29 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
-  ai:
-    dashscope:
-      api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
 
-# Mem0 Configuration for testing
+# Mem0 Configuration for unit testing (no real API keys needed)
 mem0:
   vector-store:
     type: in-memory
     url: http://localhost:6333
-    collection: test-memories
+    collection: unit-test-memories
     options:
-      similarity-threshold: 0.3
+      similarity-threshold: 0.5
 
   llm:
-    type: dashscope
-    api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
-    model: qwen-turbo
+    type: mock
+    api-key: mock-api-key
+    model: mock-model
     options:
       max-tokens: 1000
       temperature: 0.7
 
   embeddings:
-    type: dashscope
-    model: text-embedding-v1
+    type: mock
+    model: mock-embedding-model
     options:
       dimensions: 1536
-
-  graph:
-    type: neo4j
-    uri: bolt://localhost:7687
-    username: neo4j
-    password: password
-    options:
-      database: neo4j
 
   memory-types:
     factual: "Stores facts and information"
@@ -57,18 +46,17 @@ mem0:
 
   max-memories: 100
   embedding-dimension: 1536
-  similarity-threshold: 0.3
+  similarity-threshold: 0.5
 
-# Logging configuration for testing
+# Logging configuration for unit testing
 logging:
   level:
-    com.mem0: DEBUG
-    org.springframework: INFO
+    com.mem0: INFO
+    org.springframework: WARN
+    org.mockito: WARN
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{HH:mm:ss} - %msg%n"
 
-# Server configuration for testing
+# Server configuration for unit testing
 server:
-  port: 8081
-  servlet:
-    context-path: /api/v1
+  port: 0 # Random available port

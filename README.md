@@ -34,8 +34,8 @@ Java Mem0 is a Java implementation of the Mem0 memory system, providing intellig
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/mem0ai/java-mem0.git
-cd java-mem0
+git clone https://github.com/LangMem/lang-memory.git
+cd lang-memory
 ```
 
 2. Build the project:
@@ -54,27 +54,30 @@ mvn spring-boot:run
 
 ```java
 import com.mem0.memory.Memory;
-import com.mem0.memory.MemoryConfig;
 import com.mem0.memory.MemoryItem;
+import com.mem0.memory.Message;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-// Initialize memory with DashScope
-MemoryConfig config = MemoryConfig.builder()
-    .vectorStoreType("qdrant")
-    .llmType("dashscope")  // 使用DashScope
-    .build();
+@Service
+public class MyService {
 
-Memory memory = new Memory(config);
+    @Autowired
+    private Memory memory;
 
-// Add memories
-List<Message> messages = Arrays.asList(
-    new Message("user", "我是张三，我喜欢吃披萨"),
-    new Message("assistant", "很高兴认识你张三！我会记住你喜欢吃披萨。")
-);
+    public void useMemory() {
+        // Add memories
+        List<Message> messages = Arrays.asList(
+            new Message("user", "我是张三，我喜欢吃披萨"),
+            new Message("assistant", "很高兴认识你张三！我会记住你喜欢吃披萨。")
+        );
 
-memory.add(messages, "zhang_user");
+        memory.add(messages, "zhang_user");
 
-// Search memories
-List<MemoryItem> results = memory.search("张三喜欢什么？", "zhang_user");
+        // Search memories
+        List<MemoryItem> results = memory.search("张三喜欢什么？", "zhang_user");
+    }
+}
 ```
 
 ## Architecture
@@ -87,8 +90,8 @@ src/main/java/com/mem0/
 ├── vectorstores/     # Vector database integrations
 ├── llms/            # LLM provider integrations
 ├── embeddings/      # Embedding model integrations
-├── graphs/          # Graph database support
-├── client/          # API client
+├── controllers/     # REST API controllers
+├── examples/        # Example implementations
 └── configs/         # Configuration management
 ```
 
@@ -96,26 +99,27 @@ src/main/java/com/mem0/
 
 #### Vector Stores
 
-- Qdrant
-- Elasticsearch
-- Weaviate
-- Pinecone (via HTTP client)
-- Chroma (via HTTP client)
+- ✅ **Qdrant** - 完整实现
+- ✅ **InMemory** - 内存存储实现
+- ⚠️ **Elasticsearch** - 依赖已添加，实现计划中
+- ⚠️ **Weaviate** - 依赖已添加，实现计划中
+- 📋 **Pinecone** - 计划通过 HTTP 客户端支持
+- 📋 **Chroma** - 计划通过 HTTP 客户端支持
 
 #### LLM Providers
 
-- **DashScope** (通义千问系列)
-- OpenAI
-- Anthropic
-- Azure OpenAI
-- AWS Bedrock (via HTTP client)
+- ✅ **DashScope** (通义千问系列) - 完整实现
+- ✅ **OpenAI** - 完整实现
+- ⚠️ **Anthropic** - 依赖已添加，实现计划中
+- 📋 **Azure OpenAI** - 计划支持
+- 📋 **AWS Bedrock** - 计划通过 HTTP 客户端支持
 
 #### Embedding Models
 
-- **DashScope Embeddings**
-- OpenAI Embeddings
-- HuggingFace (via HTTP client)
-- VertexAI (via HTTP client)
+- ✅ **DashScope Embeddings** - 完整实现
+- ✅ **OpenAI Embeddings** - 完整实现
+- 📋 **HuggingFace** - 计划通过 HTTP 客户端支持
+- 📋 **VertexAI** - 计划通过 HTTP 客户端支持
 
 ## Configuration
 
@@ -164,11 +168,14 @@ export NEO4J_PASSWORD="password"
 #### Add Memories
 
 ```java
-// Add conversation memories
-memory.add(messages, userId, metadata);
+// Add conversation memories (with inference)
+memory.add(messages, userId);
 
-// Add with custom memory type
-memory.add(messages, userId, metadata, MemoryType.FACTUAL);
+// Add with metadata and custom memory type
+memory.add(messages, userId, metadata, true, MemoryType.FACTUAL);
+
+// Add without inference (faster, no LLM processing)
+memory.add(messages, userId, metadata, false, MemoryType.FACTUAL);
 ```
 
 #### Search Memories
@@ -177,9 +184,12 @@ memory.add(messages, userId, metadata, MemoryType.FACTUAL);
 // Basic search
 List<MemoryItem> results = memory.search(query, userId);
 
-// Search with filters
+// Search with filters and custom parameters
 Map<String, Object> filters = Map.of("agent_id", "chatbot");
-List<MemoryItem> results = memory.search(query, userId, filters, 10);
+List<MemoryItem> results = memory.search(query, userId, filters, 10, 0.7);
+
+// Get all memories for a user
+List<MemoryItem> allMemories = memory.getAll(userId, filters, 100);
 ```
 
 #### Update Memories
@@ -199,17 +209,17 @@ memory.delete(memoryId);
 memory.deleteAll(userId);
 ```
 
-### Async Operations
+### Additional Operations
 
 ```java
-AsyncMemory asyncMemory = new AsyncMemory(config);
+// Get specific memory by ID
+MemoryItem memory = memory.get(memoryId);
 
-// Async add
-await asyncMemory.add(messages, userId);
-
-// Async search
-List<MemoryItem> results = await asyncMemory.search(query, userId);
+// Reset all memories (for testing)
+memory.reset();
 ```
+
+> **注意**: 异步操作支持正在开发中，当前版本使用同步 API。
 
 ## Examples
 
@@ -219,11 +229,8 @@ List<MemoryItem> results = await asyncMemory.search(query, userId);
 @Service
 public class CustomerSupportService {
 
-    private final Memory memory;
-
-    public CustomerSupportService(Memory memory) {
-        this.memory = memory;
-    }
+    @Autowired
+    private Memory memory;
 
     public String handleCustomerQuery(String query, String customerId) {
         // Search for relevant memories
@@ -237,6 +244,11 @@ public class CustomerSupportService {
         // Generate response with context
         return generateResponse(query, context);
     }
+
+    private String generateResponse(String query, String context) {
+        // 实现响应生成逻辑
+        return "Response based on: " + context;
+    }
 }
 ```
 
@@ -246,8 +258,8 @@ public class CustomerSupportService {
 @Component
 public class AIAssistant {
 
-    private final Memory memory;
-    private final OpenAIClient openAIClient;
+    @Autowired
+    private Memory memory;
 
     public String chat(String message, String userId) {
         // Get relevant memories
@@ -268,6 +280,17 @@ public class AIAssistant {
 
         return response;
     }
+
+    private String buildMemoryContext(List<MemoryItem> memories) {
+        return memories.stream()
+            .map(MemoryItem::getContent)
+            .collect(Collectors.joining("\n"));
+    }
+
+    private String generateResponse(String message, String context) {
+        // 实现AI响应生成逻辑
+        return "AI response based on context: " + context;
+    }
 }
 ```
 
@@ -279,6 +302,9 @@ public class AIAssistant {
 # Clone repository
 git clone https://github.com/mem0ai/java-mem0.git
 cd java-mem0
+
+# Configure environment
+export DASHSCOPE_API_KEY="your-dashscope-api-key"
 
 # Build
 mvn clean install
