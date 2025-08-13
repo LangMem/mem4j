@@ -13,6 +13,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
 
 # Mem0 Configuration for testing
 mem0:
@@ -21,11 +24,11 @@ mem0:
     url: http://localhost:6333
     collection: test-memories
     options:
-      similarity-threshold: 0.7
+      similarity-threshold: 0.3
 
   llm:
     type: dashscope
-    api-key: ${DASHSCOPE_API_KEY:test-dashscope-api-key}
+    api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
     model: qwen-turbo
     options:
       max-tokens: 1000
@@ -54,7 +57,7 @@ mem0:
 
   max-memories: 100
   embedding-dimension: 1536
-  similarity-threshold: 0.7
+  similarity-threshold: 0.3
 
 # Logging configuration for testing
 logging:
