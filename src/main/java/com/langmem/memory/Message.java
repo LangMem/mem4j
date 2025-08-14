@@ -27,177 +27,183 @@ import java.util.Map;
  */
 public class Message {
 
-  @NotBlank
-  private String role;
+	@NotBlank
+	private String role;
 
-  @NotBlank
-  private String content;
+	@NotBlank
+	private String content;
 
-  private String name;
+	private String name;
 
-  @JsonProperty("function_call")
-  private FunctionCall functionCall;
+	@JsonProperty("function_call")
+	private FunctionCall functionCall;
 
-  @JsonProperty("tool_calls")
-  private ToolCall[] toolCalls;
+	@JsonProperty("tool_calls")
+	private ToolCall[] toolCalls;
 
-  @JsonProperty("tool_call_id")
-  private String toolCallId;
+	@JsonProperty("tool_call_id")
+	private String toolCallId;
 
-  private Map<String, Object> metadata;
+	private Map<String, Object> metadata;
 
-  @JsonProperty("created_at")
-  private Instant createdAt;
+	@JsonProperty("created_at")
+	private Instant createdAt;
 
-  public Message() {
-    this.createdAt = Instant.now();
-  }
+	public Message() {
+		this.createdAt = Instant.now();
+	}
 
-  public Message(String role, String content) {
-    this.role = role;
-    this.content = content;
-    this.createdAt = Instant.now();
-  }
+	public Message(String role, String content) {
+		this.role = role;
+		this.content = content;
+		this.createdAt = Instant.now();
+	}
 
-  public Message(String role, String content, String name) {
-    this.role = role;
-    this.content = content;
-    this.name = name;
-    this.createdAt = Instant.now();
-  }
+	public Message(String role, String content, String name) {
+		this.role = role;
+		this.content = content;
+		this.name = name;
+		this.createdAt = Instant.now();
+	}
 
-  // Getters and Setters
-  public String getRole() {
-    return role;
-  }
+	// Getters and Setters
+	public String getRole() {
+		return role;
+	}
 
-  public void setRole(String role) {
-    this.role = role;
-  }
+	public void setRole(String role) {
+		this.role = role;
+	}
 
-  public String getContent() {
-    return content;
-  }
+	public String getContent() {
+		return content;
+	}
 
-  public void setContent(String content) {
-    this.content = content;
-  }
+	public void setContent(String content) {
+		this.content = content;
+	}
 
-  public String getName() {
-    return name;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public void setName(String name) {
-    this.name = name;
-  }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-  public FunctionCall getFunctionCall() {
-    return functionCall;
-  }
+	public FunctionCall getFunctionCall() {
+		return functionCall;
+	}
 
-  public void setFunctionCall(FunctionCall functionCall) {
-    this.functionCall = functionCall;
-  }
+	public void setFunctionCall(FunctionCall functionCall) {
+		this.functionCall = functionCall;
+	}
 
-  public ToolCall[] getToolCalls() {
-    return toolCalls;
-  }
+	public ToolCall[] getToolCalls() {
+		return toolCalls;
+	}
 
-  public void setToolCalls(ToolCall[] toolCalls) {
-    this.toolCalls = toolCalls;
-  }
+	public void setToolCalls(ToolCall[] toolCalls) {
+		this.toolCalls = toolCalls;
+	}
 
-  public String getToolCallId() {
-    return toolCallId;
-  }
+	public String getToolCallId() {
+		return toolCallId;
+	}
 
-  public void setToolCallId(String toolCallId) {
-    this.toolCallId = toolCallId;
-  }
+	public void setToolCallId(String toolCallId) {
+		this.toolCallId = toolCallId;
+	}
 
-  public Map<String, Object> getMetadata() {
-    return metadata;
-  }
+	public Map<String, Object> getMetadata() {
+		return metadata;
+	}
 
-  public void setMetadata(Map<String, Object> metadata) {
-    this.metadata = metadata;
-  }
+	public void setMetadata(Map<String, Object> metadata) {
+		this.metadata = metadata;
+	}
 
-  public Instant getCreatedAt() {
-    return createdAt;
-  }
+	public Instant getCreatedAt() {
+		return createdAt;
+	}
 
-  public void setCreatedAt(Instant createdAt) {
-    this.createdAt = createdAt;
-  }
+	public void setCreatedAt(Instant createdAt) {
+		this.createdAt = createdAt;
+	}
 
-  public static class FunctionCall {
-    private String name;
-    private String arguments;
+	public static class FunctionCall {
 
-    public FunctionCall() {
-    }
+		private String name;
 
-    public FunctionCall(String name, String arguments) {
-      this.name = name;
-      this.arguments = arguments;
-    }
+		private String arguments;
 
-    public String getName() {
-      return name;
-    }
+		public FunctionCall() {
+		}
 
-    public void setName(String name) {
-      this.name = name;
-    }
+		public FunctionCall(String name, String arguments) {
+			this.name = name;
+			this.arguments = arguments;
+		}
 
-    public String getArguments() {
-      return arguments;
-    }
+		public String getName() {
+			return name;
+		}
 
-    public void setArguments(String arguments) {
-      this.arguments = arguments;
-    }
-  }
+		public void setName(String name) {
+			this.name = name;
+		}
 
-  public static class ToolCall {
+		public String getArguments() {
+			return arguments;
+		}
 
-    private String id;
-    private String type;
-    private FunctionCall function;
+		public void setArguments(String arguments) {
+			this.arguments = arguments;
+		}
 
-    public ToolCall() {
-    }
+	}
 
-    public ToolCall(String id, String type, FunctionCall function) {
-      this.id = id;
-      this.type = type;
-      this.function = function;
-    }
+	public static class ToolCall {
 
-    public String getId() {
-      return id;
-    }
+		private String id;
 
-    public void setId(String id) {
-      this.id = id;
-    }
+		private String type;
 
-    public String getType() {
-      return type;
-    }
+		private FunctionCall function;
 
-    public void setType(String type) {
-      this.type = type;
-    }
+		public ToolCall() {
+		}
 
-    public FunctionCall getFunction() {
-      return function;
-    }
+		public ToolCall(String id, String type, FunctionCall function) {
+			this.id = id;
+			this.type = type;
+			this.function = function;
+		}
 
-    public void setFunction(FunctionCall function) {
-      this.function = function;
-    }
-  }
+		public String getId() {
+			return id;
+		}
+
+		public void setId(String id) {
+			this.id = id;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public FunctionCall getFunction() {
+			return function;
+		}
+
+		public void setFunction(FunctionCall function) {
+			this.function = function;
+		}
+
+	}
 
 }

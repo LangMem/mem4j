@@ -16,13 +16,14 @@
 
 package com.langmem.vectorstores;
 
-import com.langmem.configs.MemoryConfig;
 import com.langmem.memory.MemoryItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -30,203 +31,212 @@ import java.util.stream.Collectors;
  * In-memory implementation of VectorStoreService for testing and development
  */
 
-@Service
 public class InMemoryVectorStoreService implements VectorStoreService {
 
-  private static final Logger logger = LoggerFactory.getLogger(InMemoryVectorStoreService.class);
+	private static final Logger logger = LoggerFactory.getLogger(InMemoryVectorStoreService.class);
 
-  private final Map<String, MemoryItem> memoryStore = new ConcurrentHashMap<>();
-  private final Map<String, double[]> embeddings = new ConcurrentHashMap<>();
+	private final Map<String, MemoryItem> memoryStore = new ConcurrentHashMap<>();
 
-  @Override
-  public void add(MemoryItem item) {
+	private final Map<String, double[]> embeddings = new ConcurrentHashMap<>();
 
-    try {
-      String id = item.getId() != null ? item.getId() : UUID.randomUUID().toString();
-      item.setId(id);
-      memoryStore.put(id, item);
-      if (item.getEmbedding() != null) {
-        embeddings.put(id, item.getEmbedding());
-      }
-      logger.debug("Added memory item: {}", id);
-    } catch (Exception e) {
-      logger.error("Error adding memory item", e);
-      throw new RuntimeException("Failed to add memory item", e);
-    }
-  }
+	@Override
+	public void add(MemoryItem item) {
 
-  @Override
-  public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
+		try {
+			String id = item.getId() != null ? item.getId() : UUID.randomUUID().toString();
+			item.setId(id);
+			memoryStore.put(id, item);
+			if (item.getEmbedding() != null) {
+				embeddings.put(id, item.getEmbedding());
+			}
+			logger.debug("Added memory item: {}", id);
+		}
+		catch (Exception e) {
+			logger.error("Error adding memory item", e);
+			throw new RuntimeException("Failed to add memory item", e);
+		}
+	}
 
-      try {
-      return memoryStore.values().stream()
-          .filter(item -> matchesFilters(item, filters))
-          .map(item -> {
-            MemoryItem result = new MemoryItem(item.getContent(), item.getMemoryType());
-            result.setId(item.getId());
-            result.setUserId(item.getUserId());
-            result.setAgentId(item.getAgentId());
-            result.setRunId(item.getRunId());
-            result.setActorId(item.getActorId());
-            result.setMetadata(item.getMetadata());
-            result.setCreatedAt(item.getCreatedAt());
-            result.setUpdatedAt(item.getUpdatedAt());
+	@Override
+	public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
 
-            // Calculate similarity score
-            double[] itemEmbedding = embeddings.get(item.getId());
-            if (itemEmbedding != null) {
-              double similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
-              result.setScore(similarity);
-              return similarity >= threshold ? result : null;
-            }
-            return null;
-          })
-          .filter(Objects::nonNull)
-          .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
-          .limit(limit)
-          .collect(Collectors.toList());
-    } catch (Exception e) {
-      logger.error("Error searching memories", e);
-      throw new RuntimeException("Failed to search memories", e);
-    }
+		try {
+			return memoryStore.values().stream().filter(item -> matchesFilters(item, filters)).map(item -> {
+				MemoryItem result = new MemoryItem(item.getContent(), item.getMemoryType());
+				result.setId(item.getId());
+				result.setUserId(item.getUserId());
+				result.setAgentId(item.getAgentId());
+				result.setRunId(item.getRunId());
+				result.setActorId(item.getActorId());
+				result.setMetadata(item.getMetadata());
+				result.setCreatedAt(item.getCreatedAt());
+				result.setUpdatedAt(item.getUpdatedAt());
 
-  }
+				// Calculate similarity score
+				double[] itemEmbedding = embeddings.get(item.getId());
+				if (itemEmbedding != null) {
+					double similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
+					result.setScore(similarity);
+					return similarity >= threshold ? result : null;
+				}
+				return null;
+			})
+				.filter(Objects::nonNull)
+				.sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
+				.limit(limit)
+				.collect(Collectors.toList());
+		}
+		catch (Exception e) {
+			logger.error("Error searching memories", e);
+			throw new RuntimeException("Failed to search memories", e);
+		}
 
-  @Override
-  public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
+	}
 
-      try {
-      return memoryStore.values().stream()
-          .filter(item -> matchesFilters(item, filters))
-          .limit(limit)
-          .collect(Collectors.toList());
-    } catch (Exception e) {
-      logger.error("Error getting all memories", e);
-      throw new RuntimeException("Failed to get memories", e);
-    }
-  }
+	@Override
+	public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
 
-  @Override
-  public MemoryItem get(String memoryId) {
+		try {
+			return memoryStore.values()
+				.stream()
+				.filter(item -> matchesFilters(item, filters))
+				.limit(limit)
+				.collect(Collectors.toList());
+		}
+		catch (Exception e) {
+			logger.error("Error getting all memories", e);
+			throw new RuntimeException("Failed to get memories", e);
+		}
+	}
 
-      try {
-      return memoryStore.get(memoryId);
-    } catch (Exception e) {
-      logger.error("Error getting memory: {}", memoryId, e);
-      throw new RuntimeException("Failed to get memory", e);
-    }
+	@Override
+	public MemoryItem get(String memoryId) {
 
-  }
+		try {
+			return memoryStore.get(memoryId);
+		}
+		catch (Exception e) {
+			logger.error("Error getting memory: {}", memoryId, e);
+			throw new RuntimeException("Failed to get memory", e);
+		}
 
-  @Override
-  public void update(MemoryItem item) {
+	}
 
-    try {
-      if (item.getId() != null && memoryStore.containsKey(item.getId())) {
-        memoryStore.put(item.getId(), item);
-        if (item.getEmbedding() != null) {
-          embeddings.put(item.getId(), item.getEmbedding());
-        }
-        logger.debug("Updated memory item: {}", item.getId());
-      } else {
-        add(item);
-      }
-    } catch (Exception e) {
-      logger.error("Error updating memory item", e);
-      throw new RuntimeException("Failed to update memory item", e);
-    }
+	@Override
+	public void update(MemoryItem item) {
 
-  }
+		try {
+			if (item.getId() != null && memoryStore.containsKey(item.getId())) {
+				memoryStore.put(item.getId(), item);
+				if (item.getEmbedding() != null) {
+					embeddings.put(item.getId(), item.getEmbedding());
+				}
+				logger.debug("Updated memory item: {}", item.getId());
+			}
+			else {
+				add(item);
+			}
+		}
+		catch (Exception e) {
+			logger.error("Error updating memory item", e);
+			throw new RuntimeException("Failed to update memory item", e);
+		}
 
-  @Override
-  public void delete(String memoryId) {
+	}
 
-    try {
-      memoryStore.remove(memoryId);
-      embeddings.remove(memoryId);
-      logger.debug("Deleted memory: {}", memoryId);
-    } catch (Exception e) {
-      logger.error("Error deleting memory: {}", memoryId, e);
-      throw new RuntimeException("Failed to delete memory", e);
-    }
-  }
+	@Override
+	public void delete(String memoryId) {
 
-  @Override
-  public void deleteAll(Map<String, Object> filters) {
+		try {
+			memoryStore.remove(memoryId);
+			embeddings.remove(memoryId);
+			logger.debug("Deleted memory: {}", memoryId);
+		}
+		catch (Exception e) {
+			logger.error("Error deleting memory: {}", memoryId, e);
+			throw new RuntimeException("Failed to delete memory", e);
+		}
+	}
 
-    try {
-      List<String> toDelete = memoryStore.values().stream()
-          .filter(item -> matchesFilters(item, filters))
-          .map(MemoryItem::getId)
-          .collect(Collectors.toList());
+	@Override
+	public void deleteAll(Map<String, Object> filters) {
 
-      toDelete.forEach(id -> {
-        memoryStore.remove(id);
-        embeddings.remove(id);
-      });
+		try {
+			List<String> toDelete = memoryStore.values()
+				.stream()
+				.filter(item -> matchesFilters(item, filters))
+				.map(MemoryItem::getId)
+				.collect(Collectors.toList());
 
-      logger.debug("Deleted {} memories with filters: {}", toDelete.size(), filters);
-    } catch (Exception e) {
-      logger.error("Error deleting memories with filters: {}", filters, e);
-      throw new RuntimeException("Failed to delete memories", e);
-    }
-  }
+			toDelete.forEach(id -> {
+				memoryStore.remove(id);
+				embeddings.remove(id);
+			});
 
-  @Override
-  public void reset() {
+			logger.debug("Deleted {} memories with filters: {}", toDelete.size(), filters);
+		}
+		catch (Exception e) {
+			logger.error("Error deleting memories with filters: {}", filters, e);
+			throw new RuntimeException("Failed to delete memories", e);
+		}
+	}
 
-    try {
-      memoryStore.clear();
-      embeddings.clear();
-      logger.info("Reset in-memory vector store");
-    } catch (Exception e) {
-      logger.error("Error resetting vector store", e);
-      throw new RuntimeException("Failed to reset vector store", e);
-    }
-  }
+	@Override
+	public void reset() {
 
-  private boolean matchesFilters(MemoryItem item, Map<String, Object> filters) {
+		try {
+			memoryStore.clear();
+			embeddings.clear();
+			logger.info("Reset in-memory vector store");
+		}
+		catch (Exception e) {
+			logger.error("Error resetting vector store", e);
+			throw new RuntimeException("Failed to reset vector store", e);
+		}
+	}
 
-    if (filters == null || filters.isEmpty()) {
-      return true;
-    }
+	private boolean matchesFilters(MemoryItem item, Map<String, Object> filters) {
 
-    return filters.entrySet().stream().allMatch(entry -> {
-      String key = entry.getKey();
-      Object value = entry.getValue();
+		if (filters == null || filters.isEmpty()) {
+			return true;
+		}
 
-      return switch (key) {
-        case "user_id" -> Objects.equals(item.getUserId(), value);
-        case "agent_id" -> Objects.equals(item.getAgentId(), value);
-        case "run_id" -> Objects.equals(item.getRunId(), value);
-        case "actor_id" -> Objects.equals(item.getActorId(), value);
-        case "memory_type" -> Objects.equals(item.getMemoryType(), value);
-        default -> true;
-      };
-    });
-  }
+		return filters.entrySet().stream().allMatch(entry -> {
+			String key = entry.getKey();
+			Object value = entry.getValue();
 
-  private double cosineSimilarity(double[] a, double[] b) {
+			return switch (key) {
+				case "user_id" -> Objects.equals(item.getUserId(), value);
+				case "agent_id" -> Objects.equals(item.getAgentId(), value);
+				case "run_id" -> Objects.equals(item.getRunId(), value);
+				case "actor_id" -> Objects.equals(item.getActorId(), value);
+				case "memory_type" -> Objects.equals(item.getMemoryType(), value);
+				default -> true;
+			};
+		});
+	}
 
-    if (a.length != b.length) {
-      return 0.0;
-    }
+	private double cosineSimilarity(double[] a, double[] b) {
 
-    double dotProduct = 0.0;
-    double normA = 0.0;
-    double normB = 0.0;
+		if (a.length != b.length) {
+			return 0.0;
+		}
 
-    for (int i = 0; i < a.length; i++) {
-      dotProduct += a[i] * b[i];
-      normA += a[i] * a[i];
-      normB += b[i] * b[i];
-    }
+		double dotProduct = 0.0;
+		double normA = 0.0;
+		double normB = 0.0;
 
-    if (normA == 0.0 || normB == 0.0) {
-      return 0.0;
-    }
+		for (int i = 0; i < a.length; i++) {
+			dotProduct += a[i] * b[i];
+			normA += a[i] * a[i];
+			normB += b[i] * b[i];
+		}
 
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-  }
+		if (normA == 0.0 || normB == 0.0) {
+			return 0.0;
+		}
+
+		return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+	}
 
 }

@@ -22,24 +22,24 @@ package com.langmem.embeddings;
 
 public interface EmbeddingService {
 
-  /**
-   * Generate embedding for a text
-   */
-  double[] embed(String text);
+	/**
+	 * Generate embedding for a text
+	 */
+	double[] embed(String text);
 
-  /**
-   * Generate embeddings for multiple texts
-   */
-  double[][] embed(String[] texts);
+	/**
+	 * Generate embeddings for multiple texts
+	 */
+	double[][] embed(String[] texts);
 
-  /**
-   * Get the dimension of embeddings
-   */
-  int getDimension();
+	/**
+	 * Get the dimension of embeddings
+	 */
+	int getDimension();
 
-  /**
-   * Check if the service is available
-   */
-  boolean isAvailable();
+	/**
+	 * Check if the service is available
+	 */
+	boolean isAvailable();
 
 }

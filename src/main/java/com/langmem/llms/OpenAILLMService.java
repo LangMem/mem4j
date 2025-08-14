@@ -36,120 +36,123 @@ import java.util.stream.Collectors;
 @Service
 public class OpenAILLMService implements LLMService {
 
-  private static final Logger logger = LoggerFactory.getLogger(OpenAILLMService.class);
+	private static final Logger logger = LoggerFactory.getLogger(OpenAILLMService.class);
 
-  private final OpenAiService openAiService;
-  private final String model;
+	private final OpenAiService openAiService;
 
-  public OpenAILLMService(MemoryConfig config) {
-    this.model = config.getLlm().getModel();
-    this.openAiService = new OpenAiService(
-        config.getLlm().getApiKey(),
-        Duration.ofSeconds(60));
-  }
+	private final String model;
 
-  @Override
-  public String generate(String prompt) {
+	public OpenAILLMService(MemoryConfig config) {
+		this.model = config.getLlm().getModel();
+		this.openAiService = new OpenAiService(config.getLlm().getApiKey(), Duration.ofSeconds(60));
+	}
 
-    try {
-      ChatCompletionRequest request = ChatCompletionRequest.builder()
-          .model(model)
-          .messages(List.of(new ChatMessage("user", prompt)))
-          .maxTokens(1000)
-          .temperature(0.7)
-          .build();
+	@Override
+	public String generate(String prompt) {
 
-      var response = openAiService.createChatCompletion(request);
-      return response.getChoices().get(0).getMessage().getContent();
-    } catch (Exception e) {
-      logger.error("Error generating response from OpenAI", e);
-      throw new RuntimeException("Failed to generate response", e);
-    }
-  }
+		try {
+			ChatCompletionRequest request = ChatCompletionRequest.builder()
+				.model(model)
+				.messages(List.of(new ChatMessage("user", prompt)))
+				.maxTokens(1000)
+				.temperature(0.7)
+				.build();
 
-  @Override
-  public String generate(List<Message> messages) {
+			var response = openAiService.createChatCompletion(request);
+			return response.getChoices().get(0).getMessage().getContent();
+		}
+		catch (Exception e) {
+			logger.error("Error generating response from OpenAI", e);
+			throw new RuntimeException("Failed to generate response", e);
+		}
+	}
 
-    try {
-      List<ChatMessage> chatMessages = messages.stream()
-          .map(msg -> new ChatMessage(msg.getRole(), msg.getContent()))
-          .collect(Collectors.toList());
+	@Override
+	public String generate(List<Message> messages) {
 
-      ChatCompletionRequest request = ChatCompletionRequest.builder()
-          .model(model)
-          .messages(chatMessages)
-          .maxTokens(1000)
-          .temperature(0.7)
-          .build();
+		try {
+			List<ChatMessage> chatMessages = messages.stream()
+				.map(msg -> new ChatMessage(msg.getRole(), msg.getContent()))
+				.collect(Collectors.toList());
 
-      var response = openAiService.createChatCompletion(request);
-      return response.getChoices().get(0).getMessage().getContent();
-    } catch (Exception e) {
-      logger.error("Error generating response from messages", e);
-      throw new RuntimeException("Failed to generate response", e);
-    }
-  }
+			ChatCompletionRequest request = ChatCompletionRequest.builder()
+				.model(model)
+				.messages(chatMessages)
+				.maxTokens(1000)
+				.temperature(0.7)
+				.build();
 
-  @Override
-  public String generate(String systemPrompt, String userMessage) {
+			var response = openAiService.createChatCompletion(request);
+			return response.getChoices().get(0).getMessage().getContent();
+		}
+		catch (Exception e) {
+			logger.error("Error generating response from messages", e);
+			throw new RuntimeException("Failed to generate response", e);
+		}
+	}
 
-    try {
-      List<ChatMessage> messages = List.of(
-          new ChatMessage("system", systemPrompt),
-          new ChatMessage("user", userMessage));
+	@Override
+	public String generate(String systemPrompt, String userMessage) {
 
-      ChatCompletionRequest request = ChatCompletionRequest.builder()
-          .model(model)
-          .messages(messages)
-          .maxTokens(1000)
-          .temperature(0.7)
-          .build();
+		try {
+			List<ChatMessage> messages = List.of(new ChatMessage("system", systemPrompt),
+					new ChatMessage("user", userMessage));
 
-      var response = openAiService.createChatCompletion(request);
-      return response.getChoices().get(0).getMessage().getContent();
-    } catch (Exception e) {
-      logger.error("Error generating response with system prompt", e);
-      throw new RuntimeException("Failed to generate response", e);
-    }
-  }
+			ChatCompletionRequest request = ChatCompletionRequest.builder()
+				.model(model)
+				.messages(messages)
+				.maxTokens(1000)
+				.temperature(0.7)
+				.build();
 
-  @Override
-  public String generateStructured(String prompt, String schema) {
+			var response = openAiService.createChatCompletion(request);
+			return response.getChoices().get(0).getMessage().getContent();
+		}
+		catch (Exception e) {
+			logger.error("Error generating response with system prompt", e);
+			throw new RuntimeException("Failed to generate response", e);
+		}
+	}
 
-    try {
-      String structuredPrompt = String.format("""
-          %s
+	@Override
+	public String generateStructured(String prompt, String schema) {
 
-          Please respond in the following JSON format:
-          %s
-          """, prompt, schema);
+		try {
+			String structuredPrompt = String.format("""
+					%s
 
-      ChatCompletionRequest request = ChatCompletionRequest.builder()
-          .model(model)
-          .messages(List.of(new ChatMessage("user", structuredPrompt)))
-          .maxTokens(1000)
-          .temperature(0.1) // Lower temperature for structured output
-          .build();
+					Please respond in the following JSON format:
+					%s
+					""", prompt, schema);
 
-      var response = openAiService.createChatCompletion(request);
-      return response.getChoices().get(0).getMessage().getContent();
-    } catch (Exception e) {
-      logger.error("Error generating structured response", e);
-      throw new RuntimeException("Failed to generate structured response", e);
-    }
-  }
+			ChatCompletionRequest request = ChatCompletionRequest.builder()
+				.model(model)
+				.messages(List.of(new ChatMessage("user", structuredPrompt)))
+				.maxTokens(1000)
+				.temperature(0.1) // Lower temperature for structured output
+				.build();
 
-  @Override
-  public boolean isAvailable() {
+			var response = openAiService.createChatCompletion(request);
+			return response.getChoices().get(0).getMessage().getContent();
+		}
+		catch (Exception e) {
+			logger.error("Error generating structured response", e);
+			throw new RuntimeException("Failed to generate structured response", e);
+		}
+	}
 
-    try {
-      // Simple test to check if service is available
-      generate("Hello");
-      return true;
-    } catch (Exception e) {
-      logger.warn("OpenAI service is not available", e);
-      return false;
-    }
-  }
+	@Override
+	public boolean isAvailable() {
+
+		try {
+			// Simple test to check if service is available
+			generate("Hello");
+			return true;
+		}
+		catch (Exception e) {
+			logger.warn("OpenAI service is not available", e);
+			return false;
+		}
+	}
 
 }

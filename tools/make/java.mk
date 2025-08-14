@@ -28,12 +28,12 @@ build: ## Build the project
 .PHONY: format-fix
 format-fix: ## Format the code
 	@$(LOG_TARGET)
-	mvnd -Dmvnd.connectTimeout=30000 spring-javaformat:apply
+	mvnd -Dmvnd.connectTimeout=30000 io.spring.javaformat:spring-javaformat-maven-plugin:apply
 
 .PHONY: format-check
 format-check: ## Format Check the code
 	@$(LOG_TARGET)
-	mvnd -Dmvnd.connectTimeout=30000 spring-javaformat:validate
+	mvnd -Dmvnd.connectTimeout=30000 io.spring.javaformat:spring-javaformat-maven-plugin:validate
 
 .PHONY: spotless-apply
 spotless-apply: ## Run spotless and apply changes

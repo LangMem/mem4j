@@ -33,168 +33,158 @@ import java.util.Scanner;
 @Component
 public class ChatbotExample {
 
-  private static final Logger logger = LoggerFactory.getLogger(ChatbotExample.class);
+	private static final Logger logger = LoggerFactory.getLogger(ChatbotExample.class);
 
-  private final Memory memory;
-  private final Scanner scanner;
+	private final Memory memory;
 
-  public ChatbotExample(Memory memory) {
-    this.memory = memory;
-    this.scanner = new Scanner(System.in);
-  }
+	private final Scanner scanner;
 
-  /**
-   * Run the chatbot example
-   */
-  public void run() {
+	public ChatbotExample(Memory memory) {
+		this.memory = memory;
+		this.scanner = new Scanner(System.in);
+	}
 
-    System.out.println("=== Java Mem0 Chatbot Example ===");
-    System.out.println("Type 'exit' to quit");
-    System.out.println();
+	/**
+	 * Run the chatbot example
+	 */
+	public void run() {
 
-    String userId = "demo_user";
+		System.out.println("=== Java Mem0 Chatbot Example ===");
+		System.out.println("Type 'exit' to quit");
+		System.out.println();
 
-    // Add some initial memories
-    addInitialMemories(userId);
+		String userId = "demo_user";
 
-    while (true) {
-      System.out.print("You: ");
-      String userInput = scanner.nextLine().trim();
+		// Add some initial memories
+		addInitialMemories(userId);
 
-      if ("exit".equalsIgnoreCase(userInput)) {
-        System.out.println("Goodbye!");
-        break;
-      }
+		while (true) {
+			System.out.print("You: ");
+			String userInput = scanner.nextLine().trim();
 
-      if (userInput.isEmpty()) {
-        continue;
-      }
+			if ("exit".equalsIgnoreCase(userInput)) {
+				System.out.println("Goodbye!");
+				break;
+			}
 
-      // Generate response with memory context
-      String response = generateResponse(userInput, userId);
-      System.out.println("Bot: " + response);
+			if (userInput.isEmpty()) {
+				continue;
+			}
 
-      // Store the conversation
-      List<Message> conversation = Arrays.asList(
-          new Message("user", userInput),
-          new Message("assistant", response));
-      memory.add(conversation, userId);
-    }
-  }
+			// Generate response with memory context
+			String response = generateResponse(userInput, userId);
+			System.out.println("Bot: " + response);
 
-  /**
-   * Generate response using memory context
-   */
-  private String generateResponse(String userInput, String userId) {
+			// Store the conversation
+			List<Message> conversation = Arrays.asList(new Message("user", userInput),
+					new Message("assistant", response));
+			memory.add(conversation, userId);
+		}
+	}
 
-    // Search for relevant memories
-    List<MemoryItem> memories = memory.search(userInput, userId, null, 5, null);
+	/**
+	 * Generate response using memory context
+	 */
+	private String generateResponse(String userInput, String userId) {
 
-    // Build context from memories
-    StringBuilder context = new StringBuilder();
-    if (!memories.isEmpty()) {
-      context.append("Based on our previous conversations, I remember:\n");
-      for (MemoryItem memory : memories) {
-        context.append("- ").append(memory.getContent()).append("\n");
-      }
-      context.append("\n");
-    }
+		// Search for relevant memories
+		List<MemoryItem> memories = memory.search(userInput, userId, null, 5, null);
 
-    // Generate response using context
-    String systemPrompt = "You are a helpful AI assistant. Use the memory context to provide personalized responses.";
-    String fullPrompt = context.toString() + "User: " + userInput;
+		// Build context from memories
+		StringBuilder context = new StringBuilder();
+		if (!memories.isEmpty()) {
+			context.append("Based on our previous conversations, I remember:\n");
+			for (MemoryItem memory : memories) {
+				context.append("- ").append(memory.getContent()).append("\n");
+			}
+			context.append("\n");
+		}
 
-    // For demo purposes, generate a simple response
-    return generateSimpleResponse(userInput, context.toString());
-  }
+		// Generate response using context
+		String systemPrompt = "You are a helpful AI assistant. Use the memory context to provide personalized responses.";
+		String fullPrompt = context.toString() + "User: " + userInput;
 
-  /**
-   * Generate a simple response (in real app, this would use LLM)
-   */
-  private String generateSimpleResponse(String userInput, String context) {
+		// For demo purposes, generate a simple response
+		return generateSimpleResponse(userInput, context.toString());
+	}
 
-    String lowerInput = userInput.toLowerCase();
+	/**
+	 * Generate a simple response (in real app, this would use LLM)
+	 */
+	private String generateSimpleResponse(String userInput, String context) {
 
-    if (lowerInput.contains("hello") || lowerInput.contains("hi")) {
-      return "Hello! Nice to see you again. " +
-          (context.contains("remember") ? "I remember our previous conversations!" : "");
-    }
+		String lowerInput = userInput.toLowerCase();
 
-    if (lowerInput.contains("name")) {
-      return "I remember you! " +
-          (context.contains("name") ? "Your name is mentioned in my memories." : "I don't have your name stored yet.");
-    }
+		if (lowerInput.contains("hello") || lowerInput.contains("hi")) {
+			return "Hello! Nice to see you again. "
+					+ (context.contains("remember") ? "I remember our previous conversations!" : "");
+		}
 
-    if (lowerInput.contains("preference") || lowerInput.contains("like")) {
-      return "Based on our conversations, I remember your preferences. " +
-          (context.contains("preference") ? "I have some information about what you like!"
-              : "I'm still learning about your preferences.");
-    }
+		if (lowerInput.contains("name")) {
+			return "I remember you! " + (context.contains("name") ? "Your name is mentioned in my memories."
+					: "I don't have your name stored yet.");
+		}
 
-    if (lowerInput.contains("weather")) {
-      return "I don't have real-time weather data, but I can remember if you've mentioned weather preferences before. "
-          +
-          (context.contains("weather") ? "I see you've talked about weather before!" : "");
-    }
+		if (lowerInput.contains("preference") || lowerInput.contains("like")) {
+			return "Based on our conversations, I remember your preferences. " + (context.contains("preference")
+					? "I have some information about what you like!" : "I'm still learning about your preferences.");
+		}
 
-    return "I understand what you're saying. " +
-        (context.contains("remember") ? "I'm using my memory to provide a personalized response."
-            : "I'm learning from our conversation.");
-  }
+		if (lowerInput.contains("weather")) {
+			return "I don't have real-time weather data, but I can remember if you've mentioned weather preferences before. "
+					+ (context.contains("weather") ? "I see you've talked about weather before!" : "");
+		}
 
-  /**
-   * Add some initial memories for demonstration
-   */
-  private void addInitialMemories(String userId) {
+		return "I understand what you're saying. " + (context.contains("remember")
+				? "I'm using my memory to provide a personalized response." : "I'm learning from our conversation.");
+	}
 
-    List<List<Message>> initialConversations = Arrays.asList(
-        Arrays.asList(
-            new Message("user", "Hi, I'm John"),
-            new Message("assistant", "Nice to meet you John! I'll remember your name.")),
-        Arrays.asList(
-            new Message("user", "I like pizza and coffee"),
-            new Message("assistant", "Great! I'll remember that you enjoy pizza and coffee.")),
-        Arrays.asList(
-            new Message("user", "I work as a software developer"),
-            new Message("assistant", "That's interesting! I'll remember you're a software developer.")),
-        Arrays.asList(
-            new Message("user", "I prefer warm weather over cold weather"),
-            new Message("assistant", "Noted! You prefer warm weather to cold weather.")));
+	/**
+	 * Add some initial memories for demonstration
+	 */
+	private void addInitialMemories(String userId) {
 
-    for (List<Message> conversation : initialConversations) {
-      memory.add(conversation, userId);
-    }
+		List<List<Message>> initialConversations = Arrays.asList(
+				Arrays.asList(new Message("user", "Hi, I'm John"),
+						new Message("assistant", "Nice to meet you John! I'll remember your name.")),
+				Arrays.asList(new Message("user", "I like pizza and coffee"),
+						new Message("assistant", "Great! I'll remember that you enjoy pizza and coffee.")),
+				Arrays.asList(new Message("user", "I work as a software developer"),
+						new Message("assistant", "That's interesting! I'll remember you're a software developer.")),
+				Arrays.asList(new Message("user", "I prefer warm weather over cold weather"),
+						new Message("assistant", "Noted! You prefer warm weather to cold weather.")));
 
-    logger.info("Added initial memories for user: {}", userId);
-  }
+		for (List<Message> conversation : initialConversations) {
+			memory.add(conversation, userId);
+		}
 
-  /**
-   * Demonstrate memory search functionality
-   */
-  public void demonstrateMemorySearch(String userId) {
+		logger.info("Added initial memories for user: {}", userId);
+	}
 
-    System.out.println("\n=== Memory Search Demo ===");
+	/**
+	 * Demonstrate memory search functionality
+	 */
+	public void demonstrateMemorySearch(String userId) {
 
-    String[] testQueries = {
-        "What's my name?",
-        "What do I like?",
-        "What's my job?",
-        "What's my weather preference?"
-    };
+		System.out.println("\n=== Memory Search Demo ===");
 
-    for (String query : testQueries) {
-      System.out.println("\nQuery: " + query);
-      List<MemoryItem> results = memory.search(query, userId, null, 3, null);
+		String[] testQueries = { "What's my name?", "What do I like?", "What's my job?",
+				"What's my weather preference?" };
 
-      if (results.isEmpty()) {
-        System.out.println("No relevant memories found.");
-      } else {
-        System.out.println("Found " + results.size() + " relevant memories:");
-        for (MemoryItem memory : results) {
-          System.out.println("- " + memory.getContent() + " (score: " + memory.getScore() + ")");
-        }
-      }
-    }
-  }
+		for (String query : testQueries) {
+			System.out.println("\nQuery: " + query);
+			List<MemoryItem> results = memory.search(query, userId, null, 3, null);
+
+			if (results.isEmpty()) {
+				System.out.println("No relevant memories found.");
+			}
+			else {
+				System.out.println("Found " + results.size() + " relevant memories:");
+				for (MemoryItem memory : results) {
+					System.out.println("- " + memory.getContent() + " (score: " + memory.getScore() + ")");
+				}
+			}
+		}
+	}
 
 }

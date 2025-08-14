@@ -40,256 +40,251 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.lenient;
 
 /**
- * Unit test class for Memory functionality using Mockito
- * This test doesn't require real API keys or external services
+ * Unit test class for Memory functionality using Mockito This test doesn't require real
+ * API keys or external services
  */
 @ExtendWith(MockitoExtension.class)
 public class MemoryUnitTest {
 
-  @Mock
-  private MemoryConfig memoryConfig;
+	@Mock
+	private MemoryConfig memoryConfig;
 
-  @Mock
-  private VectorStoreService vectorStoreService;
+	@Mock
+	private VectorStoreService vectorStoreService;
 
-  @Mock
-  private LLMService llmService;
+	@Mock
+	private LLMService llmService;
 
-  @Mock
-  private EmbeddingService embeddingService;
+	@Mock
+	private EmbeddingService embeddingService;
 
-  private Memory memory;
-  private String testUserId = "test_user";
+	private Memory memory;
 
-  @BeforeEach
-  void setUp() {
-    // Configure mock behavior with lenient stubbing
-    lenient().when(memoryConfig.getSimilarityThreshold()).thenReturn(0.7);
-    lenient().when(embeddingService.embed(anyString())).thenReturn(createMockEmbedding());
-    lenient().when(embeddingService.getDimension()).thenReturn(1536);
-    lenient().when(embeddingService.isAvailable()).thenReturn(true);
-    lenient().when(llmService.isAvailable()).thenReturn(true);
+	private String testUserId = "test_user";
 
-    // Create Memory instance with mocked dependencies
-    memory = new Memory(memoryConfig, vectorStoreService, llmService, embeddingService);
-  }
+	@BeforeEach
+	void setUp() {
+		// Configure mock behavior with lenient stubbing
+		lenient().when(memoryConfig.getSimilarityThreshold()).thenReturn(0.7);
+		lenient().when(embeddingService.embed(anyString())).thenReturn(createMockEmbedding());
+		lenient().when(embeddingService.getDimension()).thenReturn(1536);
+		lenient().when(embeddingService.isAvailable()).thenReturn(true);
+		lenient().when(llmService.isAvailable()).thenReturn(true);
 
-  @Test
-  void testAddMemories() {
-    // Arrange
-    List<Message> messages = Arrays.asList(
-        new Message("user", "I like pizza"),
-        new Message("assistant", "I'll remember that you like pizza."));
+		// Create Memory instance with mocked dependencies
+		memory = new Memory(memoryConfig, vectorStoreService, llmService, embeddingService);
+	}
 
-    // Mock LLM response for memory extraction
-    when(llmService.generate(anyString())).thenReturn("- User likes pizza");
+	@Test
+	void testAddMemories() {
+		// Arrange
+		List<Message> messages = Arrays.asList(new Message("user", "I like pizza"),
+				new Message("assistant", "I'll remember that you like pizza."));
 
-    // Act
-    memory.add(messages, testUserId);
+		// Mock LLM response for memory extraction
+		when(llmService.generate(anyString())).thenReturn("- User likes pizza");
 
-    // Assert
-    verify(embeddingService, times(1)).embed(anyString());
-    verify(vectorStoreService, times(1)).add(any(MemoryItem.class));
-  }
+		// Act
+		memory.add(messages, testUserId);
 
-  @Test
-  void testAddMemoriesWithoutInference() {
-    // Arrange
-    List<Message> messages = Arrays.asList(
-        new Message("user", "I work as a developer"),
-        new Message("assistant", "That's interesting!"));
+		// Assert
+		verify(embeddingService, times(1)).embed(anyString());
+		verify(vectorStoreService, times(1)).add(any(MemoryItem.class));
+	}
 
-    // Act
-    memory.add(messages, testUserId, null, false, MemoryType.FACTUAL);
+	@Test
+	void testAddMemoriesWithoutInference() {
+		// Arrange
+		List<Message> messages = Arrays.asList(new Message("user", "I work as a developer"),
+				new Message("assistant", "That's interesting!"));
 
-    // Assert
-    verify(llmService, never()).generate(anyString()); // No LLM call when infer=false
-    verify(embeddingService, times(1)).embed(anyString());
-    verify(vectorStoreService, times(1)).add(any(MemoryItem.class));
-  }
+		// Act
+		memory.add(messages, testUserId, null, false, MemoryType.FACTUAL);
 
-  @Test
-  void testSearchMemories() {
-    // Arrange
-    String query = "What do I like?";
-    List<MemoryItem> mockResults = createMockMemoryItems();
+		// Assert
+		verify(llmService, never()).generate(anyString()); // No LLM call when infer=false
+		verify(embeddingService, times(1)).embed(anyString());
+		verify(vectorStoreService, times(1)).add(any(MemoryItem.class));
+	}
 
-    when(vectorStoreService.search(any(double[].class), any(), anyInt(), anyDouble()))
-        .thenReturn(mockResults);
+	@Test
+	void testSearchMemories() {
+		// Arrange
+		String query = "What do I like?";
+		List<MemoryItem> mockResults = createMockMemoryItems();
 
-    // Act
-    List<MemoryItem> results = memory.search(query, testUserId);
+		when(vectorStoreService.search(any(double[].class), any(), anyInt(), anyDouble())).thenReturn(mockResults);
 
-    // Assert
-    assertNotNull(results);
-    assertFalse(results.isEmpty());
-    assertEquals(2, results.size());
-    verify(embeddingService, times(1)).embed(query);
-    verify(vectorStoreService, times(1)).search(any(double[].class), any(), anyInt(), anyDouble());
-  }
+		// Act
+		List<MemoryItem> results = memory.search(query, testUserId);
 
-  @Test
-  void testSearchMemoriesWithFilters() {
-    // Arrange
-    String query = "programming";
-    Map<String, Object> filters = Map.of("agent_id", "test_agent");
-    List<MemoryItem> mockResults = createMockMemoryItems();
+		// Assert
+		assertNotNull(results);
+		assertFalse(results.isEmpty());
+		assertEquals(2, results.size());
+		verify(embeddingService, times(1)).embed(query);
+		verify(vectorStoreService, times(1)).search(any(double[].class), any(), anyInt(), anyDouble());
+	}
 
-    when(vectorStoreService.search(any(double[].class), any(), anyInt(), anyDouble()))
-        .thenReturn(mockResults);
+	@Test
+	void testSearchMemoriesWithFilters() {
+		// Arrange
+		String query = "programming";
+		Map<String, Object> filters = Map.of("agent_id", "test_agent");
+		List<MemoryItem> mockResults = createMockMemoryItems();
 
-    // Act
-    List<MemoryItem> results = memory.search(query, testUserId, filters, 5, 0.8);
+		when(vectorStoreService.search(any(double[].class), any(), anyInt(), anyDouble())).thenReturn(mockResults);
 
-    // Assert
-    assertNotNull(results);
-    verify(embeddingService, times(1)).embed(query);
-    verify(vectorStoreService, times(1)).search(any(double[].class), any(), eq(5), eq(0.8));
-  }
+		// Act
+		List<MemoryItem> results = memory.search(query, testUserId, filters, 5, 0.8);
 
-  @Test
-  void testGetAllMemories() {
-    // Arrange
-    List<MemoryItem> mockResults = createMockMemoryItems();
-    when(vectorStoreService.getAll(any(), anyInt())).thenReturn(mockResults);
+		// Assert
+		assertNotNull(results);
+		verify(embeddingService, times(1)).embed(query);
+		verify(vectorStoreService, times(1)).search(any(double[].class), any(), eq(5), eq(0.8));
+	}
 
-    // Act
-    List<MemoryItem> results = memory.getAll(testUserId, null, 100);
+	@Test
+	void testGetAllMemories() {
+		// Arrange
+		List<MemoryItem> mockResults = createMockMemoryItems();
+		when(vectorStoreService.getAll(any(), anyInt())).thenReturn(mockResults);
 
-    // Assert
-    assertNotNull(results);
-    assertEquals(2, results.size());
-    verify(vectorStoreService, times(1)).getAll(any(), eq(100));
-  }
+		// Act
+		List<MemoryItem> results = memory.getAll(testUserId, null, 100);
 
-  @Test
-  void testUpdateMemory() {
-    // Arrange
-    String memoryId = "test-memory-id";
-    Map<String, Object> updateData = Map.of("content", "Updated content");
-    MemoryItem existingMemory = createMockMemoryItem("test-memory-id", "Original content");
+		// Assert
+		assertNotNull(results);
+		assertEquals(2, results.size());
+		verify(vectorStoreService, times(1)).getAll(any(), eq(100));
+	}
 
-    when(vectorStoreService.get(memoryId)).thenReturn(existingMemory);
+	@Test
+	void testUpdateMemory() {
+		// Arrange
+		String memoryId = "test-memory-id";
+		Map<String, Object> updateData = Map.of("content", "Updated content");
+		MemoryItem existingMemory = createMockMemoryItem("test-memory-id", "Original content");
 
-    // Act
-    memory.update(memoryId, updateData);
+		when(vectorStoreService.get(memoryId)).thenReturn(existingMemory);
 
-    // Assert
-    verify(vectorStoreService, times(1)).get(memoryId);
-    verify(embeddingService, times(1)).embed("Updated content");
-    verify(vectorStoreService, times(1)).update(any(MemoryItem.class));
-  }
+		// Act
+		memory.update(memoryId, updateData);
 
-  @Test
-  void testDeleteMemory() {
-    // Arrange
-    String memoryId = "test-memory-id";
+		// Assert
+		verify(vectorStoreService, times(1)).get(memoryId);
+		verify(embeddingService, times(1)).embed("Updated content");
+		verify(vectorStoreService, times(1)).update(any(MemoryItem.class));
+	}
 
-    // Act
-    memory.delete(memoryId);
+	@Test
+	void testDeleteMemory() {
+		// Arrange
+		String memoryId = "test-memory-id";
 
-    // Assert
-    verify(vectorStoreService, times(1)).delete(memoryId);
-  }
+		// Act
+		memory.delete(memoryId);
 
-  @Test
-  void testDeleteAllMemories() {
-    // Arrange
-    String userId = "test_user";
+		// Assert
+		verify(vectorStoreService, times(1)).delete(memoryId);
+	}
 
-    // Act
-    memory.deleteAll(userId);
+	@Test
+	void testDeleteAllMemories() {
+		// Arrange
+		String userId = "test_user";
 
-    // Assert
-    verify(vectorStoreService, times(1)).deleteAll(any());
-  }
+		// Act
+		memory.deleteAll(userId);
 
-  @Test
-  void testGetMemoryById() {
-    // Arrange
-    String memoryId = "test-memory-id";
-    MemoryItem mockMemory = createMockMemoryItem(memoryId, "Test content");
-    when(vectorStoreService.get(memoryId)).thenReturn(mockMemory);
+		// Assert
+		verify(vectorStoreService, times(1)).deleteAll(any());
+	}
 
-    // Act
-    MemoryItem result = memory.get(memoryId);
+	@Test
+	void testGetMemoryById() {
+		// Arrange
+		String memoryId = "test-memory-id";
+		MemoryItem mockMemory = createMockMemoryItem(memoryId, "Test content");
+		when(vectorStoreService.get(memoryId)).thenReturn(mockMemory);
 
-    // Assert
-    assertNotNull(result);
-    assertEquals(memoryId, result.getId());
-    assertEquals("Test content", result.getContent());
-    verify(vectorStoreService, times(1)).get(memoryId);
-  }
+		// Act
+		MemoryItem result = memory.get(memoryId);
 
-  @Test
-  void testResetMemories() {
-    // Act
-    memory.reset();
+		// Assert
+		assertNotNull(result);
+		assertEquals(memoryId, result.getId());
+		assertEquals("Test content", result.getContent());
+		verify(vectorStoreService, times(1)).get(memoryId);
+	}
 
-    // Assert
-    verify(vectorStoreService, times(1)).reset();
-  }
+	@Test
+	void testResetMemories() {
+		// Act
+		memory.reset();
 
-  @Test
-  void testMemoryWithMetadata() {
-    // Arrange
-    List<Message> messages = Arrays.asList(
-        new Message("user", "I work as a software developer"),
-        new Message("assistant", "That's interesting!"));
-    Map<String, Object> metadata = Map.of("session_id", "test_session", "agent_id", "test_agent");
+		// Assert
+		verify(vectorStoreService, times(1)).reset();
+	}
 
-    // Act
-    memory.add(messages, testUserId, metadata, false, MemoryType.FACTUAL);
+	@Test
+	void testMemoryWithMetadata() {
+		// Arrange
+		List<Message> messages = Arrays.asList(new Message("user", "I work as a software developer"),
+				new Message("assistant", "That's interesting!"));
+		Map<String, Object> metadata = Map.of("session_id", "test_session", "agent_id", "test_agent");
 
-    // Assert
-    verify(vectorStoreService, times(1)).add(argThat(memoryItem -> {
-      return memoryItem.getUserId().equals(testUserId) &&
-          memoryItem.getMemoryType().equals(MemoryType.FACTUAL.getValue()) &&
-          memoryItem.getMetadata() != null &&
-          memoryItem.getMetadata().get("agent_id").equals("test_agent");
-    }));
-  }
+		// Act
+		memory.add(messages, testUserId, metadata, false, MemoryType.FACTUAL);
 
-  @Test
-  void testMemoryExtractionWithLLM() {
-    // Arrange
-    List<Message> messages = Arrays.asList(
-        new Message("user", "My name is John and I like chocolate"),
-        new Message("assistant", "Nice to meet you John!"));
+		// Assert
+		verify(vectorStoreService, times(1)).add(argThat(memoryItem -> {
+			return memoryItem.getUserId().equals(testUserId)
+					&& memoryItem.getMemoryType().equals(MemoryType.FACTUAL.getValue())
+					&& memoryItem.getMetadata() != null
+					&& memoryItem.getMetadata().get("agent_id").equals("test_agent");
+		}));
+	}
 
-    when(llmService.generate(anyString())).thenReturn(
-        "- User's name is John\n- User likes chocolate");
+	@Test
+	void testMemoryExtractionWithLLM() {
+		// Arrange
+		List<Message> messages = Arrays.asList(new Message("user", "My name is John and I like chocolate"),
+				new Message("assistant", "Nice to meet you John!"));
 
-    // Act
-    memory.add(messages, testUserId, null, true, MemoryType.FACTUAL);
+		when(llmService.generate(anyString())).thenReturn("- User's name is John\n- User likes chocolate");
 
-    // Assert
-    verify(llmService, times(1)).generate(anyString());
-    verify(embeddingService, times(2)).embed(anyString()); // Two memories extracted
-    verify(vectorStoreService, times(2)).add(any(MemoryItem.class));
-  }
+		// Act
+		memory.add(messages, testUserId, null, true, MemoryType.FACTUAL);
 
-  // Helper methods
-  private double[] createMockEmbedding() {
-    double[] embedding = new double[1536];
-    for (int i = 0; i < embedding.length; i++) {
-      embedding[i] = Math.random();
-    }
-    return embedding;
-  }
+		// Assert
+		verify(llmService, times(1)).generate(anyString());
+		verify(embeddingService, times(2)).embed(anyString()); // Two memories extracted
+		verify(vectorStoreService, times(2)).add(any(MemoryItem.class));
+	}
 
-  private List<MemoryItem> createMockMemoryItems() {
-    MemoryItem item1 = createMockMemoryItem("1", "I like pizza");
-    MemoryItem item2 = createMockMemoryItem("2", "I work as a developer");
-    return Arrays.asList(item1, item2);
-  }
+	// Helper methods
+	private double[] createMockEmbedding() {
+		double[] embedding = new double[1536];
+		for (int i = 0; i < embedding.length; i++) {
+			embedding[i] = Math.random();
+		}
+		return embedding;
+	}
 
-  private MemoryItem createMockMemoryItem(String id, String content) {
-    MemoryItem item = new MemoryItem(content, MemoryType.FACTUAL.getValue());
-    item.setId(id);
-    item.setUserId(testUserId);
-    item.setScore(0.9);
-    item.setEmbedding(createMockEmbedding());
-    return item;
-  }
+	private List<MemoryItem> createMockMemoryItems() {
+		MemoryItem item1 = createMockMemoryItem("1", "I like pizza");
+		MemoryItem item2 = createMockMemoryItem("2", "I work as a developer");
+		return Arrays.asList(item1, item2);
+	}
+
+	private MemoryItem createMockMemoryItem(String id, String content) {
+		MemoryItem item = new MemoryItem(content, MemoryType.FACTUAL.getValue());
+		item.setId(id);
+		item.setUserId(testUserId);
+		item.setScore(0.9);
+		item.setEmbedding(createMockEmbedding());
+		return item;
+	}
+
 }

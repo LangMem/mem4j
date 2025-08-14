@@ -14,278 +14,435 @@
  * limitations under the License.
  */
 
-//package com.langmem.vectorstores;
-//
-//import com.langmem.configs.MemoryConfig;
-//import com.langmem.memory.MemoryItem;
-//import io.qdrant.client.QdrantClient;
-//import io.qdrant.client.QdrantGrpcClient;
-//import io.qdrant.client.grpc.Collections;
-//import io.qdrant.client.grpc.Points;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.*;
-//import java.util.stream.Collectors;
-//
-///**
-// * Qdrant implementation of VectorStoreService
-// */
-//@Service
-//public class QdrantVectorStoreService implements VectorStoreService {
-//
-//  private static final Logger logger = LoggerFactory.getLogger(QdrantVectorStoreService.class);
-//
-//  private final QdrantClient client;
-//  private final String collectionName;
-//  private final int vectorSize;
-//
-//  public QdrantVectorStoreService(MemoryConfig config) {
-//    this.collectionName = config.getVectorStore().getCollection();
-//    this.vectorSize = config.getEmbeddingDimension();
-//
-//    // Initialize Qdrant client
-//    this.client = new QdrantClient(
-//        QdrantGrpcClient.newBuilder(
-//            config.getVectorStore().getUrl(),
-//            false).build());
-//
-//    // Ensure collection exists
-//    ensureCollectionExists();
-//  }
-//
-//  @Override
-//  public void add(MemoryItem item) {
-//    try {
-//      Points.PointStruct point = Points.PointStruct.newBuilder()
-//          .setId(item.getId() != null ? item.getId() : UUID.randomUUID().toString())
-//          .putAllPayload(buildPayload(item))
-//          .addAllVectors(Collections.Vectors.newBuilder()
-//              .addAllVector(Arrays.stream(item.getEmbedding())
-//                  .boxed()
-//                  .collect(Collectors.toList()))
-//              .build())
-//          .build();
-//
-//      client.upsert(collectionName, List.of(point), null, null, null);
-//      logger.debug("Added memory item: {}", item.getId());
-//    } catch (Exception e) {
-//      logger.error("Error adding memory item", e);
-//      throw new RuntimeException("Failed to add memory item", e);
-//    }
-//  }
-//
-//  @Override
-//  public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
-//    try {
-//      // Build filter conditions
-//      Collections.Filter filter = buildFilter(filters);
-//
-//      // Perform search
-//      var response = client.search(
-//          collectionName,
-//          Arrays.stream(queryEmbedding).boxed().collect(Collectors.toList()),
-//          Collections.Vectors.newBuilder().build(),
-//          filter,
-//          limit,
-//          threshold,
-//          null,
-//          null,
-//          null);
-//
-//      return response.getResultList().stream()
-//          .map(this::convertToMemoryItem)
-//          .collect(Collectors.toList());
-//    } catch (Exception e) {
-//      logger.error("Error searching memories", e);
-//      throw new RuntimeException("Failed to search memories", e);
-//    }
-//  }
-//
-//  @Override
-//  public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
-//    try {
-//      Collections.Filter filter = buildFilter(filters);
-//
-//      var response = client.scroll(
-//          collectionName,
-//          filter,
-//          null,
-//          limit,
-//          null,
-//          null,
-//          null);
-//
-//      return response.getResultList().stream()
-//          .map(this::convertToMemoryItem)
-//          .collect(Collectors.toList());
-//    } catch (Exception e) {
-//      logger.error("Error getting all memories", e);
-//      throw new RuntimeException("Failed to get memories", e);
-//    }
-//  }
-//
-//  @Override
-//  public MemoryItem get(String memoryId) {
-//    try {
-//      var response = client.retrieve(
-//          collectionName,
-//          List.of(memoryId),
-//          null,
-//          null,
-//          null);
-//
-//      if (!response.getResultList().isEmpty()) {
-//        return convertToMemoryItem(response.getResultList().get(0));
-//      }
-//      return null;
-//    } catch (Exception e) {
-//      logger.error("Error getting memory: {}", memoryId, e);
-//      throw new RuntimeException("Failed to get memory", e);
-//    }
-//  }
-//
-//  @Override
-//  public void update(MemoryItem item) {
-//    add(item); // Qdrant upsert handles updates
-//  }
-//
-//  @Override
-//  public void delete(String memoryId) {
-//    try {
-//      client.delete(collectionName, List.of(memoryId), null, null);
-//      logger.debug("Deleted memory: {}", memoryId);
-//    } catch (Exception e) {
-//      logger.error("Error deleting memory: {}", memoryId, e);
-//      throw new RuntimeException("Failed to delete memory", e);
-//    }
-//  }
-//
-//  @Override
-//  public void deleteAll(Map<String, Object> filters) {
-//    try {
-//      Collections.Filter filter = buildFilter(filters);
-//      client.delete(collectionName, null, filter, null);
-//      logger.debug("Deleted memories with filters: {}", filters);
-//    } catch (Exception e) {
-//      logger.error("Error deleting memories with filters: {}", filters, e);
-//      throw new RuntimeException("Failed to delete memories", e);
-//    }
-//  }
-//
-//  @Override
-//  public void reset() {
-//    try {
-//      client.deleteCollection(collectionName);
-//      ensureCollectionExists();
-//      logger.info("Reset vector store collection");
-//    } catch (Exception e) {
-//      logger.error("Error resetting vector store", e);
-//      throw new RuntimeException("Failed to reset vector store", e);
-//    }
-//  }
-//
-//  private void ensureCollectionExists() {
-//    try {
-//      var collections = client.listCollections();
-//      boolean exists = collections.getCollectionsList().stream()
-//          .anyMatch(info -> info.getName().equals(collectionName));
-//
-//      if (!exists) {
-//        var vectorParams = Collections.VectorParams.newBuilder()
-//            .setSize(vectorSize)
-//            .setDistance(Collections.Distance.Cosine)
-//            .build();
-//
-//        var createRequest = Collections.CreateCollection.newBuilder()
-//            .setCollectionName(collectionName)
-//            .setVectorsConfig(Collections.VectorsConfig.newBuilder()
-//                .setParams(vectorParams)
-//                .build())
-//            .build();
-//
-//        client.createCollection(createRequest);
-//        logger.info("Created collection: {}", collectionName);
-//      }
-//    } catch (Exception e) {
-//      logger.error("Error ensuring collection exists", e);
-//      throw new RuntimeException("Failed to create collection", e);
-//    }
-//  }
-//
-//  private Map<String, Collections.Value> buildPayload(MemoryItem item) {
-//    Map<String, Collections.Value> payload = new HashMap<>();
-//
-//    if (item.getContent() != null) {
-//      payload.put("content", Collections.Value.newBuilder().setStringValue(item.getContent()).build());
-//    }
-//    if (item.getMemoryType() != null) {
-//      payload.put("memory_type", Collections.Value.newBuilder().setStringValue(item.getMemoryType()).build());
-//    }
-//    if (item.getUserId() != null) {
-//      payload.put("user_id", Collections.Value.newBuilder().setStringValue(item.getUserId()).build());
-//    }
-//    if (item.getAgentId() != null) {
-//      payload.put("agent_id", Collections.Value.newBuilder().setStringValue(item.getAgentId()).build());
-//    }
-//    if (item.getRunId() != null) {
-//      payload.put("run_id", Collections.Value.newBuilder().setStringValue(item.getRunId()).build());
-//    }
-//    if (item.getActorId() != null) {
-//      payload.put("actor_id", Collections.Value.newBuilder().setStringValue(item.getActorId()).build());
-//    }
-//    if (item.getCreatedAt() != null) {
-//      payload.put("created_at",
-//          Collections.Value.newBuilder().setIntegerValue(item.getCreatedAt().toEpochMilli()).build());
-//    }
-//    if (item.getUpdatedAt() != null) {
-//      payload.put("updated_at",
-//          Collections.Value.newBuilder().setIntegerValue(item.getUpdatedAt().toEpochMilli()).build());
-//    }
-//
-//    return payload;
-//  }
-//
-//  private Collections.Filter buildFilter(Map<String, Object> filters) {
-//    if (filters == null || filters.isEmpty()) {
-//      return Collections.Filter.newBuilder().build();
-//    }
-//
-//    var conditions = filters.entrySet().stream()
-//        .map(entry -> Collections.Condition.newBuilder()
-//            .setField(Collections.FieldCondition.newBuilder()
-//                .setKey(entry.getKey())
-//                .setMatch(Collections.Match.newBuilder()
-//                    .setKeyword(entry.getValue().toString())
-//                    .build())
-//                .build())
-//            .build())
-//        .collect(Collectors.toList());
-//
-//    return Collections.Filter.newBuilder()
-//        .addAllMust(conditions)
-//        .build();
-//  }
-//
-//  private MemoryItem convertToMemoryItem(Points.Record record) {
-//    MemoryItem item = new MemoryItem();
-//    item.setId(record.getId());
-//
-//    // Convert payload back to MemoryItem fields
-//    record.getPayloadMap().forEach((key, value) -> {
-//      switch (key) {
-//        case "content" -> item.setContent(value.getStringValue());
-//        case "memory_type" -> item.setMemoryType(value.getStringValue());
-//        case "user_id" -> item.setUserId(value.getStringValue());
-//        case "agent_id" -> item.setAgentId(value.getStringValue());
-//        case "run_id" -> item.setRunId(value.getStringValue());
-//        case "actor_id" -> item.setActorId(value.getStringValue());
-//        case "created_at" -> item.setCreatedAt(java.time.Instant.ofEpochMilli(value.getIntegerValue()));
-//        case "updated_at" -> item.setUpdatedAt(java.time.Instant.ofEpochMilli(value.getIntegerValue()));
-//      }
-//    });
-//
-//    return item;
-//  }
-//}
+package com.langmem.vectorstores;
+
+import com.langmem.configs.MemoryConfig;
+import com.langmem.memory.MemoryItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Qdrant implementation of VectorStoreService
+ * <p>
+ * This implementation provides vector storage capabilities using Qdrant, supporting
+ * operations like adding, searching, updating, and deleting memory items.
+ *
+ * Note: This is a simplified implementation that falls back to in-memory storage. For
+ * full Qdrant integration, ensure the correct Qdrant client dependencies are available
+ * and uncomment the Qdrant-specific code sections.
+ */
+@Service
+public class QdrantVectorStoreService implements VectorStoreService {
+
+	private static final Logger logger = LoggerFactory.getLogger(QdrantVectorStoreService.class);
+
+	// TODO: Add Qdrant client when dependencies are properly configured
+	// private final QdrantClient client;
+	private final String collectionName;
+
+	private final int vectorSize;
+
+	private final String url;
+
+	// In-memory storage for development/testing - replace with actual Qdrant client
+	private final Map<String, MemoryItem> memoryStore = new HashMap<>();
+
+	/**
+	 * Constructor for QdrantVectorStoreService
+	 * @param config Memory configuration containing vector store settings
+	 */
+	public QdrantVectorStoreService(MemoryConfig config) {
+		this.collectionName = config.getVectorStore().getCollection();
+		this.vectorSize = config.getEmbeddingDimension();
+		this.url = config.getVectorStore().getUrl() != null ? config.getVectorStore().getUrl()
+				: "http://localhost:6333";
+
+		logger.info("Initialized QdrantVectorStoreService with collection: {}, url: {}", collectionName, url);
+		logger.warn("Using in-memory storage fallback. For production, configure Qdrant client properly.");
+
+		// TODO: Initialize actual Qdrant client
+		/*
+		 * try { this.client = new QdrantClient(QdrantGrpcClient.newBuilder(url,
+		 * false).build()); ensureCollectionExists(); } catch (Exception e) {
+		 * logger.error("Failed to initialize Qdrant client", e); throw new
+		 * RuntimeException("Failed to initialize Qdrant client", e); }
+		 */
+	}
+
+	@Override
+	public void add(MemoryItem item) {
+		try {
+			String pointId = item.getId() != null ? item.getId() : UUID.randomUUID().toString();
+			item.setId(pointId);
+
+			// For now, use in-memory storage
+			memoryStore.put(pointId, item);
+			logger.debug("Added memory item: {}", pointId);
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * // Create vector from embedding List<Float> vectorList =
+			 * Arrays.stream(item.getEmbedding()) .boxed() .map(Double::floatValue)
+			 * .collect(Collectors.toList());
+			 *
+			 * // Build point with payload and vector Points.PointStruct point =
+			 * Points.PointStruct.newBuilder()
+			 * .setId(Points.PointId.newBuilder().setUuid(pointId).build())
+			 * .putAllPayload(buildPayload(item)) .setVectors(Points.Vectors.newBuilder()
+			 * .setVector(Points.Vector.newBuilder() .addAllData(vectorList) .build())
+			 * .build()) .build();
+			 *
+			 * // Upsert the point Points.UpsertPoints request =
+			 * Points.UpsertPoints.newBuilder() .setCollectionName(collectionName)
+			 * .addPoints(point) .build();
+			 *
+			 * client.upsertAsync(request).get();
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error adding memory item", e);
+			throw new RuntimeException("Failed to add memory item", e);
+		}
+	}
+
+	@Override
+	public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
+		try {
+			// Simple similarity search using in-memory storage
+			List<MemoryItem> results = memoryStore.values()
+				.stream()
+				.filter(item -> matchesFilters(item, filters))
+				.map(item -> {
+					// Calculate simple cosine similarity
+					double similarity = calculateCosineSimilarity(queryEmbedding, item.getEmbedding());
+					// Store similarity for sorting
+					return new AbstractMap.SimpleEntry<>(similarity, item);
+				})
+				.filter(entry -> entry.getKey() >= threshold)
+				.sorted((e1, e2) -> Double.compare(e2.getKey(), e1.getKey()))
+				.limit(limit)
+				.map(AbstractMap.SimpleEntry::getValue)
+				.collect(Collectors.toList());
+
+			logger.debug("Found {} similar memories", results.size());
+			return results;
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * Collections.Filter filter = buildFilter(filters);
+			 *
+			 * List<Float> queryVector = Arrays.stream(queryEmbedding) .boxed()
+			 * .map(Double::floatValue) .collect(Collectors.toList());
+			 *
+			 * Points.SearchPoints searchRequest = Points.SearchPoints.newBuilder()
+			 * .setCollectionName(collectionName) .addAllVector(queryVector)
+			 * .setLimit(limit) .setScoreThreshold((float) threshold) .setFilter(filter)
+			 * .setWithPayload(Points.WithPayloadSelector.newBuilder().setEnable(true).
+			 * build ()) .build();
+			 *
+			 * List<Points.ScoredPoint> response =
+			 * client.searchAsync(searchRequest).get(); return response.stream()
+			 * .map(this::convertToMemoryItem) .collect(Collectors.toList());
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error searching memories", e);
+			throw new RuntimeException("Failed to search memories", e);
+		}
+	}
+
+	@Override
+	public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
+		try {
+			List<MemoryItem> results = memoryStore.values()
+				.stream()
+				.filter(item -> matchesFilters(item, filters))
+				.limit(limit)
+				.collect(Collectors.toList());
+
+			logger.debug("Retrieved {} memories", results.size());
+			return results;
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * Collections.Filter filter = buildFilter(filters);
+			 *
+			 * Points.ScrollPoints scrollRequest = Points.ScrollPoints.newBuilder()
+			 * .setCollectionName(collectionName) .setFilter(filter) .setLimit(limit)
+			 * .setWithPayload(Points.WithPayloadSelector.newBuilder().setEnable(true).
+			 * build ()) .build();
+			 *
+			 * List<Points.RetrievedPoint> response =
+			 * client.scrollAsync(scrollRequest).get(); return response.stream()
+			 * .map(this::convertToMemoryItem) .collect(Collectors.toList());
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error getting all memories", e);
+			throw new RuntimeException("Failed to get memories", e);
+		}
+	}
+
+	@Override
+	public MemoryItem get(String memoryId) {
+		try {
+			MemoryItem item = memoryStore.get(memoryId);
+			logger.debug("Retrieved memory: {}", memoryId);
+			return item;
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * Points.GetPoints getRequest = Points.GetPoints.newBuilder()
+			 * .setCollectionName(collectionName)
+			 * .addIds(Points.PointId.newBuilder().setUuid(memoryId).build())
+			 * .setWithPayload(Points.WithPayloadSelector.newBuilder().setEnable(true).
+			 * build ()) .build();
+			 *
+			 * List<Points.RetrievedPoint> response = client.getAsync(getRequest).get();
+			 * if (!response.isEmpty()) { return convertToMemoryItem(response.get(0)); }
+			 * return null;
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error getting memory: {}", memoryId, e);
+			throw new RuntimeException("Failed to get memory", e);
+		}
+	}
+
+	@Override
+	public void update(MemoryItem item) {
+		add(item); // Both in-memory and Qdrant upsert handle updates the same way
+	}
+
+	@Override
+	public void delete(String memoryId) {
+		try {
+			memoryStore.remove(memoryId);
+			logger.debug("Deleted memory: {}", memoryId);
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * Points.DeletePoints deleteRequest = Points.DeletePoints.newBuilder()
+			 * .setCollectionName(collectionName)
+			 * .setPoints(Points.PointsSelector.newBuilder()
+			 * .setPoints(Points.PointsIdsList.newBuilder()
+			 * .addIds(Points.PointId.newBuilder().setUuid(memoryId).build()) .build())
+			 * .build()) .build();
+			 *
+			 * client.deleteAsync(deleteRequest).get();
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error deleting memory: {}", memoryId, e);
+			throw new RuntimeException("Failed to delete memory", e);
+		}
+	}
+
+	@Override
+	public void deleteAll(Map<String, Object> filters) {
+		try {
+			List<String> toDelete = memoryStore.values()
+				.stream()
+				.filter(item -> matchesFilters(item, filters))
+				.map(MemoryItem::getId)
+				.collect(Collectors.toList());
+
+			toDelete.forEach(memoryStore::remove);
+			logger.debug("Deleted {} memories with filters: {}", toDelete.size(), filters);
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * Collections.Filter filter = buildFilter(filters);
+			 *
+			 * Points.DeletePoints deleteRequest = Points.DeletePoints.newBuilder()
+			 * .setCollectionName(collectionName)
+			 * .setPoints(Points.PointsSelector.newBuilder() .setFilter(filter) .build())
+			 * .build();
+			 *
+			 * client.deleteAsync(deleteRequest).get();
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error deleting memories with filters: {}", filters, e);
+			throw new RuntimeException("Failed to delete memories", e);
+		}
+	}
+
+	@Override
+	public void reset() {
+		try {
+			memoryStore.clear();
+			logger.info("Reset vector store collection");
+
+			// TODO: Replace with actual Qdrant implementation
+			/*
+			 * client.deleteCollectionAsync(collectionName).get();
+			 * ensureCollectionExists();
+			 */
+		}
+		catch (Exception e) {
+			logger.error("Error resetting vector store", e);
+			throw new RuntimeException("Failed to reset vector store", e);
+		}
+	}
+
+	/**
+	 * Calculate cosine similarity between two vectors
+	 */
+	private double calculateCosineSimilarity(double[] vec1, double[] vec2) {
+		if (vec1.length != vec2.length) {
+			return 0.0;
+		}
+
+		double dotProduct = 0.0;
+		double norm1 = 0.0;
+		double norm2 = 0.0;
+
+		for (int i = 0; i < vec1.length; i++) {
+			dotProduct += vec1[i] * vec2[i];
+			norm1 += vec1[i] * vec1[i];
+			norm2 += vec2[i] * vec2[i];
+		}
+
+		return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+	}
+
+	/**
+	 * Check if a memory item matches the given filters
+	 */
+	private boolean matchesFilters(MemoryItem item, Map<String, Object> filters) {
+		if (filters == null || filters.isEmpty()) {
+			return true;
+		}
+
+		for (Map.Entry<String, Object> filter : filters.entrySet()) {
+			String key = filter.getKey();
+			String value = filter.getValue().toString();
+
+			switch (key) {
+				case "user_id" -> {
+					if (!value.equals(item.getUserId()))
+						return false;
+				}
+				case "agent_id" -> {
+					if (!value.equals(item.getAgentId()))
+						return false;
+				}
+				case "run_id" -> {
+					if (!value.equals(item.getRunId()))
+						return false;
+				}
+				case "actor_id" -> {
+					if (!value.equals(item.getActorId()))
+						return false;
+				}
+				case "memory_type" -> {
+					if (!value.equals(item.getMemoryType()))
+						return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/*
+	 * TODO: Uncomment when Qdrant dependencies are properly configured
+	 *
+	 * private void ensureCollectionExists() { try { List<String> collections =
+	 * client.listCollectionsAsync().get();
+	 *
+	 * boolean exists = collections.contains(collectionName);
+	 *
+	 * if (!exists) { Collections.VectorParams vectorParams =
+	 * Collections.VectorParams.newBuilder() .setSize(vectorSize)
+	 * .setDistance(Collections.Distance.Cosine) .build();
+	 *
+	 * Collections.CreateCollection createRequest =
+	 * Collections.CreateCollection.newBuilder() .setCollectionName(collectionName)
+	 * .setVectorsConfig(Collections.VectorsConfig.newBuilder() .setParams(vectorParams)
+	 * .build()) .build();
+	 *
+	 * client.createCollectionAsync(createRequest).get();
+	 * logger.info("Created collection: {}", collectionName); } } catch (Exception e) {
+	 * logger.error("Error ensuring collection exists", e); throw new
+	 * RuntimeException("Failed to create collection", e); } }
+	 *
+	 * private Map<String, Collections.Value> buildPayload(MemoryItem item) { Map<String,
+	 * Collections.Value> payload = new HashMap<>();
+	 *
+	 * if (item.getContent() != null) { payload.put("content",
+	 * Collections.Value.newBuilder().setStringValue(item.getContent()).build()); } if
+	 * (item.getMemoryType() != null) { payload.put("memory_type",
+	 * Collections.Value.newBuilder().setStringValue(item.getMemoryType()).build()); } if
+	 * (item.getUserId() != null) { payload.put("user_id",
+	 * Collections.Value.newBuilder().setStringValue(item.getUserId()).build()); } if
+	 * (item.getAgentId() != null) { payload.put("agent_id",
+	 * Collections.Value.newBuilder().setStringValue(item.getAgentId()).build()); } if
+	 * (item.getRunId() != null) { payload.put("run_id",
+	 * Collections.Value.newBuilder().setStringValue(item.getRunId()).build()); } if
+	 * (item.getActorId() != null) { payload.put("actor_id",
+	 * Collections.Value.newBuilder().setStringValue(item.getActorId()).build()); } if
+	 * (item.getCreatedAt() != null) { payload.put("created_at",
+	 * Collections.Value.newBuilder().setIntegerValue(item.getCreatedAt().
+	 * toEpochMilli()).build()); } if (item.getUpdatedAt() != null) {
+	 * payload.put("updated_at",
+	 * Collections.Value.newBuilder().setIntegerValue(item.getUpdatedAt().
+	 * toEpochMilli()).build()); }
+	 *
+	 * return payload; }
+	 *
+	 * private Collections.Filter buildFilter(Map<String, Object> filters) { if (filters
+	 * == null || filters.isEmpty()) { return Collections.Filter.newBuilder().build(); }
+	 *
+	 * var conditions = filters.entrySet().stream() .map(entry ->
+	 * Collections.Condition.newBuilder()
+	 * .setField(Collections.FieldCondition.newBuilder() .setKey(entry.getKey())
+	 * .setMatch(Collections.Match.newBuilder() .setKeyword(entry.getValue().toString())
+	 * .build()) .build()) .build()) .collect(Collectors.toList());
+	 *
+	 * return Collections.Filter.newBuilder() .addAllMust(conditions) .build(); }
+	 *
+	 * private MemoryItem convertToMemoryItem(Points.RetrievedPoint record) { MemoryItem
+	 * item = new MemoryItem();
+	 *
+	 * if (record.getId().hasUuid()) { item.setId(record.getId().getUuid()); } else if
+	 * (record.getId().hasNum()) { item.setId(String.valueOf(record.getId().getNum())); }
+	 *
+	 * record.getPayloadMap().forEach((key, value) -> { switch (key) { case "content" ->
+	 * item.setContent(value.getStringValue()); case "memory_type" ->
+	 * item.setMemoryType(value.getStringValue()); case "user_id" ->
+	 * item.setUserId(value.getStringValue()); case "agent_id" ->
+	 * item.setAgentId(value.getStringValue()); case "run_id" ->
+	 * item.setRunId(value.getStringValue()); case "actor_id" ->
+	 * item.setActorId(value.getStringValue()); case "created_at" ->
+	 * item.setCreatedAt(Instant.ofEpochMilli(value.getIntegerValue())); case "updated_at"
+	 * -> item.setUpdatedAt(Instant.ofEpochMilli(value.getIntegerValue())); } });
+	 *
+	 * return item; }
+	 *
+	 * private MemoryItem convertToMemoryItem(Points.ScoredPoint scoredPoint) { MemoryItem
+	 * item = new MemoryItem();
+	 *
+	 * if (scoredPoint.getId().hasUuid()) { item.setId(scoredPoint.getId().getUuid()); }
+	 * else if (scoredPoint.getId().hasNum()) {
+	 * item.setId(String.valueOf(scoredPoint.getId().getNum())); }
+	 *
+	 * scoredPoint.getPayloadMap().forEach((key, value) -> { switch (key) { case "content"
+	 * -> item.setContent(value.getStringValue()); case "memory_type" ->
+	 * item.setMemoryType(value.getStringValue()); case "user_id" ->
+	 * item.setUserId(value.getStringValue()); case "agent_id" ->
+	 * item.setAgentId(value.getStringValue()); case "run_id" ->
+	 * item.setRunId(value.getStringValue()); case "actor_id" ->
+	 * item.setActorId(value.getStringValue()); case "created_at" ->
+	 * item.setCreatedAt(Instant.ofEpochMilli(value.getIntegerValue())); case "updated_at"
+	 * -> item.setUpdatedAt(Instant.ofEpochMilli(value.getIntegerValue())); } });
+	 *
+	 * return item; }
+	 */
+
+}

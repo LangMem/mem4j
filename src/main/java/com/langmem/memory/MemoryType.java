@@ -22,53 +22,53 @@ package com.langmem.memory;
 
 public enum MemoryType {
 
-  /**
-   * Factual memory - stores facts and information
-   */
-  FACTUAL("factual"),
+	/**
+	 * Factual memory - stores facts and information
+	 */
+	FACTUAL("factual"),
 
-  /**
-   * Episodic memory - stores events and experiences
-   */
-  EPISODIC("episodic"),
+	/**
+	 * Episodic memory - stores events and experiences
+	 */
+	EPISODIC("episodic"),
 
-  /**
-   * Semantic memory - stores concepts and relationships
-   */
-  SEMANTIC("semantic"),
+	/**
+	 * Semantic memory - stores concepts and relationships
+	 */
+	SEMANTIC("semantic"),
 
-  /**
-   * Procedural memory - stores how-to information and procedures
-   */
-  PROCEDURAL("procedural"),
+	/**
+	 * Procedural memory - stores how-to information and procedures
+	 */
+	PROCEDURAL("procedural"),
 
-  /**
-   * Working memory - temporary information for current task
-   */
-  WORKING("working");
+	/**
+	 * Working memory - temporary information for current task
+	 */
+	WORKING("working");
 
-  private final String value;
+	private final String value;
 
-  MemoryType(String value) {
-    this.value = value;
-  }
+	MemoryType(String value) {
+		this.value = value;
+	}
 
-  public String getValue() {
-    return value;
-  }
+	public String getValue() {
+		return value;
+	}
 
-  public static MemoryType fromString(String text) {
-    for (MemoryType type : MemoryType.values()) {
-      if (type.value.equalsIgnoreCase(text)) {
-        return type;
-      }
-    }
-    throw new IllegalArgumentException("No memory type with value " + text + " found");
-  }
+	public static MemoryType fromString(String text) {
+		for (MemoryType type : MemoryType.values()) {
+			if (type.value.equalsIgnoreCase(text)) {
+				return type;
+			}
+		}
+		throw new IllegalArgumentException("No memory type with value " + text + " found");
+	}
 
-  @Override
-  public String toString() {
-    return value;
-  }
+	@Override
+	public String toString() {
+		return value;
+	}
 
 }

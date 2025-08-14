@@ -35,152 +35,161 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * DashScope implementation of LLMService using direct HTTP calls
- * Todo：替换为 Spring AI Alibaba 的 DashScope Chat Client？
+ * DashScope implementation of LLMService using direct HTTP calls Todo：替换为 Spring AI
+ * Alibaba 的 DashScope Chat Client？
  */
 
 @Service
 public class DashScopeLLMService implements LLMService {
 
-  private static final Logger logger = LoggerFactory.getLogger(DashScopeLLMService.class);
-  private static final String DASHSCOPE_API_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
+	private static final Logger logger = LoggerFactory.getLogger(DashScopeLLMService.class);
 
-  private final RestTemplate restTemplate;
-  private final ObjectMapper objectMapper;
-  private final String apiKey;
-  private final String model;
+	private static final String DASHSCOPE_API_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
 
-  public DashScopeLLMService(MemoryConfig config) {
-    this.restTemplate = new RestTemplate();
-    this.objectMapper = new ObjectMapper();
-    this.apiKey = config.getLlm().getApiKey();
-    this.model = config.getLlm().getModel();
-  }
+	private final RestTemplate restTemplate;
 
-  @Override
-  public String generate(String prompt) {
-    try {
-      Map<String, Object> requestBody = new HashMap<>();
-      requestBody.put("model", model);
+	private final ObjectMapper objectMapper;
 
-      Map<String, Object> input = new HashMap<>();
-      input.put("messages", List.of(Map.of("role", "user", "content", prompt)));
-      requestBody.put("input", input);
+	private final String apiKey;
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-      headers.set("Authorization", "Bearer " + apiKey);
+	private final String model;
 
-      HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-      ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
+	public DashScopeLLMService(MemoryConfig config) {
+		this.restTemplate = new RestTemplate();
+		this.objectMapper = new ObjectMapper();
+		this.apiKey = config.getLlm().getApiKey();
+		this.model = config.getLlm().getModel();
+	}
 
-      JsonNode responseJson = objectMapper.readTree(response.getBody());
-      return responseJson.path("output").path("text").asText();
-    } catch (Exception e) {
-      logger.error("Error generating response from DashScope", e);
-      throw new RuntimeException("Failed to generate response", e);
-    }
-  }
+	@Override
+	public String generate(String prompt) {
+		try {
+			Map<String, Object> requestBody = new HashMap<>();
+			requestBody.put("model", model);
 
-  @Override
-  public String generate(List<Message> messages) {
-    try {
-      List<Map<String, String>> apiMessages = messages.stream()
-          .map(msg -> Map.of("role", msg.getRole(), "content", msg.getContent()))
-          .collect(Collectors.toList());
+			Map<String, Object> input = new HashMap<>();
+			input.put("messages", List.of(Map.of("role", "user", "content", prompt)));
+			requestBody.put("input", input);
 
-      Map<String, Object> requestBody = new HashMap<>();
-      requestBody.put("model", model);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set("Authorization", "Bearer " + apiKey);
 
-      Map<String, Object> input = new HashMap<>();
-      input.put("messages", apiMessages);
-      requestBody.put("input", input);
+			HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+			ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-      headers.set("Authorization", "Bearer " + apiKey);
+			JsonNode responseJson = objectMapper.readTree(response.getBody());
+			return responseJson.path("output").path("text").asText();
+		}
+		catch (Exception e) {
+			logger.error("Error generating response from DashScope", e);
+			throw new RuntimeException("Failed to generate response", e);
+		}
+	}
 
-      HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-      ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
+	@Override
+	public String generate(List<Message> messages) {
+		try {
+			List<Map<String, String>> apiMessages = messages.stream()
+				.map(msg -> Map.of("role", msg.getRole(), "content", msg.getContent()))
+				.collect(Collectors.toList());
 
-      JsonNode responseJson = objectMapper.readTree(response.getBody());
-      return responseJson.path("output").path("text").asText();
-    } catch (Exception e) {
-      logger.error("Error generating response from messages", e);
-      throw new RuntimeException("Failed to generate response", e);
-    }
-  }
+			Map<String, Object> requestBody = new HashMap<>();
+			requestBody.put("model", model);
 
-  @Override
-  public String generate(String systemPrompt, String userMessage) {
-    try {
-      List<Map<String, String>> messages = List.of(
-          Map.of("role", "system", "content", systemPrompt),
-          Map.of("role", "user", "content", userMessage));
+			Map<String, Object> input = new HashMap<>();
+			input.put("messages", apiMessages);
+			requestBody.put("input", input);
 
-      Map<String, Object> requestBody = new HashMap<>();
-      requestBody.put("model", model);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set("Authorization", "Bearer " + apiKey);
 
-      Map<String, Object> input = new HashMap<>();
-      input.put("messages", messages);
-      requestBody.put("input", input);
+			HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+			ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-      headers.set("Authorization", "Bearer " + apiKey);
+			JsonNode responseJson = objectMapper.readTree(response.getBody());
+			return responseJson.path("output").path("text").asText();
+		}
+		catch (Exception e) {
+			logger.error("Error generating response from messages", e);
+			throw new RuntimeException("Failed to generate response", e);
+		}
+	}
 
-      HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-      ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
+	@Override
+	public String generate(String systemPrompt, String userMessage) {
+		try {
+			List<Map<String, String>> messages = List.of(Map.of("role", "system", "content", systemPrompt),
+					Map.of("role", "user", "content", userMessage));
 
-      JsonNode responseJson = objectMapper.readTree(response.getBody());
-      return responseJson.path("output").path("text").asText();
-    } catch (Exception e) {
-      logger.error("Error generating response with system prompt", e);
-      throw new RuntimeException("Failed to generate response", e);
-    }
-  }
+			Map<String, Object> requestBody = new HashMap<>();
+			requestBody.put("model", model);
 
-  @Override
-  public String generateStructured(String prompt, String schema) {
-    try {
-      String structuredPrompt = String.format("""
-          %s
+			Map<String, Object> input = new HashMap<>();
+			input.put("messages", messages);
+			requestBody.put("input", input);
 
-          Please respond in the following JSON format:
-          %s
-          """, prompt, schema);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set("Authorization", "Bearer " + apiKey);
 
-      Map<String, Object> requestBody = new HashMap<>();
-      requestBody.put("model", model);
+			HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+			ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
 
-      Map<String, Object> input = new HashMap<>();
-      input.put("messages", List.of(Map.of("role", "user", "content", structuredPrompt)));
-      requestBody.put("input", input);
+			JsonNode responseJson = objectMapper.readTree(response.getBody());
+			return responseJson.path("output").path("text").asText();
+		}
+		catch (Exception e) {
+			logger.error("Error generating response with system prompt", e);
+			throw new RuntimeException("Failed to generate response", e);
+		}
+	}
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-      headers.set("Authorization", "Bearer " + apiKey);
+	@Override
+	public String generateStructured(String prompt, String schema) {
+		try {
+			String structuredPrompt = String.format("""
+					%s
 
-      HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-      ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
+					Please respond in the following JSON format:
+					%s
+					""", prompt, schema);
 
-      JsonNode responseJson = objectMapper.readTree(response.getBody());
-      return responseJson.path("output").path("text").asText();
-    } catch (Exception e) {
-      logger.error("Error generating structured response", e);
-      throw new RuntimeException("Failed to generate structured response", e);
-    }
-  }
+			Map<String, Object> requestBody = new HashMap<>();
+			requestBody.put("model", model);
 
-  @Override
-  public boolean isAvailable() {
-    try {
-      // Simple test to check if service is available
-      generate("Hello");
-      return true;
-    } catch (Exception e) {
-      logger.warn("DashScope service is not available", e);
-      return false;
-    }
-  }
+			Map<String, Object> input = new HashMap<>();
+			input.put("messages", List.of(Map.of("role", "user", "content", structuredPrompt)));
+			requestBody.put("input", input);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set("Authorization", "Bearer " + apiKey);
+
+			HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+			ResponseEntity<String> response = restTemplate.postForEntity(DASHSCOPE_API_URL, request, String.class);
+
+			JsonNode responseJson = objectMapper.readTree(response.getBody());
+			return responseJson.path("output").path("text").asText();
+		}
+		catch (Exception e) {
+			logger.error("Error generating structured response", e);
+			throw new RuntimeException("Failed to generate structured response", e);
+		}
+	}
+
+	@Override
+	public boolean isAvailable() {
+		try {
+			// Simple test to check if service is available
+			generate("Hello");
+			return true;
+		}
+		catch (Exception e) {
+			logger.warn("DashScope service is not available", e);
+			return false;
+		}
+	}
+
 }

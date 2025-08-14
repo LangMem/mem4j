@@ -22,12 +22,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Main Spring Boot application class for Lang Memory
  */
-@SpringBootApplication(
-        scanBasePackages = {"com.langmem"}
-)
+@SpringBootApplication
 public class LangMemoryApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(LangMemoryApplication.class, args);
-  }
+	public static void main(String[] args) {
+		SpringApplication.run(LangMemoryApplication.class, args);
+	}
+
 }

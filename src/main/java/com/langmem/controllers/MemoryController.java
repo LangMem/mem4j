@@ -36,253 +36,222 @@ import java.util.Map;
 @RequestMapping("/memory")
 public class MemoryController {
 
-  private static final Logger logger = LoggerFactory.getLogger(MemoryController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MemoryController.class);
 
-  private final Memory memory;
+	private final Memory memory;
 
-  public MemoryController(Memory memory) {
-    this.memory = memory;
-  }
+	public MemoryController(Memory memory) {
+		this.memory = memory;
+	}
 
-  /**
-   * Add memories from conversation
-   */
-  @PostMapping("/add")
-  public ResponseEntity<Map<String, Object>> addMemories(
-      @RequestBody AddMemoryRequest request
-  ) {
+	/**
+	 * Add memories from conversation
+	 */
+	@PostMapping("/add")
+	public ResponseEntity<Map<String, Object>> addMemories(@RequestBody AddMemoryRequest request) {
 
-    try {
-      memory.add(request.getMessages(), request.getUserId(),
-          request.getMetadata(), request.isInfer(),
-          request.getMemoryType() != null ? MemoryType.fromString(request.getMemoryType()) : MemoryType.FACTUAL);
+		try {
+			memory.add(request.getMessages(), request.getUserId(), request.getMetadata(), request.isInfer(),
+					request.getMemoryType() != null ? MemoryType.fromString(request.getMemoryType())
+							: MemoryType.FACTUAL);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "message", "Memories added successfully"));
-    } catch (Exception e) {
+			return ResponseEntity.ok(Map.of("status", "success", "message", "Memories added successfully"));
+		}
+		catch (Exception e) {
 
-      logger.error("Error adding memories", e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			logger.error("Error adding memories", e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Search for relevant memories
-   */
-  @GetMapping("/search")
-  public ResponseEntity<Map<String, Object>> searchMemories(
-      @RequestParam String query,
-      @RequestParam String userId,
-      @RequestParam(defaultValue = "10") int limit,
-      @RequestParam(required = false) Double threshold,
-      @RequestParam Map<String, Object> filters
-  ) {
+	/**
+	 * Search for relevant memories
+	 */
+	@GetMapping("/search")
+	public ResponseEntity<Map<String, Object>> searchMemories(@RequestParam String query, @RequestParam String userId,
+			@RequestParam(defaultValue = "10") int limit, @RequestParam(required = false) Double threshold,
+			@RequestParam Map<String, Object> filters) {
 
-    try {
-      List<MemoryItem> results = memory.search(query, userId, filters, limit, threshold);
+		try {
+			List<MemoryItem> results = memory.search(query, userId, filters, limit, threshold);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "results", results,
-          "count", results.size()));
-    } catch (Exception e) {
-      logger.error("Error searching memories", e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			return ResponseEntity.ok(Map.of("status", "success", "results", results, "count", results.size()));
+		}
+		catch (Exception e) {
+			logger.error("Error searching memories", e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Get all memories for a user
-   */
-  @GetMapping("/all")
-  public ResponseEntity<Map<String, Object>> getAllMemories(
-      @RequestParam String userId,
-      @RequestParam(defaultValue = "100") int limit,
-      @RequestParam Map<String, Object> filters
-  ) {
+	/**
+	 * Get all memories for a user
+	 */
+	@GetMapping("/all")
+	public ResponseEntity<Map<String, Object>> getAllMemories(@RequestParam String userId,
+			@RequestParam(defaultValue = "100") int limit, @RequestParam Map<String, Object> filters) {
 
-    try {
-      List<MemoryItem> results = memory.getAll(userId, filters, limit);
+		try {
+			List<MemoryItem> results = memory.getAll(userId, filters, limit);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "results", results,
-          "count", results.size()));
-    } catch (Exception e) {
-      logger.error("Error getting all memories", e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			return ResponseEntity.ok(Map.of("status", "success", "results", results, "count", results.size()));
+		}
+		catch (Exception e) {
+			logger.error("Error getting all memories", e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Get a specific memory by ID
-   */
-  @GetMapping("/{memoryId}")
-  public ResponseEntity<Map<String, Object>> getMemory(@PathVariable String memoryId) {
+	/**
+	 * Get a specific memory by ID
+	 */
+	@GetMapping("/{memoryId}")
+	public ResponseEntity<Map<String, Object>> getMemory(@PathVariable String memoryId) {
 
-    try {
-      MemoryItem item = memory.get(memoryId);
+		try {
+			MemoryItem item = memory.get(memoryId);
 
-      if (item != null) {
-        return ResponseEntity.ok(Map.of(
-            "status", "success",
-            "memory", item));
-      } else {
-        return ResponseEntity.notFound().build();
-      }
-    } catch (Exception e) {
-      logger.error("Error getting memory: {}", memoryId, e);
+			if (item != null) {
+				return ResponseEntity.ok(Map.of("status", "success", "memory", item));
+			}
+			else {
+				return ResponseEntity.notFound().build();
+			}
+		}
+		catch (Exception e) {
+			logger.error("Error getting memory: {}", memoryId, e);
 
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Update a memory
-   */
-  @PutMapping("/{memoryId}")
-  public ResponseEntity<Map<String, Object>> updateMemory(
-      @PathVariable String memoryId,
-      @RequestBody Map<String, Object> data
-  ) {
+	/**
+	 * Update a memory
+	 */
+	@PutMapping("/{memoryId}")
+	public ResponseEntity<Map<String, Object>> updateMemory(@PathVariable String memoryId,
+			@RequestBody Map<String, Object> data) {
 
-    try {
-      memory.update(memoryId, data);
+		try {
+			memory.update(memoryId, data);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "message", "Memory updated successfully"));
-    } catch (Exception e) {
-      logger.error("Error updating memory: {}", memoryId, e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			return ResponseEntity.ok(Map.of("status", "success", "message", "Memory updated successfully"));
+		}
+		catch (Exception e) {
+			logger.error("Error updating memory: {}", memoryId, e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Delete a memory
-   */
-  @DeleteMapping("/{memoryId}")
-  public ResponseEntity<Map<String, Object>> deleteMemory(@PathVariable String memoryId) {
+	/**
+	 * Delete a memory
+	 */
+	@DeleteMapping("/{memoryId}")
+	public ResponseEntity<Map<String, Object>> deleteMemory(@PathVariable String memoryId) {
 
-    try {
-      memory.delete(memoryId);
+		try {
+			memory.delete(memoryId);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "message", "Memory deleted successfully"));
-    } catch (Exception e) {
+			return ResponseEntity.ok(Map.of("status", "success", "message", "Memory deleted successfully"));
+		}
+		catch (Exception e) {
 
-      logger.error("Error deleting memory: {}", memoryId, e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			logger.error("Error deleting memory: {}", memoryId, e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Delete all memories for a user
-   */
-  @DeleteMapping("/user/{userId}")
-  public ResponseEntity<Map<String, Object>> deleteAllMemories(@PathVariable String userId) {
+	/**
+	 * Delete all memories for a user
+	 */
+	@DeleteMapping("/user/{userId}")
+	public ResponseEntity<Map<String, Object>> deleteAllMemories(@PathVariable String userId) {
 
-    try {
-      memory.deleteAll(userId);
+		try {
+			memory.deleteAll(userId);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "success",
-          "message", "All memories deleted successfully"));
-    } catch (Exception e) {
+			return ResponseEntity.ok(Map.of("status", "success", "message", "All memories deleted successfully"));
+		}
+		catch (Exception e) {
 
-      logger.error("Error deleting all memories for user: {}", userId, e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
-  }
+			logger.error("Error deleting all memories for user: {}", userId, e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
+	}
 
-  /**
-   * Reset all memories (for testing)
-   */
-  @PostMapping("/reset")
-  public ResponseEntity<Map<String, Object>> resetMemories() {
+	/**
+	 * Reset all memories (for testing)
+	 */
+	@PostMapping("/reset")
+	public ResponseEntity<Map<String, Object>> resetMemories() {
 
-      try {
-          memory.reset();
+		try {
+			memory.reset();
 
-          return ResponseEntity.ok(Map.of(
-              "status", "success",
-              "message", "All memories reset successfully"));
-    } catch (Exception e) {
-      logger.error("Error resetting memories", e);
-      return ResponseEntity.badRequest().body(Map.of(
-          "status", "error",
-          "message", e.getMessage()));
-    }
+			return ResponseEntity.ok(Map.of("status", "success", "message", "All memories reset successfully"));
+		}
+		catch (Exception e) {
+			logger.error("Error resetting memories", e);
+			return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+		}
 
-  }
+	}
 
-  /**
-   * Request class for adding memories
-   */
-  public static class AddMemoryRequest {
+	/**
+	 * Request class for adding memories
+	 */
+	public static class AddMemoryRequest {
 
-    private List<Message> messages;
-    private String userId;
-    private Map<String, Object> metadata;
-    private boolean infer = true;
-    private String memoryType;
+		private List<Message> messages;
 
-    // Getters and Setters
-    public List<Message> getMessages() {
-      return messages;
-    }
+		private String userId;
 
-    public void setMessages(List<Message> messages) {
-      this.messages = messages;
-    }
+		private Map<String, Object> metadata;
 
-    public String getUserId() {
-      return userId;
-    }
+		private boolean infer = true;
 
-    public void setUserId(String userId) {
-      this.userId = userId;
-    }
+		private String memoryType;
 
-    public Map<String, Object> getMetadata() {
-      return metadata;
-    }
+		// Getters and Setters
+		public List<Message> getMessages() {
+			return messages;
+		}
 
-    public void setMetadata(Map<String, Object> metadata) {
-      this.metadata = metadata;
-    }
+		public void setMessages(List<Message> messages) {
+			this.messages = messages;
+		}
 
-    public boolean isInfer() {
-      return infer;
-    }
+		public String getUserId() {
+			return userId;
+		}
 
-    public void setInfer(boolean infer) {
-      this.infer = infer;
-    }
+		public void setUserId(String userId) {
+			this.userId = userId;
+		}
 
-    public String getMemoryType() {
-      return memoryType;
-    }
+		public Map<String, Object> getMetadata() {
+			return metadata;
+		}
 
-    public void setMemoryType(String memoryType) {
-      this.memoryType = memoryType;
-    }
-  }
+		public void setMetadata(Map<String, Object> metadata) {
+			this.metadata = metadata;
+		}
+
+		public boolean isInfer() {
+			return infer;
+		}
+
+		public void setInfer(boolean infer) {
+			this.infer = infer;
+		}
+
+		public String getMemoryType() {
+			return memoryType;
+		}
+
+		public void setMemoryType(String memoryType) {
+			this.memoryType = memoryType;
+		}
+
+	}
 
 }

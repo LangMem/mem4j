@@ -32,274 +32,282 @@ import java.util.Map;
 @ConfigurationProperties(prefix = MemoryConfig.CONFIG_PREFIX)
 public class MemoryConfig {
 
-  public static final String CONFIG_PREFIX = "langmem";
+	public static final String CONFIG_PREFIX = "langmem";
 
-  @NotNull
-  private VectorStoreConfig vectorStore;
+	@NotNull
+	private VectorStoreConfig vectorStore;
 
-  @NotNull
-  private LLMConfig llm;
+	@NotNull
+	private LLMConfig llm;
 
-  @NotNull
-  private EmbeddingConfig embeddings;
+	@NotNull
+	private EmbeddingConfig embeddings;
 
-  private GraphConfig graph;
+	private GraphConfig graph;
 
-  @JsonProperty("memory-types")
-  private Map<String, String> memoryTypes;
+	@JsonProperty("memory-types")
+	private Map<String, String> memoryTypes;
 
-  @JsonProperty("max-memories")
-  private Integer maxMemories = 1000;
+	@JsonProperty("max-memories")
+	private Integer maxMemories = 1000;
 
-  @JsonProperty("embedding-dimension")
-  private Integer embeddingDimension = 1536;
+	@JsonProperty("embedding-dimension")
+	private Integer embeddingDimension = 1536;
 
-  @JsonProperty("similarity-threshold")
-  private Double similarityThreshold = 0.7;
+	@JsonProperty("similarity-threshold")
+	private Double similarityThreshold = 0.7;
 
-  public static class VectorStoreConfig {
+	public static class VectorStoreConfig {
 
-    @NotBlank
-    private String type;
+		@NotBlank
+		private String type;
 
-    @NotBlank
-    private String url;
+		// @NotBlank
+		private String url;
 
-    @NotBlank
-    private String collection;
+		@NotBlank
+		private String collection;
 
-    private Map<String, Object> options;
+		private Map<String, Object> options;
 
-    // Getters and Setters
-    public String getType() {
-      return type;
-    }
+		// Getters and Setters
+		public String getType() {
+			return type;
+		}
 
-    public void setType(String type) {
-      this.type = type;
-    }
+		public void setType(String type) {
+			this.type = type;
+		}
 
-    public String getUrl() {
-      return url;
-    }
+		public String getUrl() {
+			return url;
+		}
 
-    public void setUrl(String url) {
-      this.url = url;
-    }
+		public void setUrl(String url) {
+			this.url = url;
+		}
 
-    public String getCollection() {
-      return collection;
-    }
+		public String getCollection() {
+			return collection;
+		}
 
-    public void setCollection(String collection) {
-      this.collection = collection;
-    }
+		public void setCollection(String collection) {
+			this.collection = collection;
+		}
 
-    public Map<String, Object> getOptions() {
-      return options;
-    }
+		public Map<String, Object> getOptions() {
+			return options;
+		}
 
-    public void setOptions(Map<String, Object> options) {
-      this.options = options;
-    }
-  }
+		public void setOptions(Map<String, Object> options) {
+			this.options = options;
+		}
 
-  public static class LLMConfig {
+	}
 
-    @NotBlank
-    private String type;
+	public static class LLMConfig {
 
-    @NotBlank
-    private String apiKey;
+		@NotBlank
+		private String type;
 
-    @NotBlank
-    private String model;
+		@NotBlank
+		private String apiKey;
 
-    private Map<String, Object> options;
+		@NotBlank
+		private String model;
 
-    // Getters and Setters
-    public String getType() {
-      return type;
-    }
+		private Map<String, Object> options;
 
-    public void setType(String type) {
-      this.type = type;
-    }
+		// Getters and Setters
+		public String getType() {
+			return type;
+		}
 
-    public String getApiKey() {
-      return apiKey;
-    }
+		public void setType(String type) {
+			this.type = type;
+		}
 
-    public void setApiKey(String apiKey) {
-      this.apiKey = apiKey;
-    }
+		public String getApiKey() {
+			return apiKey;
+		}
 
-    public String getModel() {
-      return model;
-    }
+		public void setApiKey(String apiKey) {
+			this.apiKey = apiKey;
+		}
 
-    public void setModel(String model) {
-      this.model = model;
-    }
-
-    public Map<String, Object> getOptions() {
-      return options;
-    }
-
-    public void setOptions(Map<String, Object> options) {
-      this.options = options;
-    }
-  }
+		public String getModel() {
+			return model;
+		}
 
-  public static class EmbeddingConfig {
+		public void setModel(String model) {
+			this.model = model;
+		}
 
-    @NotBlank
-    private String type;
+		public Map<String, Object> getOptions() {
+			return options;
+		}
 
-    @NotBlank
-    private String model;
+		public void setOptions(Map<String, Object> options) {
+			this.options = options;
+		}
 
-    private Map<String, Object> options;
+	}
 
-    // Getters and Setters
-    public String getType() {
-      return type;
-    }
-
-    public void setType(String type) {
-      this.type = type;
-    }
-
-    public String getModel() {
-      return model;
-    }
-
-    public void setModel(String model) {
-      this.model = model;
-    }
-
-    public Map<String, Object> getOptions() {
-      return options;
-    }
-
-    public void setOptions(Map<String, Object> options) {
-      this.options = options;
-    }
-  }
+	public static class EmbeddingConfig {
 
-  public static class GraphConfig {
+		@NotBlank
+		private String type;
 
-    private String type;
-    private String uri;
-    private String username;
-    private String password;
-    private Map<String, Object> options;
+		@NotBlank
+		private String model;
 
-    // Getters and Setters
-    public String getType() {
-      return type;
-    }
+		private Map<String, Object> options;
 
-    public void setType(String type) {
-      this.type = type;
-    }
-
-    public String getUri() {
-      return uri;
-    }
-
-    public void setUri(String uri) {
-      this.uri = uri;
-    }
-
-    public String getUsername() {
-      return username;
-    }
-
-    public void setUsername(String username) {
-      this.username = username;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String password) {
-      this.password = password;
-    }
-
-    public Map<String, Object> getOptions() {
-      return options;
-    }
-
-    public void setOptions(Map<String, Object> options) {
-      this.options = options;
-    }
-  }
-
-  // Getters and Setters
-  public VectorStoreConfig getVectorStore() {
-    return vectorStore;
-  }
-
-  public void setVectorStore(VectorStoreConfig vectorStore) {
-    this.vectorStore = vectorStore;
-  }
-
-  public LLMConfig getLlm() {
-    return llm;
-  }
-
-  public void setLlm(LLMConfig llm) {
-    this.llm = llm;
-  }
-
-  public EmbeddingConfig getEmbeddings() {
-    return embeddings;
-  }
-
-  public void setEmbeddings(EmbeddingConfig embeddings) {
-    this.embeddings = embeddings;
-  }
-
-  public GraphConfig getGraph() {
-    return graph;
-  }
-
-  public void setGraph(GraphConfig graph) {
-    this.graph = graph;
-  }
-
-  public Map<String, String> getMemoryTypes() {
-    return memoryTypes;
-  }
-
-  public void setMemoryTypes(Map<String, String> memoryTypes) {
-    this.memoryTypes = memoryTypes;
-  }
-
-  public Integer getMaxMemories() {
-    return maxMemories;
-  }
-
-  public void setMaxMemories(Integer maxMemories) {
-    this.maxMemories = maxMemories;
-  }
-
-  public Integer getEmbeddingDimension() {
-    return embeddingDimension;
-  }
-
-  public void setEmbeddingDimension(Integer embeddingDimension) {
-    this.embeddingDimension = embeddingDimension;
-  }
-
-  public Double getSimilarityThreshold() {
-    return similarityThreshold;
-  }
-
-  public void setSimilarityThreshold(Double similarityThreshold) {
-    this.similarityThreshold = similarityThreshold;
-  }
+		// Getters and Setters
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public String getModel() {
+			return model;
+		}
+
+		public void setModel(String model) {
+			this.model = model;
+		}
+
+		public Map<String, Object> getOptions() {
+			return options;
+		}
+
+		public void setOptions(Map<String, Object> options) {
+			this.options = options;
+		}
+
+	}
+
+	public static class GraphConfig {
+
+		private String type;
+
+		private String uri;
+
+		private String username;
+
+		private String password;
+
+		private Map<String, Object> options;
+
+		// Getters and Setters
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public String getUri() {
+			return uri;
+		}
+
+		public void setUri(String uri) {
+			this.uri = uri;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		public Map<String, Object> getOptions() {
+			return options;
+		}
+
+		public void setOptions(Map<String, Object> options) {
+			this.options = options;
+		}
+
+	}
+
+	// Getters and Setters
+	public VectorStoreConfig getVectorStore() {
+		return vectorStore;
+	}
+
+	public void setVectorStore(VectorStoreConfig vectorStore) {
+		this.vectorStore = vectorStore;
+	}
+
+	public LLMConfig getLlm() {
+		return llm;
+	}
+
+	public void setLlm(LLMConfig llm) {
+		this.llm = llm;
+	}
+
+	public EmbeddingConfig getEmbeddings() {
+		return embeddings;
+	}
+
+	public void setEmbeddings(EmbeddingConfig embeddings) {
+		this.embeddings = embeddings;
+	}
+
+	public GraphConfig getGraph() {
+		return graph;
+	}
+
+	public void setGraph(GraphConfig graph) {
+		this.graph = graph;
+	}
+
+	public Map<String, String> getMemoryTypes() {
+		return memoryTypes;
+	}
+
+	public void setMemoryTypes(Map<String, String> memoryTypes) {
+		this.memoryTypes = memoryTypes;
+	}
+
+	public Integer getMaxMemories() {
+		return maxMemories;
+	}
+
+	public void setMaxMemories(Integer maxMemories) {
+		this.maxMemories = maxMemories;
+	}
+
+	public Integer getEmbeddingDimension() {
+		return embeddingDimension;
+	}
+
+	public void setEmbeddingDimension(Integer embeddingDimension) {
+		this.embeddingDimension = embeddingDimension;
+	}
+
+	public Double getSimilarityThreshold() {
+		return similarityThreshold;
+	}
+
+	public void setSimilarityThreshold(Double similarityThreshold) {
+		this.similarityThreshold = similarityThreshold;
+	}
 
 }
