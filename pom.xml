@@ -17,31 +17,62 @@
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
+    <scm>
+        <connection>scm:git:https://github.com/LangMem/lang-memory.git</connection>
+        <developerConnection>scm:git:https://github.com/LangMem/lang-memory.git</developerConnection>
+        <url>https://github.com/LangMem/lang-memory</url>
+    </scm>
+
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/LangMem/lang-memory/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/LangMem/lang-memory/actions</url>
+    </ciManagement>
+
     <developers>
         <developer>
-            <id>langmem</id>
-            <name>LangMem Team</name>
-            <email>support@langmem.dev</email>
-            <organization>LangMem</organization>
-            <organizationUrl>https://github.com/LangMem/lang-memory</organizationUrl>
+            <name>Aias00</name>
+            <email>liuhongyu@apache.org</email>
+            <url>https://github.com/Aias00</url>
+        </developer>
+        <developer>
+            <name>Shown</name>
+            <email>shown@apache.org</email>
+            <url>https://github.com/yuluo-yx</url>
         </developer>
     </developers>
 
-    <scm>
-        <connection>scm:git:git://github.com/LangMem/lang-memory.git</connection>
-        <developerConnection>scm:git:ssh://github.com:LangMem/lang-memory.git</developerConnection>
-        <url>https://github.com/LangMem/lang-memory/tree/main</url>
-    </scm>
-
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
+        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+        <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
+        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <maven-assembly-plugin.version>3.7.0</maven-assembly-plugin.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version>
+        <asciidoctor-maven-plugin.version>2.2.3</asciidoctor-maven-plugin.version>
+        <springdoc-openapi-maven-plugin.version>1.4</springdoc-openapi-maven-plugin.version>
+        <spring-javaformat-maven-plugin.version>0.0.39</spring-javaformat-maven-plugin.version>
+        <maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
+        <sorter-maven-plugin.version>1.0.1</sorter-maven-plugin.version>
+        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+        <maven.deploy.skip>false</maven.deploy.skip>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <spring.boot.version>3.2.0</spring.boot.version>
         <spring.version>6.1.0</spring.version>
         <jackson.version>2.15.3</jackson.version>
@@ -56,6 +87,7 @@
         <mockito.version>5.7.0</mockito.version>
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.11</logback.version>
+
         <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
     </properties>
 
@@ -276,6 +308,15 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <configuration>
+                    <skip>${maven.deploy.skip}</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.3.0</version>
                 <executions>
@@ -343,8 +384,16 @@
         </plugins>
     </build>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+
     <profiles>
-        <!-- 开发环境Profile -->
         <profile>
             <id>dev</id>
             <activation>
@@ -352,40 +401,78 @@
             </activation>
         </profile>
 
-        <!-- 发布环境Profile -->
         <profile>
             <id>release</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <doclint>all,-missing</doclint>
+                        </configuration>
                         <executions>
                             <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>flatten-maven-plugin</artifactId>
+                        <version>${flatten-maven-plugin.version}</version>
+                        <configuration>
+                            <updatePomFile>true</updatePomFile>
+                            <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>flatten</id>
+                                <goals>
+                                    <goal>flatten</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                            </execution>
+                            <execution>
+                                <id>flatten.clean</id>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                                <phase>clean</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${central.publishing.maven.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
-
-    <!-- 分发管理 -->
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
 </project>
