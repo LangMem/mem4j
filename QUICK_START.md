@@ -6,7 +6,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/mem4j/mem4j.git
+git clone https://github.com/langMem/mem4j.git
 cd mem4j
 
 # 安装到本地Maven仓库

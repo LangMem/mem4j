@@ -14,9 +14,9 @@
 # limitations under the License.
 
 
-# Java Mem0 Startup Script
+# Java Mem4j Startup Script
 
-echo "Starting Java Mem0..."
+echo "Starting Java Mem4j..."
 
 # Check if Java is installed
 if ! command -v java &> /dev/null; then

@@ -37,4 +37,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        Please read the [Contribution Guideline](https://mem04j.com/docs/developer/contributor-guide/new-contributor-guide_dev) before submitting the PR.
+        Please read the [Contribution Guideline] before submitting the PR.

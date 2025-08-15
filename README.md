@@ -10,7 +10,7 @@
 
 ## Introduction
 
-Mem4j is a Java implementation of the Mem0 memory system, providing intelligent memory layer capabilities for AI assistants and agents. It enables personalized AI interactions by remembering user preferences, adapting to individual needs, and continuously learning over time.
+Mem4j is a Java implementation of the Mem4j memory system, providing intelligent memory layer capabilities for AI assistants and agents. It enables personalized AI interactions by remembering user preferences, adapting to individual needs, and continuously learning over time.
 
 ### Key Features
 
@@ -36,7 +36,7 @@ Mem4j is a Java implementation of the Mem0 memory system, providing intelligent 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/mem4j/mem4j.git
+git clone https://github.com/langMem/mem4j.git
 cd mem4j
 ```
 
@@ -319,7 +319,7 @@ public class AIAssistant {
 
 ```bash
 # Clone repository
-git clone https://github.com/mem4j/mem4j.git
+git clone https://github.com/langMem/mem4j.git
 cd mem4j
 
 # Configure environment

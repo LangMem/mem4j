@@ -49,7 +49,7 @@ public class ChatbotExample {
 	 */
 	public void run() {
 
-		System.out.println("=== Java Mem0 Chatbot Example ===");
+		System.out.println("=== Java Mem4j Chatbot Example ===");
 		System.out.println("Type 'exit' to quit");
 		System.out.println();
 

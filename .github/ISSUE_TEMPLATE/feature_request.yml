@@ -22,7 +22,7 @@ body:
     attributes:
       label: Feature Request
       description: >
-        Tip: Have you checked the docs https://mem04j.com, GitHub issues whether someone else has already reported your issue? Maybe the feature already exists?
+        Tip: Have you checked the docs, GitHub issues whether someone else has already reported your issue? Maybe the feature already exists?
 
       placeholder: >
         A concise description of what you're experiencing.
@@ -54,4 +54,4 @@ body:
       required: false
   - type: markdown
     attributes:
-      value: "Please read the [Contribution Guideline](https://mem04jcom/docs/developer/contributor-guide/new-contributor-guide_dev) before submitting the PR"
+      value: "Please read the [Contribution Guideline] before submitting the PR"
