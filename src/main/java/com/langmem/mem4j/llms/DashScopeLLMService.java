@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.mem4j.llms;
+package com.langmem.mem4j.llms;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mem4j.configs.MemoryConfig;
-import com.mem4j.memory.Message;
+import com.langmem.mem4j.configs.MemoryConfig;
+import com.langmem.mem4j.memory.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;

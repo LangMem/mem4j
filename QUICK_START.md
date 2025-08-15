@@ -59,7 +59,7 @@ cd my-mem4j-app
 
         <!-- Mem4j -->
         <dependency>
-            <groupId>com.mem4j</groupId>
+            <groupId>com.langmem.mem4j</groupId>
             <artifactId>mem4j</artifactId>
             <version>0.1.0</version>
         </dependency>
@@ -102,9 +102,9 @@ public class Application {
 ```java
 package com.example;
 
-import com.mem4j.memory.Memory;
-import com.mem4j.memory.MemoryItem;
-import com.mem4j.memory.Message;
+import com.langmem.mem4j.memory.Memory;
+import com.langmem.mem4j.memory.MemoryItem;
+import com.langmem.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -175,30 +175,31 @@ public class ChatController {
 server:
   port: 8080
 
-mem4j:
-  vector-store:
-    type: inmemory
-    collection: demo-memories
-    options:
-      similarity-threshold: 0.6
+langmem:
+  mem4j:
+    vector-store:
+      type: inmemory
+      collection: demo-memories
+      options:
+        similarity-threshold: 0.6
 
-  llm:
-    type: dashscope # 或使用 openai
-    api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
-    model: qwen-turbo
-    options:
-      max-tokens: 1000
-      temperature: 0.7
+    llm:
+      type: dashscope # 或使用 openai
+      api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
+      model: qwen-turbo
+      options:
+        max-tokens: 1000
+        temperature: 0.7
 
-  embeddings:
-    type: dashscope # 或使用 openai
-    model: text-embedding-v1
-    options:
-      dimensions: 1536
+    embeddings:
+      type: dashscope # 或使用 openai
+      model: text-embedding-v1
+      options:
+        dimensions: 1536
 
-  # 全局配置
-  max-memories: 1000
-  similarity-threshold: 0.6
+    # 全局配置
+    max-memories: 1000
+    similarity-threshold: 0.6
 ```
 
 ## 🏃 运行应用
@@ -227,7 +228,8 @@ curl -X POST "http://localhost:8080/chat" \
 如果你想使用真实的 LLM 服务，修改 `application.yml`：
 
 ```yaml
-mem4j:
+langmem:
+  mem4j:
   vector-store:
     type: in-memory
 

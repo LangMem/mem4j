@@ -16,7 +16,8 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 # Lang Memory Configuration for Docker
-mem4j:
+langmem:
+  mem4j:
   vector-store:
     type: qdrant
     url: http://qdrant:6333
@@ -53,7 +54,7 @@ mem4j:
 # Logging configuration for Docker
 logging:
   level:
-    com.mem4j: INFO
+    com.langmem.mem4j: INFO
     org.springframework: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

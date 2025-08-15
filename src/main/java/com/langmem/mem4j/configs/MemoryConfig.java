@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mem4j.configs;
+package com.langmem.mem4j.configs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +32,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = MemoryConfig.CONFIG_PREFIX)
 public class MemoryConfig {
 
-	public static final String CONFIG_PREFIX = "mem4j";
+	public static final String CONFIG_PREFIX = "langmem.mem4j";
 
 	@NotNull
 	private VectorStoreConfig vectorStore;

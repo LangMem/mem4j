@@ -14,36 +14,28 @@
  * limitations under the License.
  */
 
-package com.mem4j.llms;
-
-import com.mem4j.memory.Message;
-
-import java.util.List;
+package com.langmem.mem4j.embeddings;
 
 /**
- * Interface for LLM operations
+ * Interface for embedding operations
  */
-public interface LLMService {
+
+public interface EmbeddingService {
 
 	/**
-	 * Generate text response from a prompt
+	 * Generate embedding for a text
 	 */
-	String generate(String prompt);
+	double[] embed(String text);
 
 	/**
-	 * Generate response from a list of messages
+	 * Generate embeddings for multiple texts
 	 */
-	String generate(List<Message> messages);
+	double[][] embed(String[] texts);
 
 	/**
-	 * Generate response with system prompt and user message
+	 * Get the dimension of embeddings
 	 */
-	String generate(String systemPrompt, String userMessage);
-
-	/**
-	 * Generate structured response (JSON)
-	 */
-	String generateStructured(String prompt, String schema);
+	int getDimension();
 
 	/**
 	 * Check if the service is available

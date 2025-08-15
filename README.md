@@ -55,9 +55,9 @@ mvn spring-boot:run
 ### Basic Usage
 
 ```java
-import com.mem4j.memory.Memory;
-import com.mem4j.memory.MemoryItem;
-import com.mem4j.memory.Message;
+import com.langmem.mem4j.memory.Memory;
+import com.langmem.mem4j.memory.MemoryItem;
+import com.langmem.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,7 +87,7 @@ public class MyService {
 ### Core Components
 
 ```
-src/main/java/com/mem4j/
+src/main/java/com/langmem/mem4j/
 ├── memory/           # Core memory management
 ├── vectorstores/     # Vector database integrations
 ├── llms/            # LLM provider integrations
@@ -131,40 +131,41 @@ src/main/java/com/mem4j/
 
 ```yaml
 # Memory Configuration
-mem4j:
-  vector-store:
-    type: qdrant # 可选: inmemory, qdrant
-    url: http://localhost:6333
-    collection: memories
-    options:
-      similarity-threshold: 0.7
+langmem:
+  mem4j:
+    vector-store:
+      type: qdrant # 可选: inmemory, qdrant
+      url: http://localhost:6333
+      collection: memories
+      options:
+        similarity-threshold: 0.7
 
-  llm:
-    type: dashscope # 可选: openai, dashscope
-    api-key: ${DASHSCOPE_API_KEY}
-    model: qwen-turbo
-    options:
-      max-tokens: 1000
-      temperature: 0.7
+    llm:
+      type: dashscope # 可选: openai, dashscope
+      api-key: ${DASHSCOPE_API_KEY}
+      model: qwen-turbo
+      options:
+        max-tokens: 1000
+        temperature: 0.7
 
-  embeddings:
-    type: dashscope # 可选: openai, dashscope
-    model: text-embedding-v1
-    options:
-      dimensions: 1536
+    embeddings:
+      type: dashscope # 可选: openai, dashscope
+      model: text-embedding-v1
+      options:
+        dimensions: 1536
 
-  graph:
-    type: neo4j
-    uri: bolt://localhost:7687
-    username: neo4j
-    password: password
-    options:
-      database: neo4j
+    graph:
+      type: neo4j
+      uri: bolt://localhost:7687
+      username: neo4j
+      password: password
+      options:
+        database: neo4j
 
-  # 全局配置
-  max-memories: 1000
-  embedding-dimension: 1536
-  similarity-threshold: 0.7
+    # 全局配置
+    max-memories: 1000
+    embedding-dimension: 1536
+    similarity-threshold: 0.7
 ```
 
 ### Environment Variables

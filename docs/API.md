@@ -360,13 +360,14 @@ The application exposes health check endpoints:
 The API behavior can be configured through application properties:
 
 ```yaml
-mem4j:
-  vector-store:
-    type: in-memory
-    similarity-threshold: 0.7
-  llm:
-    type: openai
-    model: gpt-4o-mini
+langmem:
+  mem4j:
+    vector-store:
+      type: inmemory
+      similarity-threshold: 0.7
+    llm:
+      type: openai
+      model: gpt-4o-mini
   embeddings:
     type: openai
     model: text-embedding-3-small

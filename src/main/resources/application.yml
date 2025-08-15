@@ -19,51 +19,52 @@ spring:
         format_sql: true
 
 # Mem4j Configuration
-mem4j:
-  vector-store:
-    type: inmemory
-    url: http://localhost:6333
-    collection: memories
-    options:
-      similarity-threshold: 0.7
+langmem:
+  mem4j:
+    vector-store:
+      type: inmemory
+      url: http://localhost:6333
+      collection: memories
+      options:
+        similarity-threshold: 0.7
 
-  llm:
-    type: dashscope # 可选: openai, dashscope
-    api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
-    model: qwen-turbo # DashScope模型名称
-    options:
-      max-tokens: 1000
-      temperature: 0.7
+    llm:
+      type: dashscope # 可选: openai, dashscope
+      api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
+      model: qwen-turbo # DashScope模型名称
+      options:
+        max-tokens: 1000
+        temperature: 0.7
 
-  embeddings:
-    type: dashscope # 可选: openai, dashscope
-    model: text-embedding-v1 # DashScope嵌入模型名称
-    options:
-      dimensions: 1536
+    embeddings:
+      type: dashscope # 可选: openai, dashscope
+      model: text-embedding-v1 # DashScope嵌入模型名称
+      options:
+        dimensions: 1536
 
-  graph:
-    type: neo4j
-    uri: bolt://localhost:7687
-    username: neo4j
-    password: password
-    options:
-      database: neo4j
+    graph:
+      type: neo4j
+      uri: bolt://localhost:7687
+      username: neo4j
+      password: password
+      options:
+        database: neo4j
 
-  memory-types:
-    factual: "Stores facts and information"
-    episodic: "Stores events and experiences"
-    semantic: "Stores concepts and relationships"
-    procedural: "Stores how-to information"
-    working: "Temporary information for current task"
+    memory-types:
+      factual: "Stores facts and information"
+      episodic: "Stores events and experiences"
+      semantic: "Stores concepts and relationships"
+      procedural: "Stores how-to information"
+      working: "Temporary information for current task"
 
-  max-memories: 1000
-  embedding-dimension: 1536
-  similarity-threshold: 0.7
+    max-memories: 1000
+    embedding-dimension: 1536
+    similarity-threshold: 0.7
 
 # Logging configuration
 logging:
   level:
-    com.mem4j: DEBUG
+    com.langmem.mem4j: DEBUG
     org.springframework: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

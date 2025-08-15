@@ -25,11 +25,12 @@ export DASHSCOPE_API_KEY="your-dashscope-api-key"
 或者编辑 `src/main/resources/application.yml` 直接修改配置：
 
 ```yaml
-mem4j:
-  llm:
-    api-key: "your-actual-api-key-here"
-  embeddings:
-    type: dashscope
+langmem:
+  mem4j:
+    llm:
+      api-key: "your-actual-api-key-here"
+    embeddings:
+      type: dashscope
 ```
 
 ### 3. 运行示例
@@ -103,14 +104,15 @@ curl -X DELETE "http://localhost:9090/api/chat/memories/user1"
 如果您想使用 OpenAI 服务，可以修改配置：
 
 ```yaml
-mem4j:
-  llm:
-    type: openai
-    api-key: ${OPENAI_API_KEY}
-    model: gpt-3.5-turbo
-  embeddings:
-    type: openai
-    model: text-embedding-ada-002
+langmem:
+  mem4j:
+    llm:
+      type: openai
+      api-key: ${OPENAI_API_KEY}
+      model: gpt-3.5-turbo
+    embeddings:
+      type: openai
+      model: text-embedding-ada-002
 ```
 
 在生产环境中，建议：
@@ -138,6 +140,10 @@ private Memory memory;
 ### 添加记忆
 
 ```java
+import com.langmem.mem4j.memory.Message;
+import java.util.Arrays;
+import java.util.List;
+
 List<Message> messages = Arrays.asList(
     new Message("user", "我是张三，我喜欢吃披萨"),
     new Message("assistant", "很高兴认识你张三！我会记住你喜欢吃披萨。")
@@ -149,11 +155,17 @@ memory.add(messages, "user1");
 ### 搜索记忆
 
 ```java
+import com.langmem.mem4j.memory.MemoryItem;
+import java.util.List;
+
 List<MemoryItem> memories = memory.search("张三喜欢什么？", "user1");
 ```
 
 ### 获取所有记忆
 
 ```java
+import com.langmem.mem4j.memory.MemoryItem;
+import java.util.List;
+
 List<MemoryItem> allMemories = memory.getAll("user1", null, 50);
 ```

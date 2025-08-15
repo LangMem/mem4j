@@ -9,17 +9,18 @@ Mem4j 使用 Spring Boot 配置系统，支持 YAML 和 Properties 格式。所�
 ### 最小配置
 
 ```yaml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     type: inmemory
     collection: memories
 
-  llm:
+    llm:
     type: dashscope
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo
 
-  embeddings:
+    embeddings:
     type: dashscope
     model: text-embedding-v1
 ```
@@ -27,9 +28,10 @@ mem4j:
 ### 完整配置示例
 
 ```yaml
-mem4j:
-  # 向量存储配置
-  vector-store:
+langmem:
+  mem4j:
+    # 向量存储配置
+    vector-store:
     type: qdrant # 可选: inmemory, qdrant
     url: http://localhost:6333 # Qdrant 服务地址
     collection: memories # 集合名称
@@ -38,7 +40,7 @@ mem4j:
       batch-size: 100 # 批处理大小
 
   # LLM 配置
-  llm:
+    llm:
     type: dashscope # 可选: openai, dashscope
     api-key: ${DASHSCOPE_API_KEY} # API 密钥
     model: qwen-turbo # 模型名称
@@ -48,7 +50,7 @@ mem4j:
       timeout: 30 # 超时时间(秒)
 
   # 嵌入配置
-  embeddings:
+    embeddings:
     type: dashscope # 可选: openai, dashscope
     model: text-embedding-v1 # 嵌入模型
     options:
@@ -56,7 +58,7 @@ mem4j:
       batch-size: 10 # 批处理大小
 
   # 图数据库配置 (可选)
-  graph:
+    graph:
     type: neo4j # 图数据库类型
     uri: bolt://localhost:7687 # 连接URI
     username: neo4j # 用户名
@@ -86,8 +88,9 @@ mem4j:
 #### 1. 内存存储 (inmemory)
 
 ```yaml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     type: inmemory
     collection: memories
 ```
@@ -99,8 +102,9 @@ mem4j:
 #### 2. Qdrant
 
 ```yaml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     type: qdrant
     url: http://localhost:6333
     collection: memories
@@ -117,8 +121,9 @@ mem4j:
 #### 1. DashScope (通义千问)
 
 ```yaml
-mem4j:
-  llm:
+langmem:
+  mem4j:
+    llm:
     type: dashscope
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo # 或 qwen-plus, qwen-max
@@ -137,8 +142,9 @@ mem4j:
 #### 2. OpenAI
 
 ```yaml
-mem4j:
-  llm:
+langmem:
+  mem4j:
+    llm:
     type: openai
     api-key: ${OPENAI_API_KEY}
     model: gpt-3.5-turbo # 或 gpt-4
@@ -153,8 +159,9 @@ mem4j:
 #### 1. DashScope 嵌入
 
 ```yaml
-mem4j:
-  embeddings:
+langmem:
+  mem4j:
+    embeddings:
     type: dashscope
     model: text-embedding-v1
     options:
@@ -164,8 +171,9 @@ mem4j:
 #### 2. OpenAI 嵌入
 
 ```yaml
-mem4j:
-  embeddings:
+langmem:
+  mem4j:
+    embeddings:
     type: openai
     model: text-embedding-ada-002
     options:
@@ -199,41 +207,43 @@ export NEO4J_PASSWORD="your-password"
 ### 开发环境 (application-dev.yml)
 
 ```yaml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     type: inmemory
-  llm:
+    llm:
     type: dashscope
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo
-  embeddings:
+    embeddings:
     type: dashscope
     model: text-embedding-v1
 
 logging:
   level:
-    com.mem4j: DEBUG
+    com.langmem.mem4j: DEBUG
 ```
 
 ### 生产环境 (application-prod.yml)
 
 ```yaml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     type: qdrant
     url: ${QDRANT_URL}
     collection: production-memories
     options:
       api-key: ${QDRANT_API_KEY}
 
-  llm:
+    llm:
     type: dashscope
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-plus
     options:
       timeout: 30
 
-  embeddings:
+    embeddings:
     type: dashscope
     model: text-embedding-v1
 
@@ -242,7 +252,7 @@ mem4j:
 
 logging:
   level:
-    com.mem4j: INFO
+    com.langmem.mem4j: INFO
 ```
 
 ## 🐳 Docker 配置
@@ -251,22 +261,23 @@ logging:
 
 ```yaml
 # application-docker.yml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     type: qdrant
     url: http://qdrant:6333
     collection: docker-memories
 
-  llm:
+    llm:
     type: dashscope
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo
 
-  embeddings:
+    embeddings:
     type: dashscope
     model: text-embedding-v1
 
-  graph:
+    graph:
     type: neo4j
     uri: bolt://neo4j:7687
     username: neo4j
@@ -278,8 +289,9 @@ mem4j:
 ### 向量存储优化
 
 ```yaml
-mem4j:
-  vector-store:
+langmem:
+  mem4j:
+    vector-store:
     options:
       batch-size: 100 # 调整批处理大小
       similarity-threshold: 0.8 # 提高阈值减少结果数量
@@ -289,8 +301,9 @@ mem4j:
 ### LLM 优化
 
 ```yaml
-mem4j:
-  llm:
+langmem:
+  mem4j:
+    llm:
     options:
       max-tokens: 500 # 减少输出长度
       temperature: 0.1 # 降低随机性
@@ -300,8 +313,9 @@ mem4j:
 ### 嵌入优化
 
 ```yaml
-mem4j:
-  embeddings:
+langmem:
+  mem4j:
+    embeddings:
     options:
       batch-size: 20 # 批量处理嵌入
       cache-size: 1000 # 启用嵌入缓存
@@ -330,7 +344,8 @@ management:
     health:
       show-details: always
 
-mem4j:
+langmem:
+  mem4j:
   monitoring:
     enabled: true
     metrics:
@@ -365,10 +380,11 @@ mem4j:
 ```yaml
 logging:
   level:
-    com.mem4j: DEBUG
-    com.mem4j.configs: TRACE
+    com.langmem.mem4j: DEBUG
+    com.langmem.mem4j.configs: TRACE
 
-mem4j:
+langmem:
+  mem4j:
   debug:
     enabled: true
     log-requests: true

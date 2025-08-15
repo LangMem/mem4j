@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.mem4j.examples;
+package com.langmem.mem4j.examples;
 
-import com.mem4j.memory.Memory;
-import com.mem4j.memory.MemoryItem;
-import com.mem4j.memory.Message;
+import com.langmem.mem4j.memory.Memory;
+import com.langmem.mem4j.memory.MemoryItem;
+import com.langmem.mem4j.memory.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

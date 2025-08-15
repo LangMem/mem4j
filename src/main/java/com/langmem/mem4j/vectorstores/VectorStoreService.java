@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.mem4j.vectorstores;
+package com.langmem.mem4j.vectorstores;
 
-import com.mem4j.memory.MemoryItem;
+import com.langmem.mem4j.memory.MemoryItem;
 
 import java.util.List;
 import java.util.Map;

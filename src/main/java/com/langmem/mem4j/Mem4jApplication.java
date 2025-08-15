@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package com.mem4j.embeddings;
+package com.langmem.mem4j;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Interface for embedding operations
+ * Main Spring Boot application class for Mem4j
  */
+@SpringBootApplication
+public class Mem4jApplication {
 
-public interface EmbeddingService {
-
-	/**
-	 * Generate embedding for a text
-	 */
-	double[] embed(String text);
-
-	/**
-	 * Generate embeddings for multiple texts
-	 */
-	double[][] embed(String[] texts);
-
-	/**
-	 * Get the dimension of embeddings
-	 */
-	int getDimension();
-
-	/**
-	 * Check if the service is available
-	 */
-	boolean isAvailable();
+	public static void main(String[] args) {
+		SpringApplication.run(Mem4jApplication.class, args);
+	}
 
 }

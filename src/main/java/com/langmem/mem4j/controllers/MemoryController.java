@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.mem4j.controllers;
+package com.langmem.mem4j.controllers;
 
-import com.mem4j.memory.Memory;
-import com.mem4j.memory.MemoryItem;
-import com.mem4j.memory.MemoryType;
-import com.mem4j.memory.Message;
+import com.langmem.mem4j.memory.Memory;
+import com.langmem.mem4j.memory.MemoryItem;
+import com.langmem.mem4j.memory.MemoryType;
+import com.langmem.mem4j.memory.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
