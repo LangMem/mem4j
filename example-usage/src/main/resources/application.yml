@@ -9,7 +9,7 @@ spring:
 mem4j:
   # 使用内存向量存储（适合演示）
   vector-store:
-    type: in-memory
+    type: inmemory
     collection: example-memories
     options:
       similarity-threshold: 0.6

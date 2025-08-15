@@ -18,10 +18,10 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
 
-# Lang Memory Configuration
+# Mem4j Configuration
 mem4j:
   vector-store:
-    type: in-memory
+    type: inmemory
     url: http://localhost:6333
     collection: memories
     options:

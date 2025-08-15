@@ -177,18 +177,28 @@ server:
 
 mem4j:
   vector-store:
-    type: in-memory
+    type: inmemory
+    collection: demo-memories
     options:
       similarity-threshold: 0.6
 
   llm:
-    type: mock
-    api-key: mock-key
+    type: dashscope # 或使用 openai
+    api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
+    model: qwen-turbo
+    options:
+      max-tokens: 1000
+      temperature: 0.7
 
   embeddings:
-    type: mock
+    type: dashscope # 或使用 openai
+    model: text-embedding-v1
     options:
       dimensions: 1536
+
+  # 全局配置
+  max-memories: 1000
+  similarity-threshold: 0.6
 ```
 
 ## 🏃 运行应用

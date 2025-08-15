@@ -24,6 +24,8 @@ Mem4j is a Java implementation of the Mem0 memory system, providing intelligent 
 
 ## Quick Start
 
+> 🚀 **完整快速开始指南**: 查看 [QUICK_START.md](QUICK_START.md) 了解详细的项目创建和使用步骤。
+
 ### Prerequisites
 
 - Java 17 or higher
@@ -123,30 +125,46 @@ src/main/java/com/mem4j/
 
 ## Configuration
 
+> 📖 **详细配置指南**: 查看 [CONFIGURATION.md](docs/CONFIGURATION.md) 了解完整的配置选项和最佳实践。
+
 ### Application Properties
 
 ```yaml
 # Memory Configuration
 mem4j:
   vector-store:
-    type: qdrant
+    type: qdrant # 可选: inmemory, qdrant
     url: http://localhost:6333
     collection: memories
+    options:
+      similarity-threshold: 0.7
 
   llm:
-    type: dashscope # 或 openai
+    type: dashscope # 可选: openai, dashscope
     api-key: ${DASHSCOPE_API_KEY}
-    model: qwen-turbo # DashScope模型
+    model: qwen-turbo
+    options:
+      max-tokens: 1000
+      temperature: 0.7
 
   embeddings:
-    type: dashscope # 或 openai
-    model: text-embedding-v1 # DashScope嵌入模型
+    type: dashscope # 可选: openai, dashscope
+    model: text-embedding-v1
+    options:
+      dimensions: 1536
 
   graph:
     type: neo4j
     uri: bolt://localhost:7687
     username: neo4j
     password: password
+    options:
+      database: neo4j
+
+  # 全局配置
+  max-memories: 1000
+  embedding-dimension: 1536
+  similarity-threshold: 0.7
 ```
 
 ### Environment Variables
