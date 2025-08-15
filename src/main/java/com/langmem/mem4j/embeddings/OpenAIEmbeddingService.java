@@ -62,8 +62,8 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 			EmbeddingResult result = openAiService.createEmbeddings(request);
 
 			if (!result.getData().isEmpty()) {
-                List<Double> embedding = result.getData().get(0).getEmbedding();
-                return embedding.toArray(new Double[0]);
+				List<Double> embedding = result.getData().get(0).getEmbedding();
+				return embedding.toArray(new Double[0]);
 			}
 
 			throw new RuntimeException("No embedding generated");

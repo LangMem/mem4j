@@ -126,7 +126,7 @@ public class DashScopeEmbeddingService implements EmbeddingService {
 			JsonNode responseJson = objectMapper.readTree(response.getBody());
 			JsonNode embeddings = responseJson.path("output").path("embeddings");
 
-            Double[][] result = new Double[embeddings.size()][];
+			Double[][] result = new Double[embeddings.size()][];
 			for (int i = 0; i < embeddings.size(); i++) {
 				JsonNode embeddingArray = embeddings.get(i).path("embedding");
 				result[i] = new Double[embeddingArray.size()];

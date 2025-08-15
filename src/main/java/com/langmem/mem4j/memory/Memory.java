@@ -78,7 +78,7 @@ public class Memory {
 
 			// Generate embeddings and store
 			for (MemoryItem item : memoryItems) {
-                Double[] embedding = embeddingService.embed(item.getContent());
+				Double[] embedding = embeddingService.embed(item.getContent());
 				item.setEmbedding(embedding);
 				vectorStoreService.add(item);
 			}
@@ -107,7 +107,7 @@ public class Memory {
 
 		try {
 			// Generate embedding for query
-            Double[] queryEmbedding = embeddingService.embed(query);
+			Double[] queryEmbedding = embeddingService.embed(query);
 
 			// Build search filters
 			Map<String, Object> searchFilters = buildSearchFilters(userId, filters);
@@ -155,7 +155,7 @@ public class Memory {
 				if (data.containsKey("content")) {
 					item.setContent((String) data.get("content"));
 					// Re-embed if content changed
-                    Double[] embedding = embeddingService.embed(item.getContent());
+					Double[] embedding = embeddingService.embed(item.getContent());
 					item.setEmbedding(embedding);
 				}
 				if (data.containsKey("metadata")) {

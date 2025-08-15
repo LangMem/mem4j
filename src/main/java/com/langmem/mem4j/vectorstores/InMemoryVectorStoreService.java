@@ -58,7 +58,8 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 	}
 
 	@Override
-	public List<MemoryItem> search(Double[] queryEmbedding, Map<String, Object> filters, Integer limit, Double threshold) {
+	public List<MemoryItem> search(Double[] queryEmbedding, Map<String, Object> filters, Integer limit,
+			Double threshold) {
 
 		try {
 			return memoryStore.values().stream().filter(item -> matchesFilters(item, filters)).map(item -> {
@@ -73,7 +74,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 				result.setUpdatedAt(item.getUpdatedAt());
 
 				// Calculate similarity score
-                Double[] itemEmbedding = embeddings.get(item.getId());
+				Double[] itemEmbedding = embeddings.get(item.getId());
 				if (itemEmbedding != null) {
 					double similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
 					result.setScore(similarity);
