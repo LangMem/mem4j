@@ -36,7 +36,7 @@ Mem4j is a Java implementation of the Mem0 memory system, providing intelligent 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/mem4j/mem4j.git
+git clone https://github.com/Mem4j/mem4j.git
 cd mem4j
 ```
 
@@ -319,7 +319,7 @@ public class AIAssistant {
 
 ```bash
 # Clone repository
-git clone https://github.com/mem4j/mem4j.git
+git clone https://github.com/Mem4j/mem4j.git
 cd mem4j
 
 # Configure environment
@@ -400,11 +400,6 @@ Mem4j now supports **DashScope** as a primary LLM and embedding provider, offeri
 - **High Availability**: 99.9% uptime guarantee
 
 For detailed setup instructions, see [DASHSCOPE_SETUP.md](DASHSCOPE_SETUP.md).
-
-## Language Support
-
-- **English**: [README.md](README.md) (This file)
-- **中文**: [README_zh.md](README_zh.md)
 
 ## License
 
