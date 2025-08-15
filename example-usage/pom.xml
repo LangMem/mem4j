@@ -30,7 +30,7 @@
 
         <!-- Mem4j Library -->
         <dependency>
-            <groupId>com.mem4j</groupId>
+            <groupId>com.langMem</groupId>
             <artifactId>mem4j</artifactId>
             <version>0.1.0</version>
         </dependency>
@@ -51,6 +51,7 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
         </plugins>

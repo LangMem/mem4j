@@ -58,12 +58,12 @@ mvn spring-boot:run
 
 #### 方式二：手动测试 API
 
-示例应用会在 `http://localhost:9090` 启动，提供以下 API：
+示例应用会在 `http://localhost:19090` 启动，提供以下 API：
 
 #### 发送消息
 
 ```bash
-curl -X POST "http://localhost:9090/api/chat/send" \
+curl -X POST "http://localhost:19090/api/chat/send" \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user1",
@@ -74,13 +74,13 @@ curl -X POST "http://localhost:9090/api/chat/send" \
 #### 获取用户记忆
 
 ```bash
-curl "http://localhost:9090/api/chat/memories/user1"
+curl "http://localhost:19090/api/chat/memories/user1"
 ```
 
 #### 清空用户记忆
 
 ```bash
-curl -X DELETE "http://localhost:9090/api/chat/memories/user1"
+curl -X DELETE "http://localhost:19090/api/chat/memories/user1"
 ```
 
 ## 📋 配置说明

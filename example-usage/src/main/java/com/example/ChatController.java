@@ -57,12 +57,12 @@ public class ChatController {
   }
 
   @GetMapping("/memories/{userId}")
-  public List<MemoryItem> getMemories(@PathVariable String userId) {
+  public List<MemoryItem> getMemories(@PathVariable("userId") String userId) {
     return memory.getAll(userId, null, 50);
   }
 
   @DeleteMapping("/memories/{userId}")
-  public Map<String, String> clearMemories(@PathVariable String userId) {
+  public Map<String, String> clearMemories(@PathVariable("userId") String userId) {
     memory.deleteAll(userId);
     return Map.of("message", "All memories cleared for user: " + userId);
   }
