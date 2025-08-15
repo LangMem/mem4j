@@ -38,7 +38,14 @@ ignore_suffix = [
     ".tar.gz", ".tar.bz2", ".tar.xz", ".tgz", ".tbz2", ".txz"
 ]
 
+# A list of ignored files
+ignore_files = [
+    ".gitignore"
+]
+
 # Check if the incoming file ends with a blank line
+
+
 def check_file(path):
     try:
         with open(path, 'rb') as f:
@@ -54,23 +61,29 @@ def check_file(path):
     return None
 
 # Accept a list, check if each file ends with a blank line, and if not, write a new line at the end of the file
+
+
 def add_newline(file):
     print("Fixing: " + file)
     with open(file, 'a') as f:
         f.write('\n')
 
 # Gets all the files in the current directory and returns a list of files
+
+
 def get_files():
     files_to_check = []
     for root, dirs, files in os.walk('.'):
         # Ignore the specified directory
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
         for file in files:
-            if not any(file.endswith(suffix) for suffix in ignore_suffix):
+            if not any(file.endswith(suffix) for suffix in ignore_suffix) and file not in ignore_files:
                 files_to_check.append(os.path.join(root, file))
     return files_to_check
 
 # Run the checks
+
+
 def run(check_only=False):
     files = get_files()
     files_to_fix = []
@@ -93,6 +106,7 @@ def run(check_only=False):
                 print(f"Added a line break at the end of {file}.")
     else:
         print("All files have ended with a blank line.")
+
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else 'check'
