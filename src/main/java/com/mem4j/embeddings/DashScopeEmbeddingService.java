@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mem4j.configs.MemoryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -39,6 +40,7 @@ import java.util.Map;
  */
 
 @Service
+@Primary
 public class DashScopeEmbeddingService implements EmbeddingService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DashScopeEmbeddingService.class);
@@ -88,7 +90,7 @@ public class DashScopeEmbeddingService implements EmbeddingService {
 				JsonNode firstEmbedding = embeddings.get(0);
 				JsonNode embeddingArray = firstEmbedding.path("embedding");
 
-				double[] result = new double[embeddingArray.size()];
+				Double[] result = new Double[embeddingArray.size()];
 				for (int i = 0; i < embeddingArray.size(); i++) {
 					result[i] = embeddingArray.get(i).asDouble();
 				}
@@ -124,10 +126,10 @@ public class DashScopeEmbeddingService implements EmbeddingService {
 			JsonNode responseJson = objectMapper.readTree(response.getBody());
 			JsonNode embeddings = responseJson.path("output").path("embeddings");
 
-			double[][] result = new double[embeddings.size()][];
+            Double[][] result = new Double[embeddings.size()][];
 			for (int i = 0; i < embeddings.size(); i++) {
 				JsonNode embeddingArray = embeddings.get(i).path("embedding");
-				result[i] = new double[embeddingArray.size()];
+				result[i] = new Double[embeddingArray.size()];
 				for (int j = 0; j < embeddingArray.size(); j++) {
 					result[i][j] = embeddingArray.get(j).asDouble();
 				}

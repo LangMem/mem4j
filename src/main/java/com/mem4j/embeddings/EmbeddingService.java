@@ -23,13 +23,13 @@ package com.mem4j.embeddings;
 public interface EmbeddingService {
 
 	/**
-	 * Generate embedding for a text
-	 */
-	Double[] embed(String text);
+     * Generate embedding for a text
+     */
+    Double[] embed(String text);
 
 	/**
-	 * Generate embeddings for multiple texts
-	 */
+     * Generate embeddings for multiple texts
+     */
     Double[][] embed(String[] texts);
 
 	/**
