@@ -37,7 +37,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 
 	private final Map<String, MemoryItem> memoryStore = new ConcurrentHashMap<>();
 
-	private final Map<String, double[]> embeddings = new ConcurrentHashMap<>();
+	private final Map<String, Double[]> embeddings = new ConcurrentHashMap<>();
 
 	@Override
 	public void add(MemoryItem item) {
@@ -58,7 +58,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 	}
 
 	@Override
-	public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
+	public List<MemoryItem> search(Double[] queryEmbedding, Map<String, Object> filters, Integer limit, Double threshold) {
 
 		try {
 			return memoryStore.values().stream().filter(item -> matchesFilters(item, filters)).map(item -> {
@@ -73,7 +73,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 				result.setUpdatedAt(item.getUpdatedAt());
 
 				// Calculate similarity score
-				double[] itemEmbedding = embeddings.get(item.getId());
+                Double[] itemEmbedding = embeddings.get(item.getId());
 				if (itemEmbedding != null) {
 					double similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
 					result.setScore(similarity);
@@ -94,7 +94,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 	}
 
 	@Override
-	public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
+	public List<MemoryItem> getAll(Map<String, Object> filters, Integer limit) {
 
 		try {
 			return memoryStore.values()
@@ -216,7 +216,7 @@ public class InMemoryVectorStoreService implements VectorStoreService {
 		});
 	}
 
-	private double cosineSimilarity(double[] a, double[] b) {
+	private Double cosineSimilarity(Double[] a, Double[] b) {
 
 		if (a.length != b.length) {
 			return 0.0;

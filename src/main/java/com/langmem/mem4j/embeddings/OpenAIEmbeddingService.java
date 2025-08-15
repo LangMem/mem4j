@@ -54,7 +54,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public double[] embed(String text) {
+	public Double[] embed(String text) {
 
 		try {
 			EmbeddingRequest request = EmbeddingRequest.builder().model(model).input(List.of(text)).build();
@@ -62,8 +62,8 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 			EmbeddingResult result = openAiService.createEmbeddings(request);
 
 			if (!result.getData().isEmpty()) {
-				List<Double> embedding = result.getData().get(0).getEmbedding();
-				return embedding.stream().mapToDouble(Double::doubleValue).toArray();
+                List<Double> embedding = result.getData().get(0).getEmbedding();
+                return embedding.toArray(new Double[0]);
 			}
 
 			throw new RuntimeException("No embedding generated");
@@ -76,7 +76,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public double[][] embed(String[] texts) {
+	public Double[][] embed(String[] texts) {
 
 		try {
 			EmbeddingRequest request = EmbeddingRequest.builder().model(model).input(Arrays.asList(texts)).build();
@@ -86,7 +86,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 			return result.getData()
 				.stream()
 				.map(data -> data.getEmbedding().stream().mapToDouble(Double::doubleValue).toArray())
-				.toArray(double[][]::new);
+				.toArray(Double[][]::new);
 		}
 		catch (Exception e) {
 
@@ -96,12 +96,12 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public int getDimension() {
+	public Integer getDimension() {
 		return dimension;
 	}
 
 	@Override
-	public boolean isAvailable() {
+	public Boolean isAvailable() {
 
 		try {
 			// Simple test to check if service is available

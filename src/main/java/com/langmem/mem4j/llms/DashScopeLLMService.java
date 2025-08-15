@@ -22,6 +22,7 @@ import com.langmem.mem4j.configs.MemoryConfig;
 import com.langmem.mem4j.memory.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
+@Primary
 public class DashScopeLLMService implements LLMService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DashScopeLLMService.class);
