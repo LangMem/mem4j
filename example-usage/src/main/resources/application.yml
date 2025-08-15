@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: lang-memory-example
+    name: mem4j-example
 
-# Lang Memory Configuration
-langmem:
+# Mem4j Configuration
+mem4j:
   # 使用内存向量存储（适合演示）
   vector-store:
     type: in-memory
@@ -38,7 +38,7 @@ langmem:
 # 日志配置
 logging:
   level:
-    com.langmem: INFO
+    com.mem4j: INFO
     com.example: DEBUG
   pattern:
     console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

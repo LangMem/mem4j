@@ -36,13 +36,13 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Create non-root user
-RUN groupadd -r langmem && useradd -r -g langmem langmem
+RUN groupadd -r mem4j && useradd -r -g mem4j mem4j
 
 # Create logs directory
-RUN mkdir -p /app/logs && chown -R langmem:langmem /app
+RUN mkdir -p /app/logs && chown -R mem4j:mem4j /app
 
 # Switch to non-root user
-USER langmem
+USER mem4j
 
 # Expose port
 EXPOSE 8080
@@ -51,4 +51,4 @@ EXPOSE 8080
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 # Run the application
-CMD ["sh", "-c", "java $JAVA_OPTS -jar target/lang-memory-0.1.0.jar"] 
+CMD ["sh", "-c", "java $JAVA_OPTS -jar target/mem4j-0.1.0.jar"] 

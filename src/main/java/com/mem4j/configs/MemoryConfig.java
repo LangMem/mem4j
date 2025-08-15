@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.langmem.configs;
+package com.mem4j.configs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -25,14 +25,14 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Map;
 
 /**
- * Configuration class for Lang Memory system
+ * Configuration class for Mem4j system
  */
 
 @Validated
 @ConfigurationProperties(prefix = MemoryConfig.CONFIG_PREFIX)
 public class MemoryConfig {
 
-	public static final String CONFIG_PREFIX = "langmem";
+	public static final String CONFIG_PREFIX = "mem4j";
 
 	@NotNull
 	private VectorStoreConfig vectorStore;

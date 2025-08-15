@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.langmem.embeddings;
+package com.mem4j.embeddings;
 
 /**
  * Interface for embedding operations

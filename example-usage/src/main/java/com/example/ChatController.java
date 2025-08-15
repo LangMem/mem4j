@@ -16,9 +16,9 @@
 
 package com.example;
 
-import com.langmem.memory.Memory;
-import com.langmem.memory.MemoryItem;
-import com.langmem.memory.Message;
+import com.mem4j.memory.Memory;
+import com.mem4j.memory.MemoryItem;
+import com.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

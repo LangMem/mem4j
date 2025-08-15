@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.langmem.llms;
+package com.mem4j.llms;
 
-import com.langmem.memory.Message;
+import com.mem4j.memory.Message;
 
 import java.util.List;
 

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.langmem;
+package com.mem4j;
 
-import com.langmem.configs.MemoryConfig;
-import com.langmem.embeddings.EmbeddingService;
-import com.langmem.llms.LLMService;
-import com.langmem.memory.Memory;
-import com.langmem.memory.MemoryItem;
-import com.langmem.memory.MemoryType;
-import com.langmem.memory.Message;
-import com.langmem.vectorstores.VectorStoreService;
+import com.mem4j.configs.MemoryConfig;
+import com.mem4j.embeddings.EmbeddingService;
+import com.mem4j.llms.LLMService;
+import com.mem4j.memory.Memory;
+import com.mem4j.memory.MemoryItem;
+import com.mem4j.memory.MemoryType;
+import com.mem4j.memory.Message;
+import com.mem4j.vectorstores.VectorStoreService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

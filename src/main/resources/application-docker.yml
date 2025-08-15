@@ -1,13 +1,13 @@
 spring:
   application:
-    name: lang-memory-docker
+    name: mem4j-docker
 
   # Database configuration for Docker
   datasource:
-    url: jdbc:postgresql://postgres:5432/langmem
+    url: jdbc:postgresql://postgres:5432/mem4j
     driver-class-name: org.postgresql.Driver
-    username: langmem
-    password: langmem_password
+    username: mem4j
+    password: mem4j_password
 
   jpa:
     hibernate:
@@ -16,7 +16,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 # Lang Memory Configuration for Docker
-langmem:
+mem4j:
   vector-store:
     type: qdrant
     url: http://qdrant:6333
@@ -53,12 +53,12 @@ langmem:
 # Logging configuration for Docker
 logging:
   level:
-    com.langmem: INFO
+    com.mem4j: INFO
     org.springframework: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
-    name: /app/logs/lang-memory.log
+    name: /app/logs/mem4j.log
 
 # Server configuration for Docker
 server:

@@ -5,14 +5,14 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.langmem</groupId>
-    <artifactId>lang-memory</artifactId>
+    <groupId>com.mem4j</groupId>
+    <artifactId>mem4j</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
-    <name>Lang Memory</name>
+    <name>Mem4j</name>
     <description>Long-term memory for AI Agents - Java Implementation</description>
-    <url>https://github.com/LangMem/lang-memory</url>
+    <url>https://github.com/Mem4j/mem4j</url>
 
     <licenses>
         <license>
@@ -23,18 +23,18 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/LangMem/lang-memory.git</connection>
-        <developerConnection>scm:git:https://github.com/LangMem/lang-memory.git</developerConnection>
-        <url>https://github.com/LangMem/lang-memory</url>
+        <connection>scm:git:https://github.com/Mem4j/mem4j.git</connection>
+        <developerConnection>scm:git:https://github.com/Mem4j/mem4j.git</developerConnection>
+        <url>https://github.com/Mem4j/mem4j</url>
     </scm>
 
     <issueManagement>
         <system>Github Issues</system>
-        <url>https://github.com/LangMem/lang-memory/issues</url>
+        <url>https://github.com/Mem4j/mem4j/issues</url>
     </issueManagement>
     <ciManagement>
         <system>Github Actions</system>
-        <url>https://github.com/LangMem/lang-memory/actions</url>
+        <url>https://github.com/Mem4j/mem4j/actions</url>
     </ciManagement>
 
     <developers>

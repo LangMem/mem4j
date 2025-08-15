@@ -13,8 +13,8 @@
 # limitations under the License.
 
 services:
-  # Lang Memory Application
-  lang-memory:
+  # Mem4j Application
+  mem4j:
     build: .
     ports:
       - "8080:8080"
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./logs:/app/logs
     networks:
-      - langmem-network
+      - mem4j-network
 
   # PostgreSQL Database
   postgres:
@@ -37,13 +37,13 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=langmem
-      - POSTGRES_USER=langmem
-      - POSTGRES_PASSWORD=langmem_password
+      - POSTGRES_DB=mem4j
+      - POSTGRES_USER=mem4j
+      - POSTGRES_PASSWORD=mem4j_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - langmem-network
+      - mem4j-network
 
   # Qdrant Vector Database
   qdrant:
@@ -57,7 +57,7 @@ services:
       - QDRANT__SERVICE__HTTP_PORT=6333
       - QDRANT__SERVICE__GRPC_PORT=6334
     networks:
-      - langmem-network
+      - mem4j-network
 
   # Neo4j Graph Database
   neo4j:
@@ -75,7 +75,7 @@ services:
       - neo4j_import:/var/lib/neo4j/import
       - neo4j_plugins:/plugins
     networks:
-      - langmem-network
+      - mem4j-network
 
   # Elasticsearch (Optional)
   elasticsearch:
@@ -89,7 +89,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
-      - langmem-network
+      - mem4j-network
 
   # Weaviate (Optional)
   weaviate:
@@ -106,7 +106,7 @@ services:
     volumes:
       - weaviate_data:/var/lib/weaviate
     networks:
-      - langmem-network
+      - mem4j-network
 
 volumes:
   postgres_data:
@@ -119,5 +119,5 @@ volumes:
   weaviate_data:
 
 networks:
-  langmem-network:
+  mem4j-network:
     driver: bridge

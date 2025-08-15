@@ -1,10 +1,10 @@
 spring:
   application:
-    name: lang-memory
+    name: mem4j
 
   # Database configuration (for metadata storage)
   datasource:
-    url: jdbc:h2:mem:langmemdb
+    url: jdbc:h2:mem:mem4jdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -19,7 +19,7 @@ spring:
         format_sql: true
 
 # Lang Memory Configuration
-langmem:
+mem4j:
   vector-store:
     type: in-memory
     url: http://localhost:6333
@@ -63,7 +63,7 @@ langmem:
 # Logging configuration
 logging:
   level:
-    com.langmem: DEBUG
+    com.mem4j: DEBUG
     org.springframework: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

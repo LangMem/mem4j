@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>lang-memory-usage-example</artifactId>
+    <artifactId>mem4j-usage-example</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Lang Memory Usage Example</name>
-    <description>Example project showing how to use Lang Memory</description>
+    <name>Mem4j Usage Example</name>
+    <description>Example project showing how to use Mem4j</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -28,10 +28,10 @@
             <version>${spring.boot.version}</version>
         </dependency>
 
-        <!-- Lang Memory Library -->
+        <!-- Mem4j Library -->
         <dependency>
-            <groupId>com.langmem</groupId>
-            <artifactId>lang-memory</artifactId>
+            <groupId>com.mem4j</groupId>
+            <artifactId>mem4j</artifactId>
             <version>0.1.0</version>
         </dependency>
     </dependencies>

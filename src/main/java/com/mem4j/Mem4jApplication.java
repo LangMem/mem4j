@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.langmem;
+package com.mem4j;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Main Spring Boot application class for Lang Memory
+ * Main Spring Boot application class for Mem4j
  */
 @SpringBootApplication
-public class LangMemoryApplication {
+public class Mem4jApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LangMemoryApplication.class, args);
+		SpringApplication.run(Mem4jApplication.class, args);
 	}
 
 }

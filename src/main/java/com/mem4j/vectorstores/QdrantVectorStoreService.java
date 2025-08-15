@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.langmem.vectorstores;
+package com.mem4j.vectorstores;
 
-import com.langmem.configs.MemoryConfig;
-import com.langmem.memory.MemoryItem;
+import com.mem4j.configs.MemoryConfig;
+import com.mem4j.memory.MemoryItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

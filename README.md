@@ -1,7 +1,7 @@
-# Java Mem0
+# Mem4j
 
 <p align="center">
-  <img src="docs/images/banner-sm.png" width="800px" alt="Java Mem0 - The Memory Layer for Personalized AI">
+  <img src="docs/images/banner-sm.png" width="800px" alt="Mem4j - The Memory Layer for Personalized AI">
 </p>
 
 <p align="center">
@@ -10,7 +10,7 @@
 
 ## Introduction
 
-Java Mem0 is a Java implementation of the Mem0 memory system, providing intelligent memory layer capabilities for AI assistants and agents. It enables personalized AI interactions by remembering user preferences, adapting to individual needs, and continuously learning over time.
+Mem4j is a Java implementation of the Mem0 memory system, providing intelligent memory layer capabilities for AI assistants and agents. It enables personalized AI interactions by remembering user preferences, adapting to individual needs, and continuously learning over time.
 
 ### Key Features
 
@@ -34,8 +34,8 @@ Java Mem0 is a Java implementation of the Mem0 memory system, providing intellig
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/LangMem/lang-memory.git
-cd lang-memory
+git clone https://github.com/Mem4j/mem4j.git
+cd mem4j
 ```
 
 2. Build the project:
@@ -53,9 +53,9 @@ mvn spring-boot:run
 ### Basic Usage
 
 ```java
-import com.langmem.memory.Memory;
-import com.langmem.memory.MemoryItem;
-import com.langmem.memory.Message;
+import com.mem4j.memory.Memory;
+import com.mem4j.memory.MemoryItem;
+import com.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,7 +85,7 @@ public class MyService {
 ### Core Components
 
 ```
-src/main/java/com/langmem/
+src/main/java/com/mem4j/
 ├── memory/           # Core memory management
 ├── vectorstores/     # Vector database integrations
 ├── llms/            # LLM provider integrations
@@ -127,7 +127,7 @@ src/main/java/com/langmem/
 
 ```yaml
 # Memory Configuration
-langmem:
+mem4j:
   vector-store:
     type: qdrant
     url: http://localhost:6333
@@ -300,8 +300,8 @@ public class AIAssistant {
 
 ```bash
 # Clone repository
-git clone https://github.com/LangMem/lang-memory.git
-cd lang-memory
+git clone https://github.com/Mem4j/mem4j.git
+cd mem4j
 
 # Configure environment
 export DASHSCOPE_API_KEY="your-dashscope-api-key"
@@ -340,7 +340,7 @@ mvn jacoco:prepare-agent test jacoco:report
 
 ## DashScope Integration
 
-Java Mem0 now supports **DashScope** (通义千问) as a primary LLM and embedding provider, offering excellent Chinese language support and optimized performance for the Asia-Pacific region.
+Mem4j now supports **DashScope** (通义千问) as a primary LLM and embedding provider, offering excellent Chinese language support and optimized performance for the Asia-Pacific region.
 
 ### Quick Setup
 
@@ -357,7 +357,7 @@ Java Mem0 now supports **DashScope** (通义千问) as a primary LLM and embeddi
 
 3. **Update Configuration**:
    ```yaml
-   langmem:
+   mem4j:
      llm:
        type: dashscope
        api-key: ${DASHSCOPE_API_KEY}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.langmem.memory;
+package com.mem4j.memory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

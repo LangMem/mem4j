@@ -1,8 +1,8 @@
-# Java Mem0 API Documentation
+# Mem4j API Documentation
 
 ## Overview
 
-Java Mem0 provides a REST API for managing AI memory operations. The API is built on Spring Boot and provides endpoints for adding, searching, updating, and deleting memories.
+Mem4j provides a REST API for managing AI memory operations. The API is built on Spring Boot and provides endpoints for adding, searching, updating, and deleting memories.
 
 ## Base URL
 
@@ -360,7 +360,7 @@ The application exposes health check endpoints:
 The API behavior can be configured through application properties:
 
 ```yaml
-langmem:
+mem4j:
   vector-store:
     type: in-memory
     similarity-threshold: 0.7

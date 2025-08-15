@@ -1,13 +1,13 @@
-# 🚀 Lang Memory 快速开始
+# 🚀 Mem4j 快速开始
 
 ## 📦 安装库到本地仓库
 
-首先，将 Lang Memory 安装到你的本地 Maven 仓库：
+首先，将 Mem4j 安装到你的本地 Maven 仓库：
 
 ```bash
 # 克隆仓库
-git clone https://github.com/LangMem/lang-memory.git
-cd lang-memory
+git clone https://github.com/Mem4j/mem4j.git
+cd mem4j
 
 # 安装到本地Maven仓库
 mvn clean install -DskipTests
@@ -20,11 +20,11 @@ mvn clean install -DskipTests
 ```bash
 mvn archetype:generate \
   -DgroupId=com.example \
-  -DartifactId=my-lang-memory-app \
+  -DartifactId=my-mem4j-app \
   -DarchetypeArtifactId=maven-archetype-quickstart \
   -DinteractiveMode=false
 
-cd my-lang-memory-app
+cd my-mem4j-app
 ```
 
 ### 2. 修改 pom.xml
@@ -38,7 +38,7 @@ cd my-lang-memory-app
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>my-lang-memory-app</artifactId>
+    <artifactId>my-mem4j-app</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -57,10 +57,10 @@ cd my-lang-memory-app
             <version>${spring.boot.version}</version>
         </dependency>
 
-        <!-- Lang Memory -->
+        <!-- Mem4j -->
         <dependency>
-            <groupId>com.langmem</groupId>
-            <artifactId>lang-memory</artifactId>
+            <groupId>com.mem4j</groupId>
+            <artifactId>mem4j</artifactId>
             <version>0.1.0</version>
         </dependency>
     </dependencies>
@@ -102,9 +102,9 @@ public class Application {
 ```java
 package com.example;
 
-import com.langmem.memory.Memory;
-import com.langmem.memory.MemoryItem;
-import com.langmem.memory.Message;
+import com.mem4j.memory.Memory;
+import com.mem4j.memory.MemoryItem;
+import com.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -175,7 +175,7 @@ public class ChatController {
 server:
   port: 8080
 
-langmem:
+mem4j:
   vector-store:
     type: in-memory
     options:
@@ -217,7 +217,7 @@ curl -X POST "http://localhost:8080/chat" \
 如果你想使用真实的 LLM 服务，修改 `application.yml`：
 
 ```yaml
-langmem:
+mem4j:
   vector-store:
     type: in-memory
 
@@ -246,4 +246,4 @@ mvn spring-boot:run
 
 ---
 
-🎉 恭喜！你已经成功集成了 Lang Memory！
+🎉 恭喜！你已经成功集成了 Mem4j！
