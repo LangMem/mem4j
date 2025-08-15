@@ -14,13 +14,48 @@ mvn clean install -DskipTests
 cd example-usage
 ```
 
-### 2. 运行示例
+### 2. 配置 API Key
+
+设置 DashScope API Key 环境变量（推荐）：
+
+```bash
+export DASHSCOPE_API_KEY="your-dashscope-api-key"
+```
+
+或者编辑 `src/main/resources/application.yml` 直接修改配置：
+
+```yaml
+mem4j:
+  llm:
+    api-key: "your-actual-api-key-here"
+  embeddings:
+    type: dashscope
+```
+
+### 3. 运行示例
+
+#### 方式一：使用便捷脚本（推荐）
+
+```bash
+./start-example.sh
+```
+
+#### 方式二：使用 Maven 命令
 
 ```bash
 mvn spring-boot:run
 ```
 
-### 3. 测试 API
+### 4. 测试 API
+
+#### 方式一：使用自动化测试脚本（推荐）
+
+```bash
+# 在另一个终端窗口运行
+./test-api.sh
+```
+
+#### 方式二：手动测试 API
 
 示例应用会在 `http://localhost:9090` 启动，提供以下 API：
 
@@ -52,18 +87,44 @@ curl -X DELETE "http://localhost:9090/api/chat/memories/user1"
 此示例使用了以下配置：
 
 - **向量存储**: 内存模式 (`inmemory`)，适合演示和测试
-- **LLM**: Mock 模式，不需要真实的 API Key
-- **嵌入**: Mock 模式，使用随机向量进行演示
+- **LLM**: DashScope (`qwen-turbo`)，需要 API Key
+- **嵌入**: DashScope (`text-embedding-v1`)，使用相同的 API Key
 
-在生产环境中，您应该：
+### 🔑 API Key 配置
+
+示例默认使用 DashScope 服务，您需要：
+
+1. 访问 [DashScope 控制台](https://dashscope.console.aliyun.com/) 获取 API Key
+2. 设置环境变量 `DASHSCOPE_API_KEY`
+3. 或者直接在配置文件中修改 `api-key` 值
+
+### 🚀 替代配置
+
+如果您想使用 OpenAI 服务，可以修改配置：
+
+```yaml
+mem4j:
+  llm:
+    type: openai
+    api-key: ${OPENAI_API_KEY}
+    model: gpt-3.5-turbo
+  embeddings:
+    type: openai
+    model: text-embedding-ada-002
+```
+
+在生产环境中，建议：
 
 1. 使用真实的向量数据库 (如 Qdrant)
-2. 配置真实的 LLM 服务 (如 DashScope 或 OpenAI)
-3. 使用真实的嵌入服务
+2. 根据需求选择合适的 LLM 服务
+3. 配置合适的相似度阈值和记忆数量限制
 
-## 🔧 配置文件
+## 🔧 项目文件
 
-查看 `src/main/resources/application.yml` 了解完整配置。
+- `src/main/resources/application.yml` - 应用配置文件
+- `src/main/java/com/example/ChatController.java` - REST API 控制器
+- `start-example.sh` - 便捷启动脚本
+- `test-api.sh` - API 自动化测试脚本
 
 ## 📝 核心代码
 

@@ -20,7 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Example Spring Boot application using Lang Memory
+ * Example Spring Boot application using Mem4j
  */
 @SpringBootApplication
 public class ExampleApplication {
