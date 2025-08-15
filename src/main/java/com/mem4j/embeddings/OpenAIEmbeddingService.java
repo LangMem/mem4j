@@ -54,7 +54,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public double[] embed(String text) {
+	public Double[] embed(String text) {
 
 		try {
 			EmbeddingRequest request = EmbeddingRequest.builder().model(model).input(List.of(text)).build();
@@ -76,7 +76,7 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public double[][] embed(String[] texts) {
+	public Double[][] embed(String[] texts) {
 
 		try {
 			EmbeddingRequest request = EmbeddingRequest.builder().model(model).input(Arrays.asList(texts)).build();
@@ -96,12 +96,12 @@ public class OpenAIEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public int getDimension() {
+	public Integer getDimension() {
 		return dimension;
 	}
 
 	@Override
-	public boolean isAvailable() {
+	public Boolean isAvailable() {
 
 		try {
 			// Simple test to check if service is available

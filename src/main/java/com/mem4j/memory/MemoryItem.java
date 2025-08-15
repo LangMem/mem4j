@@ -56,7 +56,7 @@ public class MemoryItem {
 	private Instant updatedAt;
 
 	@JsonProperty("embedding")
-	private double[] embedding;
+	private Double[] embedding;
 
 	public MemoryItem() {
 		this.createdAt = Instant.now();
@@ -159,11 +159,11 @@ public class MemoryItem {
 		this.updatedAt = updatedAt;
 	}
 
-	public double[] getEmbedding() {
+	public Double[] getEmbedding() {
 		return embedding;
 	}
 
-	public void setEmbedding(double[] embedding) {
+	public void setEmbedding(Double[] embedding) {
 		this.embedding = embedding;
 	}
 

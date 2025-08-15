@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Main Spring Boot application class for Mem4j
  */
+
 @SpringBootApplication
 public class Mem4jApplication {
 

@@ -113,7 +113,7 @@ public class MemoryUnitTest {
 		String query = "What do I like?";
 		List<MemoryItem> mockResults = createMockMemoryItems();
 
-		when(vectorStoreService.search(any(double[].class), any(), anyInt(), anyDouble())).thenReturn(mockResults);
+		when(vectorStoreService.search(any(Double[].class), any(), anyInt(), anyDouble())).thenReturn(mockResults);
 
 		// Act
 		List<MemoryItem> results = memory.search(query, testUserId);
@@ -123,7 +123,7 @@ public class MemoryUnitTest {
 		assertFalse(results.isEmpty());
 		assertEquals(2, results.size());
 		verify(embeddingService, times(1)).embed(query);
-		verify(vectorStoreService, times(1)).search(any(double[].class), any(), anyInt(), anyDouble());
+		verify(vectorStoreService, times(1)).search(any(Double[].class), any(), anyInt(), anyDouble());
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public class MemoryUnitTest {
 		Map<String, Object> filters = Map.of("agent_id", "test_agent");
 		List<MemoryItem> mockResults = createMockMemoryItems();
 
-		when(vectorStoreService.search(any(double[].class), any(), anyInt(), anyDouble())).thenReturn(mockResults);
+		when(vectorStoreService.search(any(Double[].class), any(), anyInt(), anyDouble())).thenReturn(mockResults);
 
 		// Act
 		List<MemoryItem> results = memory.search(query, testUserId, filters, 5, 0.8);
@@ -141,7 +141,7 @@ public class MemoryUnitTest {
 		// Assert
 		assertNotNull(results);
 		verify(embeddingService, times(1)).embed(query);
-		verify(vectorStoreService, times(1)).search(any(double[].class), any(), eq(5), eq(0.8));
+		verify(vectorStoreService, times(1)).search(any(Double[].class), any(), eq(5), eq(0.8));
 	}
 
 	@Test
@@ -264,8 +264,8 @@ public class MemoryUnitTest {
 	}
 
 	// Helper methods
-	private double[] createMockEmbedding() {
-		double[] embedding = new double[1536];
+	private Double[] createMockEmbedding() {
+		Double[] embedding = new Double[1536];
 		for (int i = 0; i < embedding.length; i++) {
 			embedding[i] = Math.random();
 		}

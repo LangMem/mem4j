@@ -110,7 +110,7 @@ public class QdrantVectorStoreService implements VectorStoreService {
 	}
 
 	@Override
-	public List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold) {
+	public List<MemoryItem> search(Double[] queryEmbedding, Map<String, Object> filters, Integer limit, Double threshold) {
 		try {
 			// Simple similarity search using in-memory storage
 			List<MemoryItem> results = memoryStore.values()
@@ -118,7 +118,7 @@ public class QdrantVectorStoreService implements VectorStoreService {
 				.filter(item -> matchesFilters(item, filters))
 				.map(item -> {
 					// Calculate simple cosine similarity
-					double similarity = calculateCosineSimilarity(queryEmbedding, item.getEmbedding());
+                    Double similarity = calculateCosineSimilarity(queryEmbedding, item.getEmbedding());
 					// Store similarity for sorting
 					return new AbstractMap.SimpleEntry<>(similarity, item);
 				})
@@ -156,7 +156,7 @@ public class QdrantVectorStoreService implements VectorStoreService {
 	}
 
 	@Override
-	public List<MemoryItem> getAll(Map<String, Object> filters, int limit) {
+	public List<MemoryItem> getAll(Map<String, Object> filters, Integer limit) {
 		try {
 			List<MemoryItem> results = memoryStore.values()
 				.stream()
@@ -293,14 +293,14 @@ public class QdrantVectorStoreService implements VectorStoreService {
 	/**
 	 * Calculate cosine similarity between two vectors
 	 */
-	private double calculateCosineSimilarity(double[] vec1, double[] vec2) {
+	private Double calculateCosineSimilarity(Double[] vec1, Double[] vec2) {
 		if (vec1.length != vec2.length) {
 			return 0.0;
 		}
 
-		double dotProduct = 0.0;
-		double norm1 = 0.0;
-		double norm2 = 0.0;
+        double dotProduct = 0.0;
+        double norm1 = 0.0;
+        double norm2 = 0.0;
 
 		for (int i = 0; i < vec1.length; i++) {
 			dotProduct += vec1[i] * vec2[i];

@@ -25,21 +25,21 @@ public interface EmbeddingService {
 	/**
 	 * Generate embedding for a text
 	 */
-	double[] embed(String text);
+	Double[] embed(String text);
 
 	/**
 	 * Generate embeddings for multiple texts
 	 */
-	double[][] embed(String[] texts);
+    Double[][] embed(String[] texts);
 
 	/**
 	 * Get the dimension of embeddings
 	 */
-	int getDimension();
+	Integer getDimension();
 
 	/**
 	 * Check if the service is available
 	 */
-	boolean isAvailable();
+	Boolean isAvailable();
 
 }

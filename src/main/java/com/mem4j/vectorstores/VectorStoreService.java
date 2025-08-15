@@ -34,12 +34,12 @@ public interface VectorStoreService {
 	/**
 	 * Search for similar memories using vector similarity
 	 */
-	List<MemoryItem> search(double[] queryEmbedding, Map<String, Object> filters, int limit, double threshold);
+	List<MemoryItem> search(Double[] queryEmbedding, Map<String, Object> filters, Integer limit, Double threshold);
 
 	/**
 	 * Get all memories matching filters
 	 */
-	List<MemoryItem> getAll(Map<String, Object> filters, int limit);
+	List<MemoryItem> getAll(Map<String, Object> filters, Integer limit);
 
 	/**
 	 * Get a specific memory by ID

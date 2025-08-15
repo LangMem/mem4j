@@ -64,7 +64,7 @@ public class DashScopeEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public double[] embed(String text) {
+	public Double[] embed(String text) {
 		try {
 			Map<String, Object> requestBody = new HashMap<>();
 			requestBody.put("model", model);
@@ -104,7 +104,7 @@ public class DashScopeEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public double[][] embed(String[] texts) {
+	public Double[][] embed(String[] texts) {
 		try {
 			Map<String, Object> requestBody = new HashMap<>();
 			requestBody.put("model", model);
@@ -142,12 +142,12 @@ public class DashScopeEmbeddingService implements EmbeddingService {
 	}
 
 	@Override
-	public int getDimension() {
+	public Integer getDimension() {
 		return dimension;
 	}
 
 	@Override
-	public boolean isAvailable() {
+	public Boolean isAvailable() {
 		try {
 			// Simple test to check if service is available
 			embed("test");
