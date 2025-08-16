@@ -1,7 +1,11 @@
 # Mem4j
 
 <p align="center">
-  <img src="docs/images/banner-sm.png" width="800px" alt="Mem4j - The Memory Layer for Personalized AI">
+  <img src="docs/images/mem4j-logo.png" width="200px" alt="Mem4j Logo">
+</p>
+
+<p align="center">
+  <strong>🧠 The Memory Layer for Personalized AI</strong>
 </p>
 
 <p align="center">
