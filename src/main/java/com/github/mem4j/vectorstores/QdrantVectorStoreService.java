@@ -16,7 +16,7 @@
 
 package com.github.mem4j.vectorstores;
 
-import com.github.mem4j.configs.MemoryConfig;
+import com.github.mem4j.autoconfigure.MemoryConfig;
 import com.github.mem4j.memory.MemoryItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

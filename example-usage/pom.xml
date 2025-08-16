@@ -31,7 +31,7 @@
         <!-- Mem4j Library -->
         <dependency>
             <groupId>com.github.mem4j</groupId>
-            <artifactId>mem4j</artifactId>
+            <artifactId>mem4j-spring-boot-starter</artifactId>
             <version>0.1.0</version>
         </dependency>
     </dependencies>

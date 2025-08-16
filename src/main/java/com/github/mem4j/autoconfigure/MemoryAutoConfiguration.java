@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.mem4j.configs;
+package com.github.mem4j.autoconfigure;
 
 import com.github.mem4j.embeddings.DashScopeEmbeddingService;
 import com.github.mem4j.embeddings.EmbeddingService;

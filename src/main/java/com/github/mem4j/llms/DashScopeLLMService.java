@@ -18,7 +18,7 @@ package com.github.mem4j.llms;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mem4j.configs.MemoryConfig;
+import com.github.mem4j.autoconfigure.MemoryConfig;
 import com.github.mem4j.memory.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

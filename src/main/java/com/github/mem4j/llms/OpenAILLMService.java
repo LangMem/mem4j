@@ -16,7 +16,7 @@
 
 package com.github.mem4j.llms;
 
-import com.github.mem4j.configs.MemoryConfig;
+import com.github.mem4j.autoconfigure.MemoryConfig;
 import com.github.mem4j.memory.Message;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;

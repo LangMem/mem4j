@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.mem4j</groupId>
-    <artifactId>mem4j</artifactId>
+    <artifactId>mem4j-spring-boot-starter</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
-    <name>Mem4j</name>
-    <description>Long-term memory for AI Agents - Java Implementation</description>
+    <name>Mem4j Spring Boot Starter</name>
+    <description>Spring Boot starter for Mem4j - Long-term memory for AI Agents</description>
     <url>https://github.com/langMem/mem4j</url>
 
     <licenses>

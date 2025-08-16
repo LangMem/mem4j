@@ -16,7 +16,7 @@
 
 package com.github.mem4j.memory;
 
-import com.github.mem4j.configs.MemoryConfig;
+import com.github.mem4j.autoconfigure.MemoryConfig;
 import com.github.mem4j.embeddings.EmbeddingService;
 import com.github.mem4j.llms.LLMService;
 import com.github.mem4j.vectorstores.VectorStoreService;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.mem4j.configs;
+package com.github.mem4j.autoconfigure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
