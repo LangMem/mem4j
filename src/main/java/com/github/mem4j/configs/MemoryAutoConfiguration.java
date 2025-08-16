@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.langmem.mem4j.configs;
+package com.github.mem4j.configs;
 
-import com.langmem.mem4j.embeddings.DashScopeEmbeddingService;
-import com.langmem.mem4j.embeddings.EmbeddingService;
-import com.langmem.mem4j.embeddings.OpenAIEmbeddingService;
-import com.langmem.mem4j.llms.DashScopeLLMService;
-import com.langmem.mem4j.llms.LLMService;
-import com.langmem.mem4j.llms.OpenAILLMService;
-import com.langmem.mem4j.memory.Memory;
-import com.langmem.mem4j.vectorstores.InMemoryVectorStoreService;
-import com.langmem.mem4j.vectorstores.QdrantVectorStoreService;
-import com.langmem.mem4j.vectorstores.VectorStoreService;
+import com.github.mem4j.embeddings.DashScopeEmbeddingService;
+import com.github.mem4j.embeddings.EmbeddingService;
+import com.github.mem4j.embeddings.OpenAIEmbeddingService;
+import com.github.mem4j.llms.DashScopeLLMService;
+import com.github.mem4j.llms.LLMService;
+import com.github.mem4j.llms.OpenAILLMService;
+import com.github.mem4j.memory.Memory;
+import com.github.mem4j.vectorstores.InMemoryVectorStoreService;
+import com.github.mem4j.vectorstores.QdrantVectorStoreService;
+import com.github.mem4j.vectorstores.VectorStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -80,7 +80,7 @@ public class MemoryAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "langmem.mem4j.vector-store", name = "type", havingValue = "inmemory",
+	@ConditionalOnProperty(prefix = "github.mem4j.vector-store", name = "type", havingValue = "inmemory",
 			matchIfMissing = true)
 	public VectorStoreService inMemoryVectorStoreService() {
 		logger.info("Creating InMemoryVectorStoreService");
@@ -96,7 +96,7 @@ public class MemoryAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "langmem.mem4j.vector-store", name = "type", havingValue = "qdrant")
+	@ConditionalOnProperty(prefix = "github.mem4j.vector-store", name = "type", havingValue = "qdrant")
 	@ConditionalOnClass(name = "io.qdrant.client.QdrantClient")
 	public VectorStoreService qdrantVectorStoreService(MemoryConfig memoryConfig) {
 		logger.info("Creating QdrantVectorStoreService");

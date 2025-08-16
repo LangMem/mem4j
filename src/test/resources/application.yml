@@ -15,7 +15,7 @@ spring:
     show-sql: false
 
 # Lang Memory Configuration for unit testing (no real API keys needed)
-langmem:
+github:
   mem4j:
   vector-store:
     type: in-memory
@@ -52,7 +52,7 @@ langmem:
 # Logging configuration for unit testing
 logging:
   level:
-    com.langmem.mem4j: INFO
+    com.github.mem4j: INFO
     org.springframework: WARN
     org.mockito: WARN
   pattern:

@@ -9,7 +9,7 @@ Mem4j 使用 Spring Boot 配置系统，支持 YAML 和 Properties 格式。所�
 ### 最小配置
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
     type: inmemory
@@ -28,7 +28,7 @@ langmem:
 ### 完整配置示例
 
 ```yaml
-langmem:
+github:
   mem4j:
     # 向量存储配置
     vector-store:
@@ -88,7 +88,7 @@ langmem:
 #### 1. 内存存储 (inmemory)
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
     type: inmemory
@@ -102,7 +102,7 @@ langmem:
 #### 2. Qdrant
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
     type: qdrant
@@ -121,7 +121,7 @@ langmem:
 #### 1. DashScope (通义千问)
 
 ```yaml
-langmem:
+github:
   mem4j:
     llm:
     type: dashscope
@@ -142,7 +142,7 @@ langmem:
 #### 2. OpenAI
 
 ```yaml
-langmem:
+github:
   mem4j:
     llm:
     type: openai
@@ -159,7 +159,7 @@ langmem:
 #### 1. DashScope 嵌入
 
 ```yaml
-langmem:
+github:
   mem4j:
     embeddings:
     type: dashscope
@@ -171,7 +171,7 @@ langmem:
 #### 2. OpenAI 嵌入
 
 ```yaml
-langmem:
+github:
   mem4j:
     embeddings:
     type: openai
@@ -207,7 +207,7 @@ export NEO4J_PASSWORD="your-password"
 ### 开发环境 (application-dev.yml)
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
     type: inmemory
@@ -221,13 +221,13 @@ langmem:
 
 logging:
   level:
-    com.langmem.mem4j: DEBUG
+    com.github.mem4j: DEBUG
 ```
 
 ### 生产环境 (application-prod.yml)
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
     type: qdrant
@@ -252,7 +252,7 @@ langmem:
 
 logging:
   level:
-    com.langmem.mem4j: INFO
+    com.github.mem4j: INFO
 ```
 
 ## 🐳 Docker 配置
@@ -261,7 +261,7 @@ logging:
 
 ```yaml
 # application-docker.yml
-langmem:
+github:
   mem4j:
     vector-store:
     type: qdrant
@@ -289,7 +289,7 @@ langmem:
 ### 向量存储优化
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
     options:
@@ -301,7 +301,7 @@ langmem:
 ### LLM 优化
 
 ```yaml
-langmem:
+github:
   mem4j:
     llm:
     options:
@@ -313,7 +313,7 @@ langmem:
 ### 嵌入优化
 
 ```yaml
-langmem:
+github:
   mem4j:
     embeddings:
     options:
@@ -344,7 +344,7 @@ management:
     health:
       show-details: always
 
-langmem:
+github:
   mem4j:
   monitoring:
     enabled: true
@@ -380,10 +380,10 @@ langmem:
 ```yaml
 logging:
   level:
-    com.langmem.mem4j: DEBUG
-    com.langmem.mem4j.configs: TRACE
+    com.github.mem4j: DEBUG
+    com.github.mem4j.configs: TRACE
 
-langmem:
+github:
   mem4j:
   debug:
     enabled: true

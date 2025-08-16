@@ -25,7 +25,7 @@ export DASHSCOPE_API_KEY="your-dashscope-api-key"
 或者编辑 `src/main/resources/application.yml` 直接修改配置：
 
 ```yaml
-langmem:
+github:
   mem4j:
     llm:
       api-key: "your-actual-api-key-here"
@@ -104,7 +104,7 @@ curl -X DELETE "http://localhost:19090/api/chat/memories/user1"
 如果您想使用 OpenAI 服务，可以修改配置：
 
 ```yaml
-langmem:
+github:
   mem4j:
     llm:
       type: openai
@@ -140,7 +140,7 @@ private Memory memory;
 ### 添加记忆
 
 ```java
-import com.langmem.mem4j.memory.Message;
+import com.github.mem4j.memory.Message;
 import java.util.Arrays;
 import java.util.List;
 
@@ -155,7 +155,7 @@ memory.add(messages, "user1");
 ### 搜索记忆
 
 ```java
-import com.langmem.mem4j.memory.MemoryItem;
+import com.github.mem4j.memory.MemoryItem;
 import java.util.List;
 
 List<MemoryItem> memories = memory.search("张三喜欢什么？", "user1");
@@ -164,7 +164,7 @@ List<MemoryItem> memories = memory.search("张三喜欢什么？", "user1");
 ### 获取所有记忆
 
 ```java
-import com.langmem.mem4j.memory.MemoryItem;
+import com.github.mem4j.memory.MemoryItem;
 import java.util.List;
 
 List<MemoryItem> allMemories = memory.getAll("user1", null, 50);

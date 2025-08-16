@@ -19,7 +19,7 @@ spring:
         format_sql: true
 
 # Mem4j Configuration
-langmem:
+github:
   mem4j:
     vector-store:
       type: inmemory
@@ -64,7 +64,7 @@ langmem:
 # Logging configuration
 logging:
   level:
-    com.langmem.mem4j: DEBUG
+    com.github.mem4j: DEBUG
     org.springframework: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

@@ -59,7 +59,7 @@ cd my-mem4j-app
 
         <!-- Mem4j -->
         <dependency>
-            <groupId>com.langmem.mem4j</groupId>
+            <groupId>com.github.mem4j</groupId>
             <artifactId>mem4j</artifactId>
             <version>0.1.0</version>
         </dependency>
@@ -102,9 +102,9 @@ public class Application {
 ```java
 package com.example;
 
-import com.langmem.mem4j.memory.Memory;
-import com.langmem.mem4j.memory.MemoryItem;
-import com.langmem.mem4j.memory.Message;
+import com.github.mem4j.memory.Memory;
+import com.github.mem4j.memory.MemoryItem;
+import com.github.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -175,7 +175,7 @@ public class ChatController {
 server:
   port: 8080
 
-langmem:
+github:
   mem4j:
     vector-store:
       type: inmemory
@@ -228,7 +228,7 @@ curl -X POST "http://localhost:8080/chat" \
 如果你想使用真实的 LLM 服务，修改 `application.yml`：
 
 ```yaml
-langmem:
+github:
   mem4j:
   vector-store:
     type: in-memory

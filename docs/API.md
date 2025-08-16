@@ -360,7 +360,7 @@ The application exposes health check endpoints:
 The API behavior can be configured through application properties:
 
 ```yaml
-langmem:
+github:
   mem4j:
     vector-store:
       type: inmemory

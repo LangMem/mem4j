@@ -9,7 +9,7 @@ spring:
       api-key: ${DASHSCOPE_API_KEY:test-key}
 
 # Mem4j Configuration
-langmem:
+github:
   mem4j:
     # 使用内存向量存储（适合演示）
     vector-store:
@@ -42,7 +42,7 @@ langmem:
 # 日志配置
 logging:
   level:
-    com.langmem.mem4j: INFO
+    com.github.mem4j: INFO
     com.example: DEBUG
   pattern:
     console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

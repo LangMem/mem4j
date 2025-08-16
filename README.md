@@ -55,9 +55,9 @@ mvn spring-boot:run
 ### Basic Usage
 
 ```java
-import com.langmem.mem4j.memory.Memory;
-import com.langmem.mem4j.memory.MemoryItem;
-import com.langmem.mem4j.memory.Message;
+import com.github.mem4j.memory.Memory;
+import com.github.mem4j.memory.MemoryItem;
+import com.github.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,7 +87,7 @@ public class MyService {
 ### Core Components
 
 ```
-src/main/java/com/langmem/mem4j/
+src/main/java/com/github/mem4j/
 ├── memory/           # Core memory management
 ├── vectorstores/     # Vector database integrations
 ├── llms/            # LLM provider integrations
@@ -131,7 +131,7 @@ src/main/java/com/langmem/mem4j/
 
 ```yaml
 # Memory Configuration
-langmem:
+github:
   mem4j:
     vector-store:
       type: qdrant # Options: inmemory, qdrant
@@ -376,7 +376,7 @@ Mem4j now supports **DashScope** as a primary LLM and embedding provider, offeri
 
 3. **Update Configuration**:
    ```yaml
-   langmem:
+   github:
      mem4j:
        llm:
          type: dashscope

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.langmem.mem4j.llms;
+package com.github.mem4j.llms;
 
-import com.langmem.mem4j.configs.MemoryConfig;
-import com.langmem.mem4j.memory.Message;
+import com.github.mem4j.configs.MemoryConfig;
+import com.github.mem4j.memory.Message;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
