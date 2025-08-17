@@ -13,6 +13,42 @@
     <name>Mem4j Parent</name>
     <description>Parent POM for Mem4j - Long-term memory for AI Agents</description>
     <url>https://github.com/mem4j/mem4j</url>
+    
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <scm>
+        <connection>scm:git:https://github.com/langMem/mem4j.git</connection>
+        <developerConnection>scm:git:https://github.com/langMem/mem4j.git</developerConnection>
+        <url>https://github.com/langMem/mem4j</url>
+    </scm>
+    
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/langMem/mem4j/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/langMem/mem4j/actions</url>
+    </ciManagement>
+    
+    <developers>
+        <developer>
+            <name>Aias00</name>
+            <email>liuhongyu@apache.org</email>
+            <url>https://github.com/Aias00</url>
+        </developer>
+        <developer>
+            <name>Shown</name>
+            <email>shown@apache.org</email>
+            <url>https://github.com/yuluo-yx</url>
+        </developer>
+    </developers>
 
     <modules>
         <module>mem4j-core</module>
