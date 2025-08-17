@@ -20,54 +20,81 @@ package com.github.mem4j.config;
  * Interface for configurable Mem4j components
  */
 public interface MemoryConfigurable {
-    
-    /**
-     * Vector store configuration interface
-     */
-    interface VectorStore {
-        String getType();
-        String getUrl();
-        String getCollection();
-        VectorStoreOptions getOptions();
-    }
-    
-    interface VectorStoreOptions {
-        Double getSimilarityThreshold();
-    }
-    
-    /**
-     * LLM configuration interface
-     */
-    interface Llm {
-        String getType();
-        String getApiKey();
-        String getModel();
-        LlmOptions getOptions();
-    }
-    
-    interface LlmOptions {
-        Integer getMaxTokens();
-        Double getTemperature();
-    }
-    
-    /**
-     * Embeddings configuration interface
-     */
-    interface Embeddings {
-        String getType();
-        String getModel();
-        EmbeddingsOptions getOptions();
-    }
-    
-    interface EmbeddingsOptions {
-        Integer getDimensions();
-    }
-    
-    // Root configuration methods
-    VectorStore getVectorStore();
-    Llm getLlm();
-    Embeddings getEmbeddings();
-    Integer getMaxMemories();
-    Integer getEmbeddingDimension();
-    Double getSimilarityThreshold();
+
+	/**
+	 * Vector store configuration interface
+	 */
+	interface VectorStore {
+
+		String getType();
+
+		String getUrl();
+
+		String getCollection();
+
+		VectorStoreOptions getOptions();
+
+	}
+
+	interface VectorStoreOptions {
+
+		Double getSimilarityThreshold();
+
+	}
+
+	/**
+	 * LLM configuration interface
+	 */
+	interface Llm {
+
+		String getType();
+
+		String getApiKey();
+
+		String getModel();
+
+		LlmOptions getOptions();
+
+	}
+
+	interface LlmOptions {
+
+		Integer getMaxTokens();
+
+		Double getTemperature();
+
+	}
+
+	/**
+	 * Embeddings configuration interface
+	 */
+	interface Embeddings {
+
+		String getType();
+
+		String getModel();
+
+		EmbeddingsOptions getOptions();
+
+	}
+
+	interface EmbeddingsOptions {
+
+		Integer getDimensions();
+
+	}
+
+	// Root configuration methods
+	VectorStore getVectorStore();
+
+	Llm getLlm();
+
+	Embeddings getEmbeddings();
+
+	Integer getMaxMemories();
+
+	Integer getEmbeddingDimension();
+
+	Double getSimilarityThreshold();
+
 }

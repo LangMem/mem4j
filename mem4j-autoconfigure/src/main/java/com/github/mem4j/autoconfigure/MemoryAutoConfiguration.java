@@ -38,8 +38,7 @@ import org.springframework.context.annotation.Bean;
 /**
  * Auto-configuration for Lang Memory system
  * <p>
- * This configuration will automatically set up Memory beans when the library is
- * included
+ * This configuration will automatically set up Memory beans when the library is included
  * in a Spring Boot application. It provides:
  * <ul>
  * <li>Memory core bean with all required dependencies</li>
@@ -58,16 +57,12 @@ public class MemoryAutoConfiguration {
 	private static final Logger logger = LoggerFactory.getLogger(MemoryAutoConfiguration.class);
 
 	/**
-	 * Creates the main Memory bean with all required dependencies. This bean will
-	 * be
+	 * Creates the main Memory bean with all required dependencies. This bean will be
 	 * created only if no other Memory bean exists.
-	 * 
-	 * @param memoryConfig       the memory configuration properties
-	 * @param vectorStoreService the vector store service (auto-selected based on
-	 *                           config)
-	 * @param llmService         the LLM service (auto-selected based on config)
-	 * @param embeddingService   the embedding service (auto-selected based on
-	 *                           config)
+	 * @param memoryConfig the memory configuration properties
+	 * @param vectorStoreService the vector store service (auto-selected based on config)
+	 * @param llmService the LLM service (auto-selected based on config)
+	 * @param embeddingService the embedding service (auto-selected based on config)
 	 * @return configured Memory instance
 	 */
 	@Bean
@@ -79,26 +74,23 @@ public class MemoryAutoConfiguration {
 	}
 
 	/**
-	 * Creates an InMemoryVectorStore service when no other VectorStore is
-	 * configured or
+	 * Creates an InMemoryVectorStore service when no other VectorStore is configured or
 	 * when explicitly configured to use 'inmemory' type.
-	 * 
 	 * @return InMemoryVectorStoreService instance
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "inmemory", matchIfMissing = true)
+	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "inmemory",
+			matchIfMissing = true)
 	public VectorStoreService inMemoryVectorStoreService() {
 		logger.info("Creating InMemoryVectorStoreService");
 		return new InMemoryVectorStoreService();
 	}
 
 	/**
-	 * Creates a Qdrant VectorStore service when configured to use 'qdrant' type.
-	 * This
+	 * Creates a Qdrant VectorStore service when configured to use 'qdrant' type. This
 	 * bean will only be created if the Qdrant client classes are available on the
 	 * classpath.
-	 * 
 	 * @param memoryConfig the memory configuration properties
 	 * @return QdrantVectorStoreService instance
 	 */
@@ -112,10 +104,8 @@ public class MemoryAutoConfiguration {
 	}
 
 	/**
-	 * Creates the appropriate LLM service based on configuration. Supports OpenAI
-	 * and
+	 * Creates the appropriate LLM service based on configuration. Supports OpenAI and
 	 * DashScope implementations.
-	 * 
 	 * @param memoryConfig the memory configuration properties
 	 * @return LLMService instance based on configuration
 	 */
@@ -136,10 +126,8 @@ public class MemoryAutoConfiguration {
 	}
 
 	/**
-	 * Creates the appropriate Embedding service based on configuration. Supports
-	 * OpenAI
+	 * Creates the appropriate Embedding service based on configuration. Supports OpenAI
 	 * and DashScope implementations.
-	 * 
 	 * @param memoryConfig the memory configuration properties
 	 * @return EmbeddingService instance based on configuration
 	 */

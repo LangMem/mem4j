@@ -18,7 +18,7 @@ package com.github.mem4j.embeddings;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mem4j.config.MemoryConfigurableurable;
+import com.github.mem4j.config.MemoryConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;

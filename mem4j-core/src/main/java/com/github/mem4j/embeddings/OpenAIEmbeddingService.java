@@ -16,7 +16,7 @@
 
 package com.github.mem4j.embeddings;
 
-import com.github.mem4j.config.MemoryConfigurableurable;
+import com.github.mem4j.config.MemoryConfigurable;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
 import com.theokanning.openai.service.OpenAiService;

@@ -16,7 +16,7 @@
 
 package com.github.mem4j;
 
-import com.github.mem4j.config.MemoryConfigurableurable;
+import com.github.mem4j.config.MemoryConfigurable;
 import com.github.mem4j.embeddings.EmbeddingService;
 import com.github.mem4j.llms.LLMService;
 import com.github.mem4j.memory.Memory;

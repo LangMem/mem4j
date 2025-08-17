@@ -16,12 +16,6 @@
     <description>Core functionality for Mem4j - memory, embeddings, LLMs, and vector stores</description>
 
     <dependencies>
-        <!-- Configuration dependency -->
-        <dependency>
-            <groupId>com.github.mem4j</groupId>
-            <artifactId>mem4j-autoconfigure</artifactId>
-            <scope>provided</scope>
-        </dependency>
         
         <!-- Core Spring (for DI and context) -->
         <dependency>
@@ -150,6 +144,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            
+            <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

@@ -69,7 +69,7 @@ public class MemoryConfig implements MemoryConfigurable {
 		@NotBlank
 		private String collection;
 
-		private Map<String, Object> options;
+		private VectorStoreOptions options;
 
 		// Getters and Setters
 		public String getType() {
@@ -96,17 +96,17 @@ public class MemoryConfig implements MemoryConfigurable {
 			this.collection = collection;
 		}
 
-		public Map<String, Object> getOptions() {
+		public VectorStoreOptions getOptions() {
 			return options;
 		}
 
-		public void setOptions(Map<String, Object> options) {
+		public void setOptions(VectorStoreOptions options) {
 			this.options = options;
 		}
 
 	}
 
-	public static class LLMConfig {
+	public static class LLMConfig implements Llm {
 
 		@NotBlank
 		private String type;
@@ -117,7 +117,7 @@ public class MemoryConfig implements MemoryConfigurable {
 		@NotBlank
 		private String model;
 
-		private Map<String, Object> options;
+		private LlmOptions options;
 
 		// Getters and Setters
 		public String getType() {
@@ -144,17 +144,17 @@ public class MemoryConfig implements MemoryConfigurable {
 			this.model = model;
 		}
 
-		public Map<String, Object> getOptions() {
+		public LlmOptions getOptions() {
 			return options;
 		}
 
-		public void setOptions(Map<String, Object> options) {
+		public void setOptions(LlmOptions options) {
 			this.options = options;
 		}
 
 	}
 
-	public static class EmbeddingConfig {
+	public static class EmbeddingConfig implements Embeddings {
 
 		@NotBlank
 		private String type;
@@ -162,7 +162,7 @@ public class MemoryConfig implements MemoryConfigurable {
 		@NotBlank
 		private String model;
 
-		private Map<String, Object> options;
+		private EmbeddingsOptions options;
 
 		// Getters and Setters
 		public String getType() {
@@ -181,11 +181,11 @@ public class MemoryConfig implements MemoryConfigurable {
 			this.model = model;
 		}
 
-		public Map<String, Object> getOptions() {
+		public EmbeddingsOptions getOptions() {
 			return options;
 		}
 
-		public void setOptions(Map<String, Object> options) {
+		public void setOptions(EmbeddingsOptions options) {
 			this.options = options;
 		}
 
@@ -255,7 +255,7 @@ public class MemoryConfig implements MemoryConfigurable {
 		this.vectorStore = vectorStore;
 	}
 
-	public LLMConfig getLlm() {
+	public Llm getLlm() {
 		return llm;
 	}
 
