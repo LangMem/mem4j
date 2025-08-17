@@ -16,6 +16,7 @@
 
 package com.github.mem4j.memory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
@@ -55,7 +56,7 @@ public class MemoryItem {
 	@JsonProperty("updated_at")
 	private Instant updatedAt;
 
-	@JsonProperty("embedding")
+	@JsonIgnore
 	private Double[] embedding;
 
 	public MemoryItem() {

@@ -7,7 +7,11 @@ spring:
   ai:
     dashscope:
       api-key: ${DASHSCOPE_API_KEY:test-key}
-
+  datasource:
+    url: jdbc:h2:mem:memdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: sa
 # Mem4j Configuration
 mem4j:
   # 使用内存向量存储（适合演示）
