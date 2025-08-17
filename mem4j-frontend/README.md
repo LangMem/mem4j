@@ -1,4 +1,4 @@
-# Vue 3 + TypeScript + Vite + Pinia + Element-Plus + WindiCss + yarn
+# Mem4j Frontend Project
 
 1. yarn init vite 创建vite项目
    yarn install   安装依赖
