@@ -19,7 +19,7 @@ package com.github.mem4j.config;
 /**
  * Interface for configurable Mem4j components
  */
-public interface MemoryConfigurableurable {
+public interface MemoryConfigurable {
     
     /**
      * Vector store configuration interface

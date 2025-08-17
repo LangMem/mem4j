@@ -1,0 +1,191 @@
+{
+  "groups": [
+    {
+      "name": "mem4j",
+      "type": "com.mem4j.autoconfigure.MemoryConfig",
+      "description": "Configuration properties for Mem4j - Long-term memory for AI Agents."
+    },
+    {
+      "name": "mem4j.vector-store",
+      "type": "com.mem4j.autoconfigure.MemoryConfig$VectorStoreConfig",
+      "sourceType": "com.mem4j.autoconfigure.MemoryConfig",
+      "description": "Configuration properties for vector store service."
+    },
+    {
+      "name": "mem4j.llm",
+      "type": "com.mem4j.autoconfigure.MemoryConfig$LLMConfig",
+      "sourceType": "com.mem4j.autoconfigure.MemoryConfig",
+      "description": "Configuration properties for LLM service."
+    },
+    {
+      "name": "mem4j.embedding",
+      "type": "com.mem4j.autoconfigure.MemoryConfig$EmbeddingConfig",
+      "sourceType": "com.mem4j.autoconfigure.MemoryConfig",
+      "description": "Configuration properties for embedding service."
+    }
+  ],
+  "properties": [
+    {
+      "name": "mem4j.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable Mem4j auto-configuration.",
+      "defaultValue": true
+    },
+    {
+      "name": "mem4j.similarity-threshold",
+      "type": "java.lang.Double",
+      "description": "Similarity threshold for memory retrieval. Memories with similarity scores above this threshold will be returned.",
+      "defaultValue": 0.7
+    },
+    {
+      "name": "mem4j.vector-store.type",
+      "type": "java.lang.String",
+      "description": "Type of vector store to use. Supported values: 'inmemory', 'qdrant'.",
+      "defaultValue": "inmemory"
+    },
+    {
+      "name": "mem4j.vector-store.url",
+      "type": "java.lang.String",
+      "description": "URL for the vector store service (used for Qdrant).",
+      "defaultValue": "http://localhost:6333"
+    },
+    {
+      "name": "mem4j.vector-store.collection-name",
+      "type": "java.lang.String",
+      "description": "Name of the collection/index in the vector store.",
+      "defaultValue": "mem4j_memories"
+    },
+    {
+      "name": "mem4j.vector-store.api-key",
+      "type": "java.lang.String",
+      "description": "API key for the vector store service (if required)."
+    },
+    {
+      "name": "mem4j.llm.type",
+      "type": "java.lang.String",
+      "description": "Type of LLM service to use. Supported values: 'openai', 'dashscope', 'mock'.",
+      "defaultValue": "mock"
+    },
+    {
+      "name": "mem4j.llm.model",
+      "type": "java.lang.String",
+      "description": "Model name to use for the LLM service.",
+      "defaultValue": "gpt-3.5-turbo"
+    },
+    {
+      "name": "mem4j.llm.api-key",
+      "type": "java.lang.String",
+      "description": "API key for the LLM service."
+    },
+    {
+      "name": "mem4j.llm.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL for the LLM service API."
+    },
+    {
+      "name": "mem4j.embedding.type",
+      "type": "java.lang.String",
+      "description": "Type of embedding service to use. Supported values: 'openai', 'dashscope', 'mock'.",
+      "defaultValue": "mock"
+    },
+    {
+      "name": "mem4j.embedding.model",
+      "type": "java.lang.String",
+      "description": "Model name to use for the embedding service.",
+      "defaultValue": "text-embedding-ada-002"
+    },
+    {
+      "name": "mem4j.embedding.api-key",
+      "type": "java.lang.String",
+      "description": "API key for the embedding service."
+    },
+    {
+      "name": "mem4j.embedding.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL for the embedding service API."
+    }
+  ],
+  "hints": [
+    {
+      "name": "mem4j.vector-store.type",
+      "values": [
+        {
+          "value": "inmemory",
+          "description": "In-memory vector store (for development and testing)"
+        },
+        {
+          "value": "qdrant",
+          "description": "Qdrant vector database"
+        }
+      ]
+    },
+    {
+      "name": "mem4j.llm.type",
+      "values": [
+        {
+          "value": "openai",
+          "description": "OpenAI GPT models"
+        },
+        {
+          "value": "dashscope",
+          "description": "Alibaba DashScope models"
+        },
+        {
+          "value": "mock",
+          "description": "Mock implementation for testing"
+        }
+      ]
+    },
+    {
+      "name": "mem4j.embedding.type",
+      "values": [
+        {
+          "value": "openai",
+          "description": "OpenAI embedding models"
+        },
+        {
+          "value": "dashscope",
+          "description": "Alibaba DashScope embedding models"
+        },
+        {
+          "value": "mock",
+          "description": "Mock implementation for testing"
+        }
+      ]
+    },
+    {
+      "name": "mem4j.llm.model",
+      "values": [
+        {
+          "value": "gpt-3.5-turbo",
+          "description": "OpenAI GPT-3.5 Turbo model"
+        },
+        {
+          "value": "gpt-4",
+          "description": "OpenAI GPT-4 model"
+        },
+        {
+          "value": "qwen-turbo",
+          "description": "Alibaba Qwen Turbo model"
+        },
+        {
+          "value": "qwen-plus",
+          "description": "Alibaba Qwen Plus model"
+        }
+      ]
+    },
+    {
+      "name": "mem4j.embedding.model",
+      "values": [
+        {
+          "value": "text-embedding-ada-002",
+          "description": "OpenAI text embedding model"
+        },
+        {
+          "value": "text-embedding-v1",
+          "description": "Alibaba DashScope text embedding model"
+        }
+      ]
+    }
+  ]
+}

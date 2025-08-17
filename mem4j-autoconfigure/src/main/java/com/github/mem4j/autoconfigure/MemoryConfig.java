@@ -33,7 +33,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = MemoryConfig.CONFIG_PREFIX)
 public class MemoryConfig implements MemoryConfigurable {
 
-	public static final String CONFIG_PREFIX = "github.mem4j";
+	public static final String CONFIG_PREFIX = "mem4j";
 
 	@NotNull
 	private VectorStoreConfig vectorStore;

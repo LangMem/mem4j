@@ -9,18 +9,17 @@ Mem4j 使用 Spring Boot 配置系统，支持 YAML 和 Properties 格式。所�
 ### 最小配置
 
 ```yaml
-github:
-  mem4j:
-    vector-store:
+mem4j:
+  vector-store:
     type: inmemory
     collection: memories
 
-    llm:
+  llm:
     type: dashscope
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo
 
-    embeddings:
+  embeddings:
     type: dashscope
     model: text-embedding-v1
 ```
@@ -28,8 +27,7 @@ github:
 ### 完整配置示例
 
 ```yaml
-github:
-  mem4j:
+mem4j:
     # 向量存储配置
     vector-store:
     type: qdrant # 可选: inmemory, qdrant
@@ -88,11 +86,10 @@ github:
 #### 1. 内存存储 (inmemory)
 
 ```yaml
-github:
-  mem4j:
-    vector-store:
-    type: inmemory
-    collection: memories
+mem4j:
+  vector-store:
+  type: inmemory
+  collection: memories
 ```
 
 **适用场景**: 开发、测试、演示
@@ -102,14 +99,13 @@ github:
 #### 2. Qdrant
 
 ```yaml
-github:
-  mem4j:
-    vector-store:
-    type: qdrant
-    url: http://localhost:6333
-    collection: memories
-    options:
-      api-key: your-qdrant-api-key # 可选
+mem4j:
+  vector-store:
+  type: qdrant
+  url: http://localhost:6333
+  collection: memories
+  options:
+    api-key: your-qdrant-api-key # 可选
 ```
 
 **适用场景**: 生产环境
@@ -121,15 +117,14 @@ github:
 #### 1. DashScope (通义千问)
 
 ```yaml
-github:
-  mem4j:
-    llm:
-    type: dashscope
-    api-key: ${DASHSCOPE_API_KEY}
-    model: qwen-turbo # 或 qwen-plus, qwen-max
-    options:
-      max-tokens: 1000
-      temperature: 0.7
+mem4j:
+  llm:
+  type: dashscope
+  api-key: ${DASHSCOPE_API_KEY}
+  model: qwen-turbo # 或 qwen-plus, qwen-max
+  options:
+    max-tokens: 1000
+    temperature: 0.7
 ```
 
 **支持模型**:
@@ -142,16 +137,15 @@ github:
 #### 2. OpenAI
 
 ```yaml
-github:
-  mem4j:
-    llm:
-    type: openai
-    api-key: ${OPENAI_API_KEY}
-    model: gpt-3.5-turbo # 或 gpt-4
-    options:
-      max-tokens: 1000
-      temperature: 0.7
-      organization: your-org-id # 可选
+mem4j:
+  llm:
+  type: openai
+  api-key: ${OPENAI_API_KEY}
+  model: gpt-3.5-turbo # 或 gpt-4
+  options:
+    max-tokens: 1000
+    temperature: 0.7
+    organization: your-org-id # 可选
 ```
 
 ### 嵌入服务
@@ -159,25 +153,23 @@ github:
 #### 1. DashScope 嵌入
 
 ```yaml
-github:
-  mem4j:
-    embeddings:
-    type: dashscope
-    model: text-embedding-v1
-    options:
-      dimensions: 1536
+mem4j:
+  embeddings:
+  type: dashscope
+  model: text-embedding-v1
+  options:
+    dimensions: 1536
 ```
 
 #### 2. OpenAI 嵌入
 
 ```yaml
-github:
-  mem4j:
-    embeddings:
-    type: openai
-    model: text-embedding-ada-002
-    options:
-      dimensions: 1536
+mem4j:
+  embeddings:
+  type: openai
+  model: text-embedding-ada-002
+  options:
+    dimensions: 1536
 ```
 
 ## 🔒 环境变量
@@ -207,8 +199,7 @@ export NEO4J_PASSWORD="your-password"
 ### 开发环境 (application-dev.yml)
 
 ```yaml
-github:
-  mem4j:
+mem4j:
     vector-store:
     type: inmemory
     llm:
@@ -227,8 +218,7 @@ logging:
 ### 生产环境 (application-prod.yml)
 
 ```yaml
-github:
-  mem4j:
+mem4j:
     vector-store:
     type: qdrant
     url: ${QDRANT_URL}
@@ -261,8 +251,7 @@ logging:
 
 ```yaml
 # application-docker.yml
-github:
-  mem4j:
+mem4j:
     vector-store:
     type: qdrant
     url: http://qdrant:6333
@@ -289,36 +278,33 @@ github:
 ### 向量存储优化
 
 ```yaml
-github:
-  mem4j:
-    vector-store:
-    options:
-      batch-size: 100 # 调整批处理大小
-      similarity-threshold: 0.8 # 提高阈值减少结果数量
-      max-results: 50 # 限制最大结果数
+mem4j:
+  vector-store:
+  options:
+    batch-size: 100 # 调整批处理大小
+    similarity-threshold: 0.8 # 提高阈值减少结果数量
+    max-results: 50 # 限制最大结果数
 ```
 
 ### LLM 优化
 
 ```yaml
-github:
-  mem4j:
-    llm:
-    options:
-      max-tokens: 500 # 减少输出长度
-      temperature: 0.1 # 降低随机性
-      timeout: 15 # 设置合理超时
+mem4j:
+  llm:
+  options:
+    max-tokens: 500 # 减少输出长度
+    temperature: 0.1 # 降低随机性
+    timeout: 15 # 设置合理超时
 ```
 
 ### 嵌入优化
 
 ```yaml
-github:
-  mem4j:
-    embeddings:
-    options:
-      batch-size: 20 # 批量处理嵌入
-      cache-size: 1000 # 启用嵌入缓存
+mem4j:
+  embeddings:
+  options:
+    batch-size: 20 # 批量处理嵌入
+    cache-size: 1000 # 启用嵌入缓存
 ```
 
 ## 🔍 配置验证
@@ -344,8 +330,7 @@ management:
     health:
       show-details: always
 
-github:
-  mem4j:
+mem4j:
   monitoring:
     enabled: true
     metrics:
@@ -383,8 +368,7 @@ logging:
     com.github.mem4j: DEBUG
     com.github.mem4j.configs: TRACE
 
-github:
-  mem4j:
+mem4j:
   debug:
     enabled: true
     log-requests: true

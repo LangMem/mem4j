@@ -87,7 +87,7 @@ public class MemoryAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "github.mem4j.vector-store", name = "type", havingValue = "inmemory", matchIfMissing = true)
+	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "inmemory", matchIfMissing = true)
 	public VectorStoreService inMemoryVectorStoreService() {
 		logger.info("Creating InMemoryVectorStoreService");
 		return new InMemoryVectorStoreService();
@@ -104,7 +104,7 @@ public class MemoryAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "github.mem4j.vector-store", name = "type", havingValue = "qdrant")
+	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "qdrant")
 	@ConditionalOnClass(name = "io.qdrant.client.QdrantClient")
 	public VectorStoreService qdrantVectorStoreService(MemoryConfig memoryConfig) {
 		logger.info("Creating QdrantVectorStoreService");

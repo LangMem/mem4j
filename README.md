@@ -135,41 +135,40 @@ src/main/java/com/github/mem4j/
 
 ```yaml
 # Memory Configuration
-github:
-  mem4j:
-    vector-store:
-      type: qdrant # Options: inmemory, qdrant
-      url: http://localhost:6333
-      collection: memories
-      options:
-        similarity-threshold: 0.7
+mem4j:
+  vector-store:
+    type: qdrant # Options: inmemory, qdrant
+    url: http://localhost:6333
+    collection: memories
+    options:
+      similarity-threshold: 0.7
 
-    llm:
-      type: dashscope # Options: openai, dashscope
-      api-key: ${DASHSCOPE_API_KEY}
-      model: qwen-turbo
-      options:
-        max-tokens: 1000
-        temperature: 0.7
+  llm:
+    type: dashscope # Options: openai, dashscope
+    api-key: ${DASHSCOPE_API_KEY}
+    model: qwen-turbo
+    options:
+      max-tokens: 1000
+      temperature: 0.7
 
-    embeddings:
-      type: dashscope # Options: openai, dashscope
-      model: text-embedding-v1
-      options:
-        dimensions: 1536
+  embeddings:
+    type: dashscope # Options: openai, dashscope
+    model: text-embedding-v1
+    options:
+      dimensions: 1536
 
-    graph:
-      type: neo4j
-      uri: bolt://localhost:7687
-      username: neo4j
-      password: password
-      options:
-        database: neo4j
+  graph:
+    type: neo4j
+    uri: bolt://localhost:7687
+    username: neo4j
+    password: password
+    options:
+      database: neo4j
 
-    # Global configuration
-    max-memories: 1000
-    embedding-dimension: 1536
-    similarity-threshold: 0.7
+  # Global configuration
+  max-memories: 1000
+  embedding-dimension: 1536
+  similarity-threshold: 0.7
 ```
 
 ### Environment Variables
@@ -380,15 +379,14 @@ Mem4j now supports **DashScope** as a primary LLM and embedding provider, offeri
 
 3. **Update Configuration**:
    ```yaml
-   github:
-     mem4j:
-       llm:
-         type: dashscope
-         api-key: ${DASHSCOPE_API_KEY}
-         model: qwen-turbo
-       embeddings:
-         type: dashscope
-         model: text-embedding-v1
+   mem4j:
+     llm:
+       type: dashscope
+       api-key: ${DASHSCOPE_API_KEY}
+       model: qwen-turbo
+     embeddings:
+       type: dashscope
+       model: text-embedding-v1
    ```
 
 ### Supported Models
