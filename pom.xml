@@ -7,7 +7,7 @@
 
     <groupId>com.github.mem4j</groupId>
     <artifactId>mem4j-parent</artifactId>
-    <version>0.1.0</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <name>Mem4j Parent</name>
@@ -58,11 +58,17 @@
     </modules>
 
     <properties>
+        <!-- Project version -->
+        <revision>0.1.0</revision>
+
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
         <spring.boot.version>3.2.0</spring.boot.version>
         <spring.version>6.1.1</spring.version>
+
         <jackson.version>2.15.3</jackson.version>
         <openai.version>0.12.0</openai.version>
         <h2.version>2.3.232</h2.version>
@@ -78,8 +84,6 @@
         <mockito.version>5.7.0</mockito.version>
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.11</logback.version>
-
-        <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
     </properties>
 
     <dependencyManagement>
