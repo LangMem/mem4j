@@ -13,7 +13,7 @@
 
     <artifactId>mem4j-autoconfigure</artifactId>
     <name>Mem4j AutoConfigure</name>
-    <description>Spring Boot auto-configuration for Mem4j</description>
+    <description>Spring Boot Auto Configuration for Mem4j</description>
 
     <dependencies>
         <!-- Mem4j Core -->

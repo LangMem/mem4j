@@ -253,7 +253,7 @@ mvn spring-boot:run
 ## 📚 下一步
 
 1. 查看 [完整集成指南](INTEGRATION_GUIDE.md) 了解更多高级功能
-2. 查看 [示例项目](example-usage/) 获取更多代码示例
+2. 查看 [示例项目](mem4j-example/) 获取更多代码示例
 3. 阅读 [API 文档](docs/API.md) 了解所有可用方法
 
 ---

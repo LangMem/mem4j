@@ -5,20 +5,16 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
-    <artifactId>mem4j-usage-example</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <parent>
+        <groupId>com.github.mem4j</groupId>
+        <artifactId>mem4j-parent</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>mem4j-example</artifactId>
 
     <name>Mem4j Usage Example</name>
     <description>Example project showing how to use Mem4j</description>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>3.2.0</spring.boot.version>
-    </properties>
 
     <dependencies>
         <!-- Spring Boot Starter -->
@@ -32,12 +28,12 @@
         <dependency>
             <groupId>com.github.mem4j</groupId>
             <artifactId>mem4j-spring-boot-starter</artifactId>
-            <version>0.1.0</version>
         </dependency>
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>2.3.232</version>
+            <version>${h2.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

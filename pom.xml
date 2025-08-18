@@ -52,6 +52,7 @@
 
     <modules>
         <module>mem4j-core</module>
+        <module>mem4j-example</module>
         <module>mem4j-autoconfigure</module>
         <module>mem4j-spring-boot-starter</module>
     </modules>
@@ -64,7 +65,8 @@
         <spring.version>6.1.1</spring.version>
         <jackson.version>2.15.3</jackson.version>
         <openai.version>0.12.0</openai.version>
-        
+        <h2.version>2.3.232</h2.version>
+
         <!-- Vector Store versions -->
         <qdrant.version>1.13.0</qdrant.version>
         <elasticsearch.version>8.11.0</elasticsearch.version>
