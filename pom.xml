@@ -5,7 +5,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.mem4j</groupId>
+    <groupId>io.github.mem4j</groupId>
     <artifactId>mem4j-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
