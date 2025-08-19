@@ -24,6 +24,7 @@ import io.github.mem4j.llms.LLMService;
 import io.github.mem4j.llms.OpenAILLMService;
 import io.github.mem4j.memory.Memory;
 import io.github.mem4j.vectorstores.InMemoryVectorStoreService;
+import io.github.mem4j.vectorstores.MilvusVectorStoreService;
 import io.github.mem4j.vectorstores.QdrantVectorStoreService;
 import io.github.mem4j.vectorstores.VectorStoreService;
 import org.slf4j.Logger;
@@ -54,97 +55,117 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(MemoryConfig.class)
 public class MemoryAutoConfiguration {
 
-	private static final Logger logger = LoggerFactory.getLogger(MemoryAutoConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(MemoryAutoConfiguration.class);
 
-	/**
-	 * Creates the main Memory bean with all required dependencies. This bean will be
-	 * created only if no other Memory bean exists.
-	 * @param memoryConfig the memory configuration properties
-	 * @param vectorStoreService the vector store service (auto-selected based on config)
-	 * @param llmService the LLM service (auto-selected based on config)
-	 * @param embeddingService the embedding service (auto-selected based on config)
-	 * @return configured Memory instance
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public Memory memory(MemoryConfig memoryConfig, VectorStoreService vectorStoreService, LLMService llmService,
-			EmbeddingService embeddingService) {
-		logger.info("Creating Memory bean with vector store type: {}", memoryConfig.getVectorStore().getType());
-		return new Memory(memoryConfig, vectorStoreService, llmService, embeddingService);
-	}
+    /**
+     * Creates the main Memory bean with all required dependencies. This bean will be
+     * created only if no other Memory bean exists.
+     *
+     * @param memoryConfig       the memory configuration properties
+     * @param vectorStoreService the vector store service (auto-selected based on config)
+     * @param llmService         the LLM service (auto-selected based on config)
+     * @param embeddingService   the embedding service (auto-selected based on config)
+     * @return configured Memory instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public Memory memory(MemoryConfig memoryConfig, VectorStoreService vectorStoreService, LLMService llmService, EmbeddingService embeddingService) {
+        logger.info("Creating Memory bean with vector store type: {}", memoryConfig.getVectorStore().getType());
+        return new Memory(memoryConfig, vectorStoreService, llmService, embeddingService);
+    }
 
-	/**
-	 * Creates an InMemoryVectorStore service when no other VectorStore is configured or
-	 * when explicitly configured to use 'inmemory' type.
-	 * @return InMemoryVectorStoreService instance
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "inmemory",
-			matchIfMissing = true)
-	public VectorStoreService inMemoryVectorStoreService() {
-		logger.info("Creating InMemoryVectorStoreService");
-		return new InMemoryVectorStoreService();
-	}
+    /**
+     * Creates an InMemoryVectorStore service when no other VectorStore is configured or
+     * when explicitly configured to use 'inmemory' type.
+     *
+     * @return InMemoryVectorStoreService instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "inmemory", matchIfMissing = true)
+    public VectorStoreService inMemoryVectorStoreService() {
+        logger.info("Creating InMemoryVectorStoreService");
+        return new InMemoryVectorStoreService();
+    }
 
-	/**
-	 * Creates a Qdrant VectorStore service when configured to use 'qdrant' type. This
-	 * bean will only be created if the Qdrant client classes are available on the
-	 * classpath.
-	 * @param memoryConfig the memory configuration properties
-	 * @return QdrantVectorStoreService instance
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "qdrant")
-	@ConditionalOnClass(name = "io.qdrant.client.QdrantClient")
-	public VectorStoreService qdrantVectorStoreService(MemoryConfig memoryConfig) {
-		logger.info("Creating QdrantVectorStoreService");
-		return new QdrantVectorStoreService(memoryConfig);
-	}
+    /**
+     * Creates a Qdrant VectorStore service when configured to use 'qdrant' type. This
+     * bean will only be created if the Qdrant client classes are available on the
+     * classpath.
+     *
+     * @param memoryConfig the memory configuration properties
+     * @return QdrantVectorStoreService instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "qdrant")
+    @ConditionalOnClass(name = "io.qdrant.client.QdrantClient")
+    public VectorStoreService qdrantVectorStoreService(MemoryConfig memoryConfig) {
+        logger.info("Creating QdrantVectorStoreService");
+        return new QdrantVectorStoreService(memoryConfig);
+    }
 
-	/**
-	 * Creates the appropriate LLM service based on configuration. Supports OpenAI and
-	 * DashScope implementations.
-	 * @param memoryConfig the memory configuration properties
-	 * @return LLMService instance based on configuration
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public LLMService llmService(MemoryConfig memoryConfig) {
-		String llmType = memoryConfig.getLlm().getType();
-		logger.info("Creating LLM service of type: {}", llmType);
+    /**
+     * Creates a Milvus VectorStore service when configured to use 'milvus' type. This
+     * bean will only be created if the Milvus client classes are available on the
+     * classpath.
+     *
+     * @param memoryConfig the memory configuration properties
+     * @return MilvusVectorStoreService instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "milvus", matchIfMissing = true)
+    @ConditionalOnClass(name = "io.milvus.client.MilvusClient")
+    public VectorStoreService milvusVectorStoreService(MemoryConfig memoryConfig) {
+        logger.info("Creating MilvusVectorStoreService");
+        return new MilvusVectorStoreService(memoryConfig);
+    }
 
-		return switch (llmType.toLowerCase()) {
-			case "dashscope" -> new DashScopeLLMService(memoryConfig);
-			case "openai" -> new OpenAILLMService(memoryConfig);
-			default -> {
-				logger.warn("Unknown LLM type: {}, falling back to OpenAI", llmType);
-				yield new OpenAILLMService(memoryConfig);
-			}
-		};
-	}
+    /**
+     * Creates the appropriate LLM service based on configuration. Supports OpenAI and
+     * DashScope implementations.
+     *
+     * @param memoryConfig the memory configuration properties
+     * @return LLMService instance based on configuration
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public LLMService llmService(MemoryConfig memoryConfig) {
+        String llmType = memoryConfig.getLlm().getType();
+        logger.info("Creating LLM service of type: {}", llmType);
 
-	/**
-	 * Creates the appropriate Embedding service based on configuration. Supports OpenAI
-	 * and DashScope implementations.
-	 * @param memoryConfig the memory configuration properties
-	 * @return EmbeddingService instance based on configuration
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public EmbeddingService embeddingService(MemoryConfig memoryConfig) {
-		String embeddingType = memoryConfig.getEmbeddings().getType();
-		logger.info("Creating Embedding service of type: {}", embeddingType);
+        return switch (llmType.toLowerCase()) {
+            case "dashscope" -> new DashScopeLLMService(memoryConfig);
+            case "openai" -> new OpenAILLMService(memoryConfig);
+            default -> {
+                logger.warn("Unknown LLM type: {}, falling back to OpenAI", llmType);
+                yield new OpenAILLMService(memoryConfig);
+            }
+        };
+    }
 
-		return switch (embeddingType.toLowerCase()) {
-			case "dashscope" -> new DashScopeEmbeddingService(memoryConfig);
-			case "openai" -> new OpenAIEmbeddingService(memoryConfig);
-			default -> {
-				logger.warn("Unknown embedding type: {}, falling back to OpenAI", embeddingType);
-				yield new OpenAIEmbeddingService(memoryConfig);
-			}
-		};
-	}
+    /**
+     * Creates the appropriate Embedding service based on configuration. Supports OpenAI
+     * and DashScope implementations.
+     *
+     * @param memoryConfig the memory configuration properties
+     * @return EmbeddingService instance based on configuration
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public EmbeddingService embeddingService(MemoryConfig memoryConfig) {
+        String embeddingType = memoryConfig.getEmbeddings().getType();
+        logger.info("Creating Embedding service of type: {}", embeddingType);
+
+        return switch (embeddingType.toLowerCase()) {
+            case "dashscope" -> new DashScopeEmbeddingService(memoryConfig);
+            case "openai" -> new OpenAIEmbeddingService(memoryConfig);
+            default -> {
+                logger.warn("Unknown embedding type: {}, falling back to OpenAI", embeddingType);
+                yield new OpenAIEmbeddingService(memoryConfig);
+            }
+        };
+    }
 
 }

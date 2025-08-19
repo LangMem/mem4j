@@ -17,10 +17,16 @@ mem4j:
   # 使用内存向量存储（适合演示）
   vector-store:
     type: inmemory
-    collection: example-memories
+    collection: example_memories
     options:
       similarity-threshold: 0.6
-
+  # 使用Milvus内存向量存储（适合演示）
+  #  vector-store:
+  #    type: milvus
+  #    collection: example_memories
+  #    url: ${Milvus_SERVER_URL:localhost:19530}
+  #    options:
+  #      similarity-threshold: 0.6
   # LLM配置（DashScope - 需要设置环境变量 DASHSCOPE_API_KEY）
   llm:
     type: dashscope
