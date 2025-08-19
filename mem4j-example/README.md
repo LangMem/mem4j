@@ -140,7 +140,7 @@ private Memory memory;
 ### 添加记忆
 
 ```java
-import com.github.mem4j.memory.Message;
+import io.github.mem4j.memory.Message;
 import java.util.Arrays;
 import java.util.List;
 
@@ -155,7 +155,7 @@ memory.add(messages, "user1");
 ### 搜索记忆
 
 ```java
-import com.github.mem4j.memory.MemoryItem;
+import io.github.mem4j.memory.MemoryItem;
 import java.util.List;
 
 List<MemoryItem> memories = memory.search("张三喜欢什么？", "user1");
@@ -164,7 +164,7 @@ List<MemoryItem> memories = memory.search("张三喜欢什么？", "user1");
 ### 获取所有记忆
 
 ```java
-import com.github.mem4j.memory.MemoryItem;
+import io.github.mem4j.memory.MemoryItem;
 import java.util.List;
 
 List<MemoryItem> allMemories = memory.getAll("user1", null, 50);

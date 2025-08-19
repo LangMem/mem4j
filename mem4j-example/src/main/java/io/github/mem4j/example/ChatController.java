@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.example;
+package io.github.mem4j.example;
 
-import com.github.mem4j.memory.Memory;
-import com.github.mem4j.memory.MemoryItem;
-import com.github.mem4j.memory.Message;
+import io.github.mem4j.memory.Memory;
+import io.github.mem4j.memory.MemoryItem;
+import io.github.mem4j.memory.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
     <name>Mem4j Parent</name>
     <description>Parent POM for Mem4j - Long-term memory for AI Agents</description>
     <url>https://github.com/mem4j/mem4j</url>
-    
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -21,13 +21,13 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <scm>
         <connection>scm:git:https://github.com/langMem/mem4j.git</connection>
         <developerConnection>scm:git:https://github.com/langMem/mem4j.git</developerConnection>
         <url>https://github.com/langMem/mem4j</url>
     </scm>
-    
+
     <issueManagement>
         <system>Github Issues</system>
         <url>https://github.com/langMem/mem4j/issues</url>
@@ -36,7 +36,7 @@
         <system>Github Actions</system>
         <url>https://github.com/langMem/mem4j/actions</url>
     </ciManagement>
-    
+
     <developers>
         <developer>
             <name>Aias00</name>
@@ -78,7 +78,7 @@
         <elasticsearch.version>8.11.0</elasticsearch.version>
         <weaviate.version>5.4.0</weaviate.version>
         <neo4j.version>5.28.9</neo4j.version>
-        
+
         <!-- Test versions -->
         <junit.version>5.10.0</junit.version>
         <mockito.version>5.7.0</mockito.version>
@@ -96,7 +96,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!-- Spring AI Alibaba BOM -->
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
@@ -108,12 +108,12 @@
 
             <!-- Mem4j modules -->
             <dependency>
-                <groupId>com.github.mem4j</groupId>
+                <groupId>io.github.mem4j</groupId>
                 <artifactId>mem4j-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.mem4j</groupId>
+                <groupId>io.github.mem4j</groupId>
                 <artifactId>mem4j-autoconfigure</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -133,7 +133,7 @@
                         <parameters>true</parameters>
                     </configuration>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -153,13 +153,13 @@
                         </execution>
                     </executions>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.6.3</version>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>io.spring.javaformat</groupId>
                     <artifactId>spring-javaformat-maven-plugin</artifactId>

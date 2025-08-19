@@ -2,25 +2,25 @@
   "groups": [
     {
       "name": "mem4j",
-      "type": "com.mem4j.autoconfigure.MemoryConfig",
+      "type": "io.github.mem4j.autoconfigure.MemoryConfig",
       "description": "Configuration properties for Mem4j - Long-term memory for AI Agents."
     },
     {
       "name": "mem4j.vector-store",
-      "type": "com.mem4j.autoconfigure.MemoryConfig$VectorStoreConfig",
-      "sourceType": "com.mem4j.autoconfigure.MemoryConfig",
+      "type": "io.github.mem4j.autoconfigure.MemoryConfig$VectorStoreConfig",
+      "sourceType": "io.github.mem4j.autoconfigure.MemoryConfig",
       "description": "Configuration properties for vector store service."
     },
     {
       "name": "mem4j.llm",
-      "type": "com.mem4j.autoconfigure.MemoryConfig$LLMConfig",
-      "sourceType": "com.mem4j.autoconfigure.MemoryConfig",
+      "type": "io.github.mem4j.autoconfigure.MemoryConfig$LLMConfig",
+      "sourceType": "io.github.mem4j.autoconfigure.MemoryConfig",
       "description": "Configuration properties for LLM service."
     },
     {
       "name": "mem4j.embedding",
-      "type": "com.mem4j.autoconfigure.MemoryConfig$EmbeddingConfig",
-      "sourceType": "com.mem4j.autoconfigure.MemoryConfig",
+      "type": "io.github.mem4j.autoconfigure.MemoryConfig$EmbeddingConfig",
+      "sourceType": "io.github.mem4j.autoconfigure.MemoryConfig",
       "description": "Configuration properties for embedding service."
     }
   ],

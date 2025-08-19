@@ -59,7 +59,7 @@ cd my-mem4j-app
 
         <!-- Mem4j -->
         <dependency>
-            <groupId>com.github.mem4j</groupId>
+            <groupId>io.github.mem4j</groupId>
             <artifactId>mem4j</artifactId>
             <version>0.1.0</version>
         </dependency>
