@@ -51,6 +51,7 @@
     </developers>
 
     <modules>
+        <module>mem4j-bom</module>
         <module>mem4j-core</module>
         <module>mem4j-example</module>
         <module>mem4j-autoconfigure</module>
