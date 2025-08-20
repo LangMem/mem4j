@@ -101,8 +101,9 @@ src/main/java/com/github/mem4j/
 
 #### Vector Stores
 
-- ✅ **Qdrant** - Full implementation
 - ✅ **InMemory** - In-memory storage implementation
+- ✅ **Qdrant** - Full implementation
+- ✅ **Milvus** - Full implementation
 - ⚠️ **Elasticsearch** - Dependencies added, implementation planned
 - ⚠️ **Weaviate** - Dependencies added, implementation planned
 - 📋 **Pinecone** - Planned via HTTP client support
@@ -134,7 +135,7 @@ src/main/java/com/github/mem4j/
 github:
   mem4j:
     vector-store:
-      type: qdrant # Options: inmemory, qdrant
+      type: qdrant # Options: inmemory, qdrant, milvus
       url: http://localhost:6333
       collection: memories
       options:
