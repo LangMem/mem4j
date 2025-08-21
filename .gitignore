@@ -187,3 +187,4 @@ qdrant_storage/
 .crossnote
 testing.ipynb
 checkstyle-report.xml
+.flattened-pom.xml
