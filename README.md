@@ -56,7 +56,7 @@ Add the Mem4j Spring Boot starter to your project:
 <dependency>
     <groupId>io.github.mem4j</groupId>
     <artifactId>mem4j-spring-boot-starter</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.0.RC1</version>
 </dependency>
 ```
 

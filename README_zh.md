@@ -56,7 +56,7 @@ Mem4j 是一个为 AI 智能体和应用提供长期记忆能力的 Java 库。�
 <dependency>
     <groupId>io.github.mem4j</groupId>
     <artifactId>mem4j-spring-boot-starter</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.0.RC1</version>
 </dependency>
 ```
 
