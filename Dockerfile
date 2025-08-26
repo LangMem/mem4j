@@ -51,4 +51,4 @@ EXPOSE 8080
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 # Run the application
-CMD ["sh", "-c", "java $JAVA_OPTS -jar target/mem4j-0.1.0.jar"] 
+CMD ["sh", "-c", "java $JAVA_OPTS -jar target/mem4j-0.1.0.RC1.jar"]

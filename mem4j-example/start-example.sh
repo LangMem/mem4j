@@ -28,7 +28,7 @@ if [ ! -f "pom.xml" ]; then
 fi
 
 # Check if parent project is built
-if [ ! -f "../target/mem4j-0.1.0.jar" ]; then
+if [ ! -f "../target/mem4j-0.1.0.RC1.jar" ]; then
     echo "📦 Building parent project first..."
     cd .. && mvn clean install -DskipTests -q
     if [ $? -ne 0 ]; then

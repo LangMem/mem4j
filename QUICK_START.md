@@ -61,7 +61,7 @@ cd my-mem4j-app
         <dependency>
             <groupId>io.github.mem4j</groupId>
             <artifactId>mem4j</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.0.RC1</version>
         </dependency>
     </dependencies>
 
