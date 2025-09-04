@@ -131,6 +131,10 @@
           "description": "Alibaba DashScope models"
         },
         {
+          "value": "anthropic",
+          "description": "Anthropic Claude models"
+        },
+        {
           "value": "mock",
           "description": "Mock implementation for testing"
         }
@@ -171,6 +175,18 @@
         {
           "value": "qwen-plus",
           "description": "Alibaba Qwen Plus model"
+        },
+        {
+          "value": "claude-3-sonnet-20240229",
+          "description": "Anthropic Claude-3 Sonnet model"
+        },
+        {
+          "value": "claude-3-haiku-20240307", 
+          "description": "Anthropic Claude-3 Haiku model"
+        },
+        {
+          "value": "claude-3-opus-20240229",
+          "description": "Anthropic Claude-3 Opus model"
         }
       ]
     },

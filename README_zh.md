@@ -167,7 +167,7 @@ mem4j-core/src/main/java/io/github/mem4j/
 
 - ✅ **DashScope** - 完整实现，支持阿里云 DashScope API
 - ✅ **OpenAI** - 完整实现，支持 OpenAI API
-- 📋 **Anthropic** - 计划实现
+- ✅ **Anthropic** - 完整实现，支持 Claude API（Claude-3 Sonnet、Haiku、Opus）
 - 📋 **Azure OpenAI** - 计划实现
 - 📋 **AWS Bedrock** - 计划实现
 
@@ -195,7 +195,7 @@ mem4j:
       similarity-threshold: 0.7
 
   llm:
-    type: dashscope # 选项: openai, dashscope
+    type: dashscope # 选项: openai, dashscope, anthropic
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo
     options:
@@ -219,6 +219,7 @@ mem4j:
 ```bash
 export DASHSCOPE_API_KEY="your-dashscope-api-key"
 export OPENAI_API_KEY="your-openai-api-key"
+export ANTHROPIC_API_KEY="your-anthropic-api-key"
 export QDRANT_URL="http://localhost:6333"
 export MILVUS_URL="localhost:19530"
 ```

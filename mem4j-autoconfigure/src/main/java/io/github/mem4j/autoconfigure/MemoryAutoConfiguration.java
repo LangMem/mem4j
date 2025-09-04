@@ -19,6 +19,7 @@ package io.github.mem4j.autoconfigure;
 import io.github.mem4j.embeddings.DashScopeEmbeddingService;
 import io.github.mem4j.embeddings.EmbeddingService;
 import io.github.mem4j.embeddings.OpenAIEmbeddingService;
+import io.github.mem4j.llms.AnthropicLLMService;
 import io.github.mem4j.llms.DashScopeLLMService;
 import io.github.mem4j.llms.LLMService;
 import io.github.mem4j.llms.OpenAILLMService;
@@ -121,8 +122,8 @@ public class MemoryAutoConfiguration {
 	}
 
 	/**
-	 * Creates the appropriate LLM service based on configuration. Supports OpenAI and
-	 * DashScope implementations.
+	 * Creates the appropriate LLM service based on configuration. Supports OpenAI,
+	 * DashScope, and Anthropic implementations.
 	 * @param memoryConfig the memory configuration properties
 	 * @return LLMService instance based on configuration
 	 */
@@ -135,6 +136,7 @@ public class MemoryAutoConfiguration {
 		return switch (llmType.toLowerCase()) {
 			case "dashscope" -> new DashScopeLLMService(memoryConfig);
 			case "openai" -> new OpenAILLMService(memoryConfig);
+			case "anthropic" -> new AnthropicLLMService(memoryConfig);
 			default -> {
 				logger.warn("Unknown LLM type: {}, falling back to OpenAI", llmType);
 				yield new OpenAILLMService(memoryConfig);

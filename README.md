@@ -167,7 +167,7 @@ mem4j-core/src/main/java/io/github/mem4j/
 
 - ✅ **DashScope** - Full implementation with Alibaba Cloud DashScope API
 - ✅ **OpenAI** - Full implementation with OpenAI API
-- 📋 **Anthropic** - Planned implementation
+- ✅ **Anthropic** - Full implementation with Anthropic API
 - 📋 **Azure OpenAI** - Planned implementation
 - 📋 **AWS Bedrock** - Planned implementation
 
@@ -195,7 +195,7 @@ mem4j:
       similarity-threshold: 0.7
 
   llm:
-    type: dashscope # Options: openai, dashscope
+    type: dashscope # Options: openai, dashscope, anthropic
     api-key: ${DASHSCOPE_API_KEY}
     model: qwen-turbo
     options:
@@ -219,6 +219,7 @@ mem4j:
 ```bash
 export DASHSCOPE_API_KEY="your-dashscope-api-key"
 export OPENAI_API_KEY="your-openai-api-key"
+export ANTHROPIC_API_KEY="your-anthropic-api-key"
 export QDRANT_URL="http://localhost:6333"
 export MILVUS_URL="localhost:19530"
 ```
