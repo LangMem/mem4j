@@ -12,14 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copyright 2024-2026 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: Auto Comment for Clarity
 on:
   issues:
     types: [opened]
-  discussion:
-    types: [created]
-env:
-  ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
@@ -44,27 +54,71 @@ jobs:
             // Get issue details
             const issueTitle = context.payload.issue.title || '';
             const issueBody = context.payload.issue.body || '';
-            const issueLabels = context.payload.issue.labels?.map(label => label.name).join(', ') || '';
 
             console.log('Issue Title:', issueTitle);
             console.log('Issue Body:', issueBody);
-            console.log('Issue Labels:', issueLabels);
 
-            // Simple analysis logic
+            // Analyze what's missing specifically
             const hasDetailedDescription = issueBody.length > 50 && !issueBody.includes('No response');
             const hasStepsToReproduce = issueBody.toLowerCase().includes('步骤') || issueBody.toLowerCase().includes('重现') || issueBody.toLowerCase().includes('reproduce');
             const hasEnvironmentInfo = issueBody.toLowerCase().includes('环境') || issueBody.toLowerCase().includes('版本') || issueBody.toLowerCase().includes('version');
             const hasExpectedBehavior = issueBody.toLowerCase().includes('期望') || issueBody.toLowerCase().includes('expected');
+            const hasErrorDetails = issueBody.toLowerCase().includes('错误') || issueBody.toLowerCase().includes('error') || issueBody.toLowerCase().includes('异常');
 
             // Check if this looks like a bug report that needs more info
             const isBugReport = issueTitle.toLowerCase().includes('bug') || issueTitle.toLowerCase().includes('错误');
-            const needsMoreInfo = isBugReport && (!hasDetailedDescription || !hasStepsToReproduce || !hasEnvironmentInfo);
+            const hasVeryShortDescription = issueBody.trim().length < 30 || issueBody === 'No response' || issueBody.includes('这个怎么用') || issueBody.includes('不知道为什么');
 
-            // Also check for very short descriptions
-            const hasVeryShortDescription = issueBody.trim().length < 20 || issueBody === 'No response' || issueBody.includes('这个怎么用');
+            // Generate dynamic comment based on what's missing
+            const missingItems = [];
+            const suggestions = [];
 
-            if (needsMoreInfo || hasVeryShortDescription) {
-              const commentBody = '👋 感谢您提交这个 issue！\\n\\n为了更好地帮助您解决问题，请补充以下信息：\\n\\n- [ ] **详细的问题描述**：请详细描述您遇到的具体问题\\n- [ ] **重现步骤**：请提供能够重现问题的具体步骤\\n- [ ] **期望的行为**：请描述您期望的正确行为应该是什么\\n- [ ] **实际的行为**：请描述实际发生了什么\\n- [ ] **环境信息**：\\n  - mem4j 版本\\n  - Java 版本\\n  - 操作系统\\n  - 其他相关配置\\n\\n请编辑您的原始 issue 来添加这些信息，这将帮助我们更快地定位和解决问题。🙏';
+            if (hasVeryShortDescription) {
+              missingItems.push('详细的问题描述');
+              suggestions.push('请详细描述您遇到的具体问题，而不是简单的一句话');
+            }
+
+            if (isBugReport && !hasStepsToReproduce) {
+              missingItems.push('重现步骤');
+              suggestions.push('请提供能够重现问题的具体操作步骤');
+            }
+
+            if (isBugReport && !hasErrorDetails) {
+              missingItems.push('错误信息');
+              suggestions.push('请提供完整的错误信息、异常堆栈或错误日志');
+            }
+
+            if (isBugReport && !hasEnvironmentInfo) {
+              missingItems.push('环境信息');
+              suggestions.push('请提供 mem4j 版本、Java 版本、操作系统等环境信息');
+            }
+
+            if (!hasExpectedBehavior && isBugReport) {
+              missingItems.push('期望行为');
+              suggestions.push('请描述您期望的正确行为应该是什么');
+            }
+
+            // Only comment if there are missing items
+            if (missingItems.length > 0) {
+              let commentLines = [
+                '👋 感谢您提交这个 issue！',
+                '',
+                '为了更好地帮助您解决问题，我发现以下信息需要补充：',
+                ''
+              ];
+
+              // Add specific missing items
+              missingItems.forEach((item, index) => {
+                commentLines.push(`${index + 1}. **${item}** - ${suggestions[index]}`);
+              });
+
+              commentLines.push('');
+              commentLines.push('请编辑您的原始 issue 来添加这些信息，这将帮助我们更快地定位和解决问题。🙏');
+              commentLines.push('');
+              commentLines.push('---');
+              commentLines.push('*这是一个自动生成的提醒，旨在提高 issue 的质量和解决效率。*');
+
+              const commentBody = commentLines.join('\n');
 
               await github.rest.issues.createComment({
                 owner,
@@ -72,7 +126,8 @@ jobs:
                 issue_number,
                 body: commentBody
               });
-              console.log('Posted clarity request comment to issue #' + issue_number);
+              console.log('Posted targeted clarity request comment to issue #' + issue_number);
+              console.log('Missing items:', missingItems.join(', '));
             } else {
               console.log('Issue has sufficient information, no comment needed');
             }
