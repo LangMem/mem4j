@@ -15,7 +15,9 @@
 name: Issue Translation
 on:
   issues:
-    types: [opened, edited]
+    types: [ opened, labeled, edited ]
+    issue_comment:
+      types: [ created ]
 env:
   ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
 jobs:
@@ -26,6 +28,10 @@ jobs:
       issues: write
       id-token: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Create translation prompt
         run: |
           mkdir -p /tmp/claude-prompts
