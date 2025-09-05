@@ -32,41 +32,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Analyze issue quality with Claude
-        id: claude_analysis
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            你是一个专业的开源项目社区助手。请分析以下 GitHub issue 的内容质量。
-
-            Issue 标题: ${{ github.event.issue.title }}
-            Issue 内容: ${{ github.event.issue.body }}
-            Issue 标签: ${{ join(github.event.issue.labels.*.name, ', ') }}
-
-            请分析这个 issue 是否包含足够的信息：
-            - 问题描述是否清楚
-            - 是否包含重现步骤（如果是 bug）
-            - 是否包含期望行为和实际行为
-            - 是否包含环境信息
-
-            如果信息不足，请输出一个友好的评论内容，要求补充信息。如果信息充足，请输出 "SUFFICIENT" 表示不需要补充。
-
-            评论应该友好、专业，使用中文，格式如下：
-
-            感谢您提交这个 issue！为了更好地帮助您解决问题，请补充以下信息：
-
-            - [ ] 详细的问题描述
-            - [ ] 重现步骤（如适用）
-            - [ ] 期望的行为
-            - [ ] 实际的行为  
-            - [ ] 环境信息（版本、操作系统等）
-
-            请编辑您的原始 issue 来添加这些信息，这将帮助我们更快地定位和解决问题。
-
-            只输出评论内容，不要添加任何其他解释。
-
-      - name: Create comment if needed
+      - name: Analyze issue and create comment
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -75,19 +41,36 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
-            // Get Claude's analysis result
-            const stepOutputs = ${{ toJson(steps.claude_analysis.outputs) }};
-            const analysisResult = (stepOutputs.response || stepOutputs.result || stepOutputs.output || '').trim();
+            // Get issue details
+            const issueTitle = context.payload.issue.title || '';
+            const issueBody = context.payload.issue.body || '';
+            const issueLabels = context.payload.issue.labels?.map(label => label.name).join(', ') || '';
 
-            console.log('Claude analysis result:', analysisResult);
+            console.log('Issue Title:', issueTitle);
+            console.log('Issue Body:', issueBody);
+            console.log('Issue Labels:', issueLabels);
 
-            // Only post comment if Claude suggests the issue needs more information
-            if (analysisResult && analysisResult !== 'SUFFICIENT' && analysisResult !== '') {
+            // Simple analysis logic
+            const hasDetailedDescription = issueBody.length > 50 && !issueBody.includes('No response');
+            const hasStepsToReproduce = issueBody.toLowerCase().includes('步骤') || issueBody.toLowerCase().includes('重现') || issueBody.toLowerCase().includes('reproduce');
+            const hasEnvironmentInfo = issueBody.toLowerCase().includes('环境') || issueBody.toLowerCase().includes('版本') || issueBody.toLowerCase().includes('version');
+            const hasExpectedBehavior = issueBody.toLowerCase().includes('期望') || issueBody.toLowerCase().includes('expected');
+
+            // Check if this looks like a bug report that needs more info
+            const isBugReport = issueTitle.toLowerCase().includes('bug') || issueTitle.toLowerCase().includes('错误');
+            const needsMoreInfo = isBugReport && (!hasDetailedDescription || !hasStepsToReproduce || !hasEnvironmentInfo);
+
+            // Also check for very short descriptions
+            const hasVeryShortDescription = issueBody.trim().length < 20 || issueBody === 'No response' || issueBody.includes('这个怎么用');
+
+            if (needsMoreInfo || hasVeryShortDescription) {
+              const commentBody = '👋 感谢您提交这个 issue！\\n\\n为了更好地帮助您解决问题，请补充以下信息：\\n\\n- [ ] **详细的问题描述**：请详细描述您遇到的具体问题\\n- [ ] **重现步骤**：请提供能够重现问题的具体步骤\\n- [ ] **期望的行为**：请描述您期望的正确行为应该是什么\\n- [ ] **实际的行为**：请描述实际发生了什么\\n- [ ] **环境信息**：\\n  - mem4j 版本\\n  - Java 版本\\n  - 操作系统\\n  - 其他相关配置\\n\\n请编辑您的原始 issue 来添加这些信息，这将帮助我们更快地定位和解决问题。🙏';
+
               await github.rest.issues.createComment({
                 owner,
                 repo,
                 issue_number,
-                body: analysisResult
+                body: commentBody
               });
               console.log('Posted clarity request comment to issue #' + issue_number);
             } else {
