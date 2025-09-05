@@ -22,6 +22,10 @@ env:
 jobs:
   translate_and_update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
     steps:
       - name: Translate issue body with Claude (auto detect)
         id: translate
@@ -39,7 +43,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Update issue body with original and translation
         uses: actions/github-script@v7
         with:
