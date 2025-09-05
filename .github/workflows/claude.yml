@@ -24,6 +24,7 @@ on:
     types: [submitted]
 env:
   ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 jobs:
   claude-response:
     runs-on: ubuntu-latest
