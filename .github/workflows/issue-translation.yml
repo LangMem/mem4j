@@ -21,53 +21,47 @@ env:
 jobs:
   translate-issue:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write
       id-token: write
     steps:
-      - name: Create translation prompt
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
         run: |
-          mkdir -p /tmp/claude-prompts
-          cat > /tmp/claude-prompts/translation-prompt.txt << 'EOF'
-          你是一个专业的翻译助手。请翻译以下 GitHub issue 的内容。
-          
-          任务：
-          1. 使用 mcp__github__get_issue 获取 issue 详情
-          2. 检测 issue 标题和内容的语言
-          3. 如果是中文，翻译成英文；如果是英文，翻译成中文
-          4. 使用 mcp__github__update_issue 更新 issue，在原内容下方添加翻译
-          
-          Issue 信息：
-          - REPO: ${{ github.repository }}
-          - ISSUE_NUMBER: ${{ github.event.issue.number }}
-          
-          翻译格式：
-          ---
-          **Translation / 翻译**
-          [翻译内容]
-          EOF
-      
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Run Claude Code for Translation
         uses: anthropics/claude-code-action@v1
         with:
           prompt: |
             你是一个专业的翻译助手。请翻译以下 GitHub issue 的内容。
-            
+
+            IMPORTANT: 只更新 issue 内容，不要创建 pull request 或分支。
+
             任务：
             1. 使用 mcp__github__get_issue 获取 issue 详情
             2. 检测 issue 标题和内容的语言
             3. 如果是中文，翻译成英文；如果是英文，翻译成中文
             4. 使用 mcp__github__update_issue 更新 issue，在原内容下方添加翻译
-  
+
             Issue 信息：
             - REPO: ${{ github.repository }}
             - ISSUE_NUMBER: ${{ github.event.issue.number }}
-  
+
             翻译格式：
             ---
             **Translation / 翻译**
             [翻译内容]
+
+            注意：请直接使用 mcp__github__update_issue 工具更新 issue，不要尝试创建分支或 pull request。
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
             --allowedTools mcp__github__get_issue,mcp__github__update_issue
