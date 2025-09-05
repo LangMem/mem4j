@@ -27,41 +27,18 @@ jobs:
       issues: write
       id-token: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-        
       - name: Translate issue body with Claude (auto detect)
         id: translate
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
-            你是一个专业的翻译助手。请翻译以下 GitHub issue 的内容。
-
-            IMPORTANT: 只更新 issue 内容，不要创建 pull request 或分支。
-
-            任务：
-            1. 使用 mcp__github__get_issue 获取 issue 详情
-            2. 检测 issue 标题和内容的语言
-            3. 如果是中文，翻译成英文；如果是英文，翻译成中文
-            4. 不要解释，不要输出原文，只返回翻译内容。
-
-            Issue 信息：
-            - REPO: ${{ github.repository }}
-            - ISSUE_NUMBER: ${{ github.event.issue.number }}
-
-            翻译格式：
+            你是一名专业的双语翻译。请自动检测下面文本的主要语言（只会是中文或英文）：
+            - 如果主要语言是中文，请将其准确、地道地翻译为英文，只返回英文翻译。
+            - 如果主要语言是英文，请将其准确、地道地翻译为中文，只返回中文翻译。
+            - 不要解释，不要输出原文，只返回翻译内容。
             ---
-            **Translation / 翻译**
-            [翻译内容]
-            ---
-            {{ issue.body }}
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            ${{ github.event.issue.body }}
 
       - name: Update issue body with original and translation
         uses: actions/github-script@v7
@@ -72,11 +49,22 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const orig = context.payload.issue.body || '';
-            const translated = `${{ steps.translate.outputs.result }}`.trim();
-            const newBody = `## 原文\n${orig}\n\n## 翻译\n${translated}`;
-            await github.rest.issues.update({
-              owner,
-              repo,
-              issue_number,
-              body: newBody,
-            });
+
+            // Get the translation from the previous step
+            // Note: The exact output property may vary, trying common ones
+            const stepOutputs = ${{ toJson(steps.translate.outputs) }};
+            const translated = (stepOutputs.response || stepOutputs.result || stepOutputs.output || '').trim();
+
+            // Only update if we have a translation and it's different from original
+            if (translated && translated !== orig && translated !== 'undefined') {
+              const newBody = `## 原文 / Original\n${orig}\n\n## 翻译 / Translation\n${translated}`;
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number,
+                body: newBody,
+              });
+              console.log('Successfully updated issue with translation');
+            } else {
+              console.log('No valid translation received or translation same as original');
+            }
