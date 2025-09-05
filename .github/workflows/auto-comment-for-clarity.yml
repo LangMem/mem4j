@@ -1,0 +1,68 @@
+# Copyright 2024-2026 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Auto Comment for Clarity
+on:
+  issues:
+    types: [opened]
+  discussion:
+    types: [created]
+env:
+  ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
+jobs:
+  auto-comment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      discussions: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Create clarity prompt
+        run: |
+          mkdir -p /tmp/claude-prompts
+          cat > /tmp/claude-prompts/clarity-prompt.txt << 'EOF'
+          你是一个专业的社区助手。请分析以下 GitHub issue/discussion 的内容质量。
+          
+          任务：
+          1. 使用 mcp__github__get_issue 获取内容详情
+          2. 分析内容是否包含足够的信息：
+             - 问题描述是否清楚
+             - 是否包含重现步骤（如果是 bug）
+             - 是否包含期望行为
+             - 是否包含环境信息
+          3. 如果信息不足，使用 mcp__github__create_comment 添加友好的评论，要求补充信息
+          
+          评论模板：
+          感谢您提交这个 issue/discussion！为了更好地帮助您，请补充以下信息：
+          - [ ] 详细的问题描述
+          - [ ] 重现步骤（如适用）
+          - [ ] 期望的行为
+          - [ ] 实际的行为
+          - [ ] 环境信息（版本、操作系统等）
+          
+          请编辑您的原始 issue/discussion 来添加这些信息。
+          EOF
+      
+      - name: Run Claude Code for Auto Comment
+        uses: anthropics/claude-code-action@v1
+        with:
+          prompt: $(cat /tmp/claude-prompts/clarity-prompt.txt)
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools mcp__github__get_issue,mcp__github__create_comment
+            --system-prompt "你是一个经验丰富的开源项目维护者，擅长识别高质量的 issue 报告"
