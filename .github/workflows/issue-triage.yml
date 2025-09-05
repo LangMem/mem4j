@@ -18,6 +18,7 @@ on:
     types: [opened]
 env:
   ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 jobs:
   triage-issue:
     runs-on: ubuntu-latest
