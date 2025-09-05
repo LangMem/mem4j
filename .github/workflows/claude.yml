@@ -1,0 +1,41 @@
+name: Claude Assistant
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned, labeled]
+  pull_request_review:
+    types: [submitted]
+env:
+  ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
+jobs:
+  claude-response:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Or use OAuth token instead:
+          # claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          
+          # Optional: provide a prompt for automation workflows
+          # prompt: "Review this PR for security issues"
+          
+          # Optional: pass advanced arguments to Claude CLI
+          # claude_args: |
+          #   --max-turns 10
+          #   --model claude-4-0-sonnet-20250805
+          
+          # Optional: add custom trigger phrase (default: @claude)
+          # trigger_phrase: "/claude"
+          # Optional: add assignee trigger for issues
+          # assignee_trigger: "claude"
+          # Optional: add label trigger for issues
+          # label_trigger: "claude"
+          # Optional: grant additional permissions (requires corresponding GitHub token permissions)
+          # additional_permissions: |
+          #   actions: read
+          # Optional: allow bot users to trigger the action
+          # allowed_bots: "dependabot[bot],renovate[bot]"
