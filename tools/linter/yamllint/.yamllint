@@ -25,6 +25,7 @@ ignore: |
   **/target/**
   **/build/**
   **/dist/**
+  **/.github/**
 
 rules:
   braces:
