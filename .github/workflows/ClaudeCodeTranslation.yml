@@ -15,7 +15,7 @@
 name: Issue Translation
 on:
   issues:
-    types: [ opened, labeled, edited ]
+    types: [ opened, labeled ]
     issue_comment:
       types: [ created ]
 env:
