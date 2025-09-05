@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Issue Translation
+name: Issue Triage
 on:
   issues:
-    types: [ opened, labeled ]
-    issue_comment:
-      types: [ created ]
+    types: [opened]
 env:
   ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
 jobs:
-  translate-issue:
+  triage-issue:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write
       id-token: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
