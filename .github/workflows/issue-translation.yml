@@ -16,7 +16,7 @@ name: Bidirectional Issue Translation and Update
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened]
 env:
   ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
 jobs:
