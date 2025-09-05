@@ -35,9 +35,6 @@ jobs:
 
       - name: Triage issue with Claude
         uses: anthropics/claude-code-action@v1
-        env:
-          ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
           prompt: |
             You're an issue triage assistant for GitHub issues. Your task is to analyze the issue and select appropriate labels from the provided list.
@@ -88,6 +85,7 @@ jobs:
             - DO NOT post any comments to the issue
             - Your ONLY action should be to apply labels using mcp__github__update_issue
             - It's okay to not add any labels if none are clearly applicable
-
+          
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
             --allowedTools "Bash(gh label list),mcp__github__get_issue,mcp__github__get_issue_comments,mcp__github__update_issue,mcp__github__search_issues,mcp__github__list_issues"
