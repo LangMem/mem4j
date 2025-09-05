@@ -1,0 +1,57 @@
+# Copyright 2024-2026 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Issue Translation
+on:
+  issues:
+    types: [opened, edited]
+env:
+  ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
+jobs:
+  translate-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - name: Create translation prompt
+        run: |
+          mkdir -p /tmp/claude-prompts
+          cat > /tmp/claude-prompts/translation-prompt.txt << 'EOF'
+          你是一个专业的翻译助手。请翻译以下 GitHub issue 的内容。
+          
+          任务：
+          1. 使用 mcp__github__get_issue 获取 issue 详情
+          2. 检测 issue 标题和内容的语言
+          3. 如果是中文，翻译成英文；如果是英文，翻译成中文
+          4. 使用 mcp__github__update_issue 更新 issue，在原内容下方添加翻译
+          
+          Issue 信息：
+          - REPO: ${{ github.repository }}
+          - ISSUE_NUMBER: ${{ github.event.issue.number }}
+          
+          翻译格式：
+          ---
+          **Translation / 翻译**
+          [翻译内容]
+          EOF
+      
+      - name: Run Claude Code for Translation
+        uses: anthropics/claude-code-action@v1
+        with:
+          prompt: $(cat /tmp/claude-prompts/translation-prompt.txt)
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools mcp__github__get_issue,mcp__github__update_issue
