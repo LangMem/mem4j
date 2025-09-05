@@ -114,7 +114,7 @@ public class MemoryAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "milvus", matchIfMissing = true)
+	@ConditionalOnProperty(prefix = "mem4j.vector-store", name = "type", havingValue = "milvus")
 	@ConditionalOnClass(name = "io.milvus.client.MilvusClient")
 	public VectorStoreService milvusVectorStoreService(MemoryConfig memoryConfig) {
 		logger.info("Creating MilvusVectorStoreService");
