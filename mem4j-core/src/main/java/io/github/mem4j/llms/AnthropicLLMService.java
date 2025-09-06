@@ -190,7 +190,7 @@ public class AnthropicLLMService implements LLMService {
 		JsonNode responseJson = objectMapper.readTree(response.getBody());
 		JsonNode content = responseJson.path("content");
 
-		if (content.isArray() && content.size() > 0) {
+		if (content.isArray() && !content.isEmpty()) {
 			JsonNode firstContent = content.get(0);
 			return firstContent.path("text").asText();
 		}

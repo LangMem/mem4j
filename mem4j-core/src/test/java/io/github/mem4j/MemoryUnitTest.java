@@ -60,7 +60,7 @@ public class MemoryUnitTest {
 
 	private Memory memory;
 
-	private String testUserId = "test_user";
+	private final String testUserId = "test_user";
 
 	@BeforeEach
 	void setUp() {
