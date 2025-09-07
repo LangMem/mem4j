@@ -103,9 +103,9 @@ public class ChatController {
 
 	public static class ChatResponse {
 
-		private String response;
+		private final String response;
 
-		private int memoryCount;
+		private final int memoryCount;
 
 		public ChatResponse(String response, int memoryCount) {
 			this.response = response;
