@@ -134,7 +134,8 @@ jobs:
                   body: commentBody
                 });
               } else if (targetType === 'discussion') {
-                await github.rest.repos.createDiscussionComment({
+                // Use the correct GitHub REST API for discussion comments
+                await github.request('POST /repos/{owner}/{repo}/discussions/{discussion_number}/comments', {
                   owner,
                   repo,
                   discussion_number: number,
