@@ -16,6 +16,8 @@ name: Auto Comment for Clarity
 on:
   issues:
     types: [opened]
+  discussions:
+    types: [created]
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
@@ -33,27 +35,44 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issue_number = context.issue.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            
+            // Handle both issues and discussions
+            let title, body, number, targetType, targetUrl;
+            
+            if (context.eventName === 'issues') {
+              number = context.issue.number;
+              title = context.payload.issue.title || '';
+              body = context.payload.issue.body || '';
+              targetType = 'issue';
+              targetUrl = context.payload.issue.html_url;
+            } else if (context.eventName === 'discussions') {
+              number = context.payload.discussion.number;
+              title = context.payload.discussion.title || '';
+              body = context.payload.discussion.body || '';
+              targetType = 'discussion';
+              targetUrl = context.payload.discussion.html_url;
+            } else {
+              console.log('Unsupported event type:', context.eventName);
+              return;
+            }
 
-            // Get issue details
-            const issueTitle = context.payload.issue.title || '';
-            const issueBody = context.payload.issue.body || '';
-
-            console.log('Issue Title:', issueTitle);
-            console.log('Issue Body:', issueBody);
+            console.log('Target Type:', targetType);
+            console.log('Target Number:', number);
+            console.log('Title:', title);
+            console.log('Body:', body);
 
             // Analyze what's missing specifically
-            const hasDetailedDescription = issueBody.length > 50 && !issueBody.includes('No response');
-            const hasStepsToReproduce = issueBody.toLowerCase().includes('步骤') || issueBody.toLowerCase().includes('重现') || issueBody.toLowerCase().includes('reproduce');
-            const hasEnvironmentInfo = issueBody.toLowerCase().includes('环境') || issueBody.toLowerCase().includes('版本') || issueBody.toLowerCase().includes('version');
-            const hasExpectedBehavior = issueBody.toLowerCase().includes('期望') || issueBody.toLowerCase().includes('expected');
-            const hasErrorDetails = issueBody.toLowerCase().includes('错误') || issueBody.toLowerCase().includes('error') || issueBody.toLowerCase().includes('异常');
+            const hasDetailedDescription = body.length > 50 && !body.includes('No response');
+            const hasStepsToReproduce = body.toLowerCase().includes('步骤') || body.toLowerCase().includes('重现') || body.toLowerCase().includes('reproduce');
+            const hasEnvironmentInfo = body.toLowerCase().includes('环境') || body.toLowerCase().includes('版本') || body.toLowerCase().includes('version');
+            const hasExpectedBehavior = body.toLowerCase().includes('期望') || body.toLowerCase().includes('expected');
+            const hasErrorDetails = body.toLowerCase().includes('错误') || body.toLowerCase().includes('error') || body.toLowerCase().includes('异常');
 
             // Check if this looks like a bug report that needs more info
-            const isBugReport = issueTitle.toLowerCase().includes('bug') || issueTitle.toLowerCase().includes('错误');
-            const hasVeryShortDescription = issueBody.trim().length < 30 || issueBody === 'No response' || issueBody.includes('这个怎么用') || issueBody.includes('不知道为什么');
+            const isBugReport = title.toLowerCase().includes('bug') || title.toLowerCase().includes('错误');
+            const hasVeryShortDescription = body.trim().length < 30 || body === 'No response' || body.includes('这个怎么用') || body.includes('不知道为什么');
 
             // Generate dynamic comment based on what's missing
             const missingItems = [];
@@ -87,7 +106,7 @@ jobs:
             // Only comment if there are missing items
             if (missingItems.length > 0) {
               let commentLines = [
-                '👋 感谢您提交这个 issue！',
+                '👋 感谢您提交这个 ' + (targetType === 'issue' ? 'issue' : 'discussion') + '！',
                 '',
                 '为了更好地帮助您解决问题，我发现以下信息需要补充：',
                 ''
@@ -99,21 +118,32 @@ jobs:
               });
 
               commentLines.push('');
-              commentLines.push('请编辑您的原始 issue 来添加这些信息，这将帮助我们更快地定位和解决问题。🙏');
+              commentLines.push('请编辑您的原始' + (targetType === 'issue' ? 'issue' : 'discussion') + '来添加这些信息，这将帮助我们更快地定位和解决问题。🙏');
               commentLines.push('');
               commentLines.push('---');
-              commentLines.push('*这是一个自动生成的提醒，旨在提高 issue 的质量和解决效率。*');
+              commentLines.push('*这是一个自动生成的提醒，旨在提高' + (targetType === 'issue' ? 'issue' : 'discussion') + '的质量和解决效率。*');
 
               const commentBody = commentLines.join('\n');
 
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number,
-                body: commentBody
-              });
-              console.log('Posted targeted clarity request comment to issue #' + issue_number);
+              // Create comment based on target type
+              if (targetType === 'issue') {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: number,
+                  body: commentBody
+                });
+              } else if (targetType === 'discussion') {
+                await github.rest.repos.createDiscussionComment({
+                  owner,
+                  repo,
+                  discussion_number: number,
+                  body: commentBody
+                });
+              }
+              
+              console.log('Posted targeted clarity request comment to ' + targetType + ' #' + number);
               console.log('Missing items:', missingItems.join(', '));
             } else {
-              console.log('Issue has sufficient information, no comment needed');
+              console.log(targetType + ' has sufficient information, no comment needed');
             }

@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Issue Triage
+name: Issue Triage (Disabled)
+# Temporarily disabled to prevent duplicate comments
 on:
-  issues:
-    types: [opened]
+  workflow_dispatch: # Manual trigger only
+  # issues:
+  #   types: [opened]
 env:
   ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
 jobs:
