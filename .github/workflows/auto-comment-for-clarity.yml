@@ -16,8 +16,6 @@ name: Auto Comment for Clarity
 on:
   issues:
     types: [opened]
-  discussions:
-    types: [created]
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
