@@ -336,9 +336,9 @@ public class MilvusVectorStoreService implements VectorStoreService {
 					// 获取结果数量
 					int resultCount = fieldMap.get("id").size();
 
-				// 构建MemoryItem对象并计算相似度
-				for (int i = 0; i < resultCount; i++) {
-					MemoryItem item = buildMemoryItemFromFieldMap(fieldMap, i, resultCount);
+					// 构建MemoryItem对象并计算相似度
+					for (int i = 0; i < resultCount; i++) {
+						MemoryItem item = buildMemoryItemFromFieldMap(fieldMap, i, resultCount);
 
 						// 计算相似度分数
 						Double[] itemEmbedding = item.getEmbedding();
@@ -600,10 +600,8 @@ public class MilvusVectorStoreService implements VectorStoreService {
 		}
 
 		// 定义有效的集合字段
-		Set<String> validFields = new HashSet<>(Arrays.asList(
-			"user_id", "agent_id", "run_id", "actor_id", "memory_type",
-			"created_at", "updated_at", "content"
-		));
+		Set<String> validFields = new HashSet<>(Arrays.asList("user_id", "agent_id", "run_id", "actor_id",
+				"memory_type", "created_at", "updated_at", "content"));
 
 		List<String> conditions = new ArrayList<>();
 		for (Map.Entry<String, Object> filter : filters.entrySet()) {
@@ -653,9 +651,7 @@ public class MilvusVectorStoreService implements VectorStoreService {
 	 * @return 余弦相似度值
 	 */
 	private Double cosineSimilarity(Double[] a, Double[] b) {
-		logger.debug("计算余弦相似度 - 查询向量长度: {}, 存储向量长度: {}",
-			a != null ? a.length : "null",
-			b != null ? b.length : "null");
+		logger.debug("计算余弦相似度 - 查询向量长度: {}, 存储向量长度: {}", a != null ? a.length : "null", b != null ? b.length : "null");
 
 		if (a == null || b == null) {
 			logger.warn("向量为null - 查询向量: {}, 存储向量: {}", a == null, b == null);
@@ -741,13 +737,12 @@ public class MilvusVectorStoreService implements VectorStoreService {
 			if (vectorData != null && !vectorData.isEmpty()) {
 				// 计算每个向量的维度
 				int vectorDimension = vectorData.size() / resultCount;
-				logger.debug("向量数据总数: {}, 结果数量: {}, 每个向量维度: {}", 
-					vectorData.size(), resultCount, vectorDimension);
-				
+				logger.debug("向量数据总数: {}, 结果数量: {}, 每个向量维度: {}", vectorData.size(), resultCount, vectorDimension);
+
 				// 提取当前结果对应的向量数据
 				int startIndex = index * vectorDimension;
 				int endIndex = startIndex + vectorDimension;
-				
+
 				if (endIndex <= vectorData.size()) {
 					List<Object> currentVectorData = vectorData.subList(startIndex, endIndex);
 					Double[] embedding = currentVectorData.stream()
@@ -755,9 +750,10 @@ public class MilvusVectorStoreService implements VectorStoreService {
 						.toArray(Double[]::new);
 					item.setEmbedding(embedding);
 					logger.debug("提取向量成功 - index: {}, 向量长度: {}", index, embedding.length);
-				} else {
-					logger.warn("向量数据索引越界 - index: {}, startIndex: {}, endIndex: {}, vectorDataSize: {}", 
-						index, startIndex, endIndex, vectorData.size());
+				}
+				else {
+					logger.warn("向量数据索引越界 - index: {}, startIndex: {}, endIndex: {}, vectorDataSize: {}", index,
+							startIndex, endIndex, vectorData.size());
 				}
 			}
 		}
