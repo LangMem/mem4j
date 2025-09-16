@@ -20,10 +20,7 @@ import io.github.mem4j.config.MemoryConfigurable;
 import io.github.mem4j.memory.MemoryItem;
 import io.milvus.client.MilvusClient;
 import io.milvus.client.MilvusServiceClient;
-import io.milvus.grpc.DataType;
-import io.milvus.grpc.MutationResult;
-import io.milvus.grpc.QueryResults;
-import io.milvus.grpc.SearchResults;
+import io.milvus.grpc.*;
 import io.milvus.param.ConnectParam;
 import io.milvus.param.MetricType;
 import io.milvus.param.R;
@@ -35,8 +32,6 @@ import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.param.dml.SearchParam;
-import io.milvus.response.QueryResultsWrapper;
-import io.milvus.response.SearchResultsWrapper;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,7 +284,7 @@ public class MilvusVectorStoreService implements VectorStoreService {
 				.withCollectionName(collectionName)
 				.withMetricType(MetricType.COSINE)
 				.withOutFields(Arrays.asList("id", "content", "memory_type", "user_id", "agent_id", "run_id",
-						"actor_id", "created_at", "updated_at"))
+						"actor_id", "created_at", "updated_at", "vector"))
 				.withTopK(limit != null ? limit : 10)
 				.withVectors(Collections.singletonList(queryVector))
 				.withVectorFieldName("vector")
@@ -303,27 +298,64 @@ public class MilvusVectorStoreService implements VectorStoreService {
 				throw new RuntimeException("Search failed: " + response.getMessage());
 			}
 
-			// 解析搜索结果 - 使用简化的方式
+			// 解析搜索结果 - 正确实现
 			List<MemoryItem> results = new ArrayList<>();
 			SearchResults searchResults = response.getData();
 
-			// 获取搜索结果的数量
-			int resultCount = Math.min((int) searchResults.getResults().getNumQueries(), limit != null ? limit : 10);
+			if (searchResults != null && searchResults.getResults() != null) {
+				// 获取搜索结果的字段数据
+				List<FieldData> fieldsData = searchResults.getResults().getFieldsDataList();
 
-			for (int i = 0; i < resultCount; i++) {
-				// 构建MemoryItem - 简化实现
-				MemoryItem item = new MemoryItem();
-				item.setId("memory_" + i); // 简化ID生成
-				item.setContent("Search result " + i);
-				item.setMemoryType("factual");
-				item.setUserId("default_user");
-				item.setAgentId("default_agent");
-				item.setRunId("default_run");
-				item.setActorId("default_actor");
-				item.setCreatedAt(Instant.now());
-				item.setUpdatedAt(Instant.now());
+				if (fieldsData != null && !fieldsData.isEmpty()) {
+					// 创建字段映射
+					Map<String, List<Object>> fieldMap = new HashMap<>();
 
-				results.add(item);
+					for (FieldData fieldData : fieldsData) {
+						String fieldName = fieldData.getFieldName();
+						List<Object> values = new ArrayList<>();
+
+						if (fieldData.getType() == DataType.VarChar) {
+							// 字符串字段
+							List<String> stringData = fieldData.getScalars().getStringData().getDataList();
+							values.addAll(stringData);
+						}
+						else if (fieldData.getType() == DataType.Int64) {
+							// 长整型字段（时间戳）
+							List<Long> longData = fieldData.getScalars().getLongData().getDataList();
+							values.addAll(longData);
+						}
+						else if (fieldData.getType() == DataType.FloatVector) {
+							// 向量字段
+							List<Float> vectorData = fieldData.getVectors().getFloatVector().getDataList();
+							values.addAll(vectorData);
+						}
+
+						fieldMap.put(fieldName, values);
+					}
+
+					// 获取结果数量
+					int resultCount = fieldMap.get("id").size();
+
+					// 构建MemoryItem对象并计算相似度
+					for (int i = 0; i < resultCount; i++) {
+						MemoryItem item = buildMemoryItemFromFieldMap(fieldMap, i, resultCount);
+
+						// 计算相似度分数
+						Double[] itemEmbedding = item.getEmbedding();
+						if (itemEmbedding != null) {
+							double similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
+							item.setScore(similarity);
+
+							// 根据阈值过滤结果
+							if (threshold == null || similarity >= threshold) {
+								results.add(item);
+							}
+						}
+					}
+
+					// 按相似度分数降序排序
+					results.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
+				}
 			}
 
 			logger.debug("Found {} similar memories", results.size());
@@ -356,27 +388,43 @@ public class MilvusVectorStoreService implements VectorStoreService {
 				throw new RuntimeException("Query failed: " + response.getMessage());
 			}
 
-			// 解析查询结果 - 使用简化的方式
+			// 解析查询结果 - 正确实现
 			List<MemoryItem> results = new ArrayList<>();
 			QueryResults queryResults = response.getData();
 
-			// 获取查询结果的数量 - 简化实现
-			int resultCount = limit != null ? limit : 100;
+			if (queryResults != null && queryResults.getFieldsDataCount() > 0) {
+				// 直接获取字段数据列表
+				List<FieldData> fieldsData = queryResults.getFieldsDataList();
 
-			for (int i = 0; i < resultCount; i++) {
-				// 构建MemoryItem - 简化实现
-				MemoryItem item = new MemoryItem();
-				item.setId("memory_" + i); // 简化ID生成
-				item.setContent("Query result " + i);
-				item.setMemoryType("factual");
-				item.setUserId("default_user");
-				item.setAgentId("default_agent");
-				item.setRunId("default_run");
-				item.setActorId("default_actor");
-				item.setCreatedAt(Instant.now());
-				item.setUpdatedAt(Instant.now());
+				// 创建字段映射
+				Map<String, List<Object>> fieldMap = new HashMap<>();
 
-				results.add(item);
+				for (FieldData fieldData : fieldsData) {
+					String fieldName = fieldData.getFieldName();
+					List<Object> values = new ArrayList<>();
+
+					if (fieldData.getType() == DataType.VarChar) {
+						// 字符串字段
+						List<String> stringData = fieldData.getScalars().getStringData().getDataList();
+						values.addAll(stringData);
+					}
+					else if (fieldData.getType() == DataType.Int64) {
+						// 长整型字段（时间戳）
+						List<Long> longData = fieldData.getScalars().getLongData().getDataList();
+						values.addAll(longData);
+					}
+
+					fieldMap.put(fieldName, values);
+				}
+
+				// 获取结果数量
+				int resultCount = fieldMap.get("id").size();
+
+				// 构建MemoryItem对象
+				for (int i = 0; i < resultCount; i++) {
+					MemoryItem item = buildMemoryItemFromFieldMap(fieldMap, i, resultCount);
+					results.add(item);
+				}
 			}
 
 			logger.debug("Retrieved {} memories", results.size());
@@ -409,25 +457,45 @@ public class MilvusVectorStoreService implements VectorStoreService {
 				throw new RuntimeException("Query failed: " + response.getMessage());
 			}
 
-			// 解析查询结果 - 使用简化的方式
+			// 解析查询结果 - 正确实现
 			QueryResults queryResults = response.getData();
-			// 简化实现，假设查询成功就返回结果
-			if (queryResults == null) {
+			if (queryResults == null || queryResults.getFieldsDataCount() == 0) {
 				logger.debug("Memory not found: {}", memoryId);
 				return null;
 			}
 
-			// 构建MemoryItem - 简化实现
-			MemoryItem item = new MemoryItem();
-			item.setId(memoryId);
-			item.setContent("Memory content for " + memoryId);
-			item.setMemoryType("factual");
-			item.setUserId("default_user");
-			item.setAgentId("default_agent");
-			item.setRunId("default_run");
-			item.setActorId("default_actor");
-			item.setCreatedAt(Instant.now());
-			item.setUpdatedAt(Instant.now());
+			// 获取字段数据列表
+			List<FieldData> fieldsData = queryResults.getFieldsDataList();
+
+			// 创建字段映射
+			Map<String, List<Object>> fieldMap = new HashMap<>();
+
+			for (FieldData fieldData : fieldsData) {
+				String fieldName = fieldData.getFieldName();
+				List<Object> values = new ArrayList<>();
+
+				if (fieldData.getType() == DataType.VarChar) {
+					// 字符串字段
+					List<String> stringData = fieldData.getScalars().getStringData().getDataList();
+					values.addAll(stringData);
+				}
+				else if (fieldData.getType() == DataType.Int64) {
+					// 长整型字段（时间戳）
+					List<Long> longData = fieldData.getScalars().getLongData().getDataList();
+					values.addAll(longData);
+				}
+
+				fieldMap.put(fieldName, values);
+			}
+
+			// 检查是否有结果
+			if (fieldMap.get("id") == null || fieldMap.get("id").isEmpty()) {
+				logger.debug("Memory not found: {}", memoryId);
+				return null;
+			}
+
+			// 构建MemoryItem对象
+			MemoryItem item = buildMemoryItemFromFieldMap(fieldMap, 0, 1);
 
 			logger.debug("Retrieved memory: {}", memoryId);
 			return item;
@@ -531,10 +599,20 @@ public class MilvusVectorStoreService implements VectorStoreService {
 			return "";
 		}
 
+		// 定义有效的集合字段
+		Set<String> validFields = new HashSet<>(Arrays.asList("user_id", "agent_id", "run_id", "actor_id",
+				"memory_type", "created_at", "updated_at", "content"));
+
 		List<String> conditions = new ArrayList<>();
 		for (Map.Entry<String, Object> filter : filters.entrySet()) {
 			String key = filter.getKey();
 			String value = filter.getValue().toString();
+
+			// 只处理有效的集合字段，忽略其他参数如query、limit、threshold等
+			if (!validFields.contains(key)) {
+				logger.debug("Skipping invalid field in search expression: {}", key);
+				continue;
+			}
 
 			// 根据字段类型构建不同的表达式
 			switch (key) {
@@ -552,14 +630,135 @@ public class MilvusVectorStoreService implements VectorStoreService {
 						conditions.add(key + " == " + value);
 					}
 					break;
+				case "content":
+					// 内容字段使用模糊匹配
+					conditions.add(key + " like \"%" + value + "%\"");
+					break;
 				default:
-					// 其他字段使用模糊匹配
+					// 其他有效字段使用模糊匹配
 					conditions.add(key + " like \"%" + value + "%\"");
 					break;
 			}
 		}
 
 		return String.join(" && ", conditions);
+	}
+
+	/**
+	 * 计算余弦相似度
+	 * @param a 向量a
+	 * @param b 向量b
+	 * @return 余弦相似度值
+	 */
+	private Double cosineSimilarity(Double[] a, Double[] b) {
+		logger.debug("计算余弦相似度 - 查询向量长度: {}, 存储向量长度: {}", a != null ? a.length : "null", b != null ? b.length : "null");
+
+		if (a == null || b == null) {
+			logger.warn("向量为null - 查询向量: {}, 存储向量: {}", a == null, b == null);
+			return 0.0;
+		}
+
+		if (a.length != b.length) {
+			logger.error("向量长度不匹配! 查询向量长度: {}, 存储向量长度: {}", a.length, b.length);
+			logger.error("查询向量前5个值: {}", Arrays.toString(Arrays.copyOf(a, Math.min(5, a.length))));
+			logger.error("存储向量前5个值: {}", Arrays.toString(Arrays.copyOf(b, Math.min(5, b.length))));
+			return 0.0;
+		}
+
+		double dotProduct = 0.0;
+		double normA = 0.0;
+		double normB = 0.0;
+
+		for (int i = 0; i < a.length; i++) {
+			dotProduct += a[i] * b[i];
+			normA += a[i] * a[i];
+			normB += b[i] * b[i];
+		}
+
+		if (normA == 0.0 || normB == 0.0) {
+			logger.warn("向量范数为0 - normA: {}, normB: {}", normA, normB);
+			return 0.0;
+		}
+
+		double similarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+		logger.debug("余弦相似度计算结果: {}", similarity);
+		return similarity;
+	}
+
+	/**
+	 * 从字段映射构建MemoryItem对象
+	 * @param fieldMap 字段映射
+	 * @param index 数据索引
+	 * @param resultCount 结果总数（用于计算向量维度）
+	 * @return MemoryItem对象
+	 */
+	private MemoryItem buildMemoryItemFromFieldMap(Map<String, List<Object>> fieldMap, int index, int resultCount) {
+		MemoryItem item = new MemoryItem();
+
+		// 设置ID
+		String id = (String) fieldMap.get("id").get(index);
+		item.setId(id);
+
+		// 设置内容
+		String content = (String) fieldMap.get("content").get(index);
+		item.setContent(content);
+
+		// 设置记忆类型
+		String memoryType = (String) fieldMap.get("memory_type").get(index);
+		item.setMemoryType(memoryType);
+
+		// 设置用户ID
+		String userId = (String) fieldMap.get("user_id").get(index);
+		item.setUserId(userId);
+
+		// 设置代理ID
+		String agentId = (String) fieldMap.get("agent_id").get(index);
+		item.setAgentId(agentId);
+
+		// 设置运行ID
+		String runId = (String) fieldMap.get("run_id").get(index);
+		item.setRunId(runId);
+
+		// 设置演员ID
+		String actorId = (String) fieldMap.get("actor_id").get(index);
+		item.setActorId(actorId);
+
+		// 设置创建时间
+		Long createdAt = (Long) fieldMap.get("created_at").get(index);
+		item.setCreatedAt(Instant.ofEpochMilli(createdAt));
+
+		// 设置更新时间
+		Long updatedAt = (Long) fieldMap.get("updated_at").get(index);
+		item.setUpdatedAt(Instant.ofEpochMilli(updatedAt));
+
+		// 设置向量嵌入
+		if (fieldMap.containsKey("vector")) {
+			List<Object> vectorData = fieldMap.get("vector");
+			if (vectorData != null && !vectorData.isEmpty()) {
+				// 计算每个向量的维度
+				int vectorDimension = vectorData.size() / resultCount;
+				logger.debug("向量数据总数: {}, 结果数量: {}, 每个向量维度: {}", vectorData.size(), resultCount, vectorDimension);
+
+				// 提取当前结果对应的向量数据
+				int startIndex = index * vectorDimension;
+				int endIndex = startIndex + vectorDimension;
+
+				if (endIndex <= vectorData.size()) {
+					List<Object> currentVectorData = vectorData.subList(startIndex, endIndex);
+					Double[] embedding = currentVectorData.stream()
+						.map(obj -> ((Float) obj).doubleValue())
+						.toArray(Double[]::new);
+					item.setEmbedding(embedding);
+					logger.debug("提取向量成功 - index: {}, 向量长度: {}", index, embedding.length);
+				}
+				else {
+					logger.warn("向量数据索引越界 - index: {}, startIndex: {}, endIndex: {}, vectorDataSize: {}", index,
+							startIndex, endIndex, vectorData.size());
+				}
+			}
+		}
+
+		return item;
 	}
 
 }
