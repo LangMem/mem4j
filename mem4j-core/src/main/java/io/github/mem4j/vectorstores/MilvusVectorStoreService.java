@@ -275,9 +275,7 @@ public class MilvusVectorStoreService implements VectorStoreService {
 			String searchExpr = buildSearchExpression(filters);
 
 			// 转换查询向量为Float类型
-			List<Float> queryVector = Arrays.stream(queryEmbedding)
-				.map(Double::floatValue)
-				.collect(Collectors.toList());
+			List<Float> queryVector = Arrays.stream(queryEmbedding).map(Double::floatValue).toList();
 
 			// 构建搜索参数
 			SearchParam searchParam = SearchParam.newBuilder()
@@ -306,7 +304,7 @@ public class MilvusVectorStoreService implements VectorStoreService {
 				// 获取搜索结果的字段数据
 				List<FieldData> fieldsData = searchResults.getResults().getFieldsDataList();
 
-				if (fieldsData != null && !fieldsData.isEmpty()) {
+				if (!fieldsData.isEmpty()) {
 					// 创建字段映射
 					Map<String, List<Object>> fieldMap = new HashMap<>();
 
