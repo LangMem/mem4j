@@ -226,6 +226,8 @@ public class Memory {
 
 		String prompt = String.format("""
 				Extract key memories from this conversation. Focus on:
+				- Keep the original language and tone
+				- Be concise and specific
 				- Important facts about the user
 				- User preferences and behaviors
 				- Significant events or experiences
