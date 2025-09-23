@@ -2,7 +2,11 @@
  * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this file except in compliance with the Lic		client.createCollection(createCollectionParam);
+		logger.info("Milvus 集合已创建: {}", collectionName);
+		
+		// 加载集合到内存中
+		ensureCollectionLoaded();se.
  * You may obtain a copy of the License at
  *
  *     https://www.apache.org/licenses/LICENSE-2.0
@@ -22,12 +26,15 @@ import io.milvus.client.MilvusClient;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.*;
 import io.milvus.param.ConnectParam;
+import io.milvus.param.IndexType;
 import io.milvus.param.MetricType;
 import io.milvus.param.R;
 import io.milvus.param.collection.CreateCollectionParam;
 import io.milvus.param.collection.DropCollectionParam;
 import io.milvus.param.collection.FieldType;
 import io.milvus.param.collection.HasCollectionParam;
+import io.milvus.param.collection.LoadCollectionParam;
+import io.milvus.param.index.CreateIndexParam;
 import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
@@ -124,10 +131,12 @@ public class MilvusVectorStoreService implements VectorStoreService {
 			R<Boolean> hasCollection = client.hasCollection(hasCollectionParam);
 			if (hasCollection.getData() != null && hasCollection.getData()) {
 				logger.info("Milvus 集合已存在: {}", collectionName);
+				// 确保索引存在
+				ensureIndexExists();
+				// 确保集合已加载
+				ensureCollectionLoaded();
 				return;
-			}
-
-			// 构建字段定义
+			} // 构建字段定义
 			List<FieldType> fieldsSchema = new ArrayList<>();
 			// 主键字段
 			fieldsSchema.add(FieldType.newBuilder()
@@ -189,10 +198,51 @@ public class MilvusVectorStoreService implements VectorStoreService {
 
 			client.createCollection(createCollectionParam);
 			logger.info("Milvus 集合已创建: {}", collectionName);
+
+			// 创建向量字段的索引
+			ensureIndexExists();
+
+			// 加载集合到内存中
+			ensureCollectionLoaded();
 		}
 		catch (Exception e) {
 			logger.error("确保 Milvus 集合存在时出错", e);
 			throw new RuntimeException("创建或检查 Milvus 集合失败", e);
+		}
+	}
+
+	private void ensureIndexExists() {
+		try {
+			// 为向量字段创建索引
+			CreateIndexParam indexParam = CreateIndexParam.newBuilder()
+				.withCollectionName(collectionName)
+				.withFieldName("vector")
+				.withIndexType(IndexType.IVF_FLAT)
+				.withMetricType(MetricType.COSINE)
+				.withExtraParam("{\"nlist\":128}")
+				.build();
+
+			client.createIndex(indexParam);
+			logger.info("Milvus 向量索引已创建: {}", collectionName);
+		}
+		catch (Exception e) {
+			// 如果索引已存在，Milvus会抛出异常，但这是正常的
+			logger.debug("索引可能已存在: {}", e.getMessage());
+		}
+	}
+
+	private void ensureCollectionLoaded() {
+		try {
+			// 加载集合到内存中
+			LoadCollectionParam loadParam = LoadCollectionParam.newBuilder().withCollectionName(collectionName).build();
+
+			client.loadCollection(loadParam);
+
+			logger.info("Milvus 集合已加载到内存: {}", collectionName);
+		}
+		catch (Exception e) {
+			logger.error("确保 Milvus 集合加载时出错", e);
+			throw new RuntimeException("加载 Milvus 集合失败", e);
 		}
 	}
 
@@ -271,6 +321,9 @@ public class MilvusVectorStoreService implements VectorStoreService {
 	public List<MemoryItem> search(Double[] queryEmbedding, Map<String, Object> filters, Integer limit,
 			Double threshold) {
 		try {
+			// 确保集合已加载
+			ensureCollectionLoaded();
+
 			// 构建搜索表达式
 			String searchExpr = buildSearchExpression(filters);
 
