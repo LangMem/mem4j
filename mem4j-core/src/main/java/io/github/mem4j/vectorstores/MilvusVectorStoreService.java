@@ -1,22 +1,22 @@
 /*
- * Copyright 2024-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the Lic		client.createCollection(createCollectionParam);
-		logger.info("Milvus 集合已创建: {}", collectionName);
-		
-		// 加载集合到内存中
-		ensureCollectionLoaded();se.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2024-2025 the original author or authors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the Lic		client.createCollection(createCollectionParam);
+	logger.info("Milvus 集合已创建: {}", collectionName);
+
+	// 加载集合到内存中
+	ensureCollectionLoaded();se.
+* You may obtain a copy of the License at
+*
+*     https://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package io.github.mem4j.vectorstores;
 
@@ -34,22 +34,22 @@ import io.milvus.param.collection.DropCollectionParam;
 import io.milvus.param.collection.FieldType;
 import io.milvus.param.collection.HasCollectionParam;
 import io.milvus.param.collection.LoadCollectionParam;
-import io.milvus.param.index.CreateIndexParam;
 import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.param.dml.SearchParam;
+import io.milvus.param.index.CreateIndexParam;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * Milvus implementation of VectorStoreService
+ *
  * <p>
  * This implementation provides vector storage capabilities using Milvus, supporting
  * operations like adding, searching, updating, and deleting memory items.
@@ -326,9 +326,13 @@ public class MilvusVectorStoreService implements VectorStoreService {
 
 			// 构建搜索表达式
 			String searchExpr = buildSearchExpression(filters);
+			logger.debug("Milvus search expression: '{}'", searchExpr);
+			logger.debug("Search filters: {}", filters);
+			logger.debug("Search threshold: {}, limit: {}", threshold, limit);
 
 			// 转换查询向量为Float类型
 			List<Float> queryVector = Arrays.stream(queryEmbedding).map(Double::floatValue).toList();
+			logger.debug("Query vector length: {}", queryVector.size());
 
 			// 构建搜索参数
 			SearchParam searchParam = SearchParam.newBuilder()
@@ -356,6 +360,7 @@ public class MilvusVectorStoreService implements VectorStoreService {
 			if (searchResults != null && searchResults.getResults() != null) {
 				// 获取搜索结果的字段数据
 				List<FieldData> fieldsData = searchResults.getResults().getFieldsDataList();
+				logger.debug("Milvus returned {} field data entries", fieldsData.size());
 
 				if (!fieldsData.isEmpty()) {
 					// 创建字段映射
@@ -382,10 +387,12 @@ public class MilvusVectorStoreService implements VectorStoreService {
 						}
 
 						fieldMap.put(fieldName, values);
+						logger.debug("Field '{}' has {} values", fieldName, values.size());
 					}
 
 					// 获取结果数量
-					int resultCount = fieldMap.get("id").size();
+					int resultCount = fieldMap.get("id") != null ? fieldMap.get("id").size() : 0;
+					logger.debug("Total result count from Milvus: {}", resultCount);
 
 					// 构建MemoryItem对象并计算相似度
 					for (int i = 0; i < resultCount; i++) {
@@ -396,20 +403,42 @@ public class MilvusVectorStoreService implements VectorStoreService {
 						if (itemEmbedding != null) {
 							double similarity = cosineSimilarity(queryEmbedding, itemEmbedding);
 							item.setScore(similarity);
+							logger.debug("Item '{}' has similarity: {}, threshold: {}", item.getContent(), similarity,
+									threshold);
 
 							// 根据阈值过滤结果
 							if (threshold == null || similarity >= threshold) {
 								results.add(item);
+								logger.debug("Added item to results: '{}'", item.getContent());
 							}
+							else {
+								logger.debug("Filtered out item due to low similarity: '{}' ({})", item.getContent(),
+										similarity);
+							}
+						}
+						else {
+							logger.warn("Item has no embedding: '{}'", item.getContent());
 						}
 					}
 
 					// 按相似度分数降序排序
 					results.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
 				}
+				else {
+					logger.debug("No field data returned from Milvus search");
+				}
+			}
+			else {
+				logger.debug("No search results returned from Milvus");
 			}
 
-			logger.debug("Found {} similar memories", results.size());
+			logger.debug("Found {} similar memories after filtering", results.size());
+
+			// 如果没有结果，尝试不使用阈值进行搜索以诊断问题
+			if (results.isEmpty() && threshold != null && threshold > 0) {
+				logger.warn("No results found with threshold {}, this might indicate a threshold issue", threshold);
+			}
+
 			return results;
 		}
 		catch (Exception e) {
@@ -642,9 +671,7 @@ public class MilvusVectorStoreService implements VectorStoreService {
 		}
 	}
 
-	/**
-	 * 构建搜索表达式
-	 */
+	/** 构建搜索表达式 */
 	private String buildSearchExpression(Map<String, Object> filters) {
 		if (filters == null || filters.isEmpty()) {
 			return "";
