@@ -19,16 +19,13 @@ package io.github.mem4j.example;
 import io.github.mem4j.memory.Memory;
 import io.github.mem4j.memory.MemoryItem;
 import io.github.mem4j.memory.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-/**
- * Example controller showing how to use Memory in a web application
- */
+/** Example controller showing how to use Memory in a web application */
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
@@ -47,9 +44,13 @@ public class ChatController {
 		// 构建简单响应（实际应用中这里会调用LLM）
 		String response = generateResponse(message, relevantMemories);
 
-		// 存储对话
-		List<Message> conversation = Arrays.asList(new Message("user", message), new Message("assistant", response));
-		memory.add(conversation, userId);
+		// 只有当消息包含新信息时才存储记忆
+		// 查询类消息（如"我喜欢喝什么？"）不应该被存储为记忆
+		if (shouldStoreAsMemory(message)) {
+			List<Message> conversation = Arrays.asList(new Message("user", message),
+					new Message("assistant", response));
+			memory.add(conversation, userId);
+		}
 
 		return new ChatResponse(response, relevantMemories.size());
 	}
@@ -70,9 +71,46 @@ public class ChatController {
 			return "Hello! This is my first time talking with you. How can I help?";
 		}
 
-		return String.format(
-				"I remember we've talked before (%d previous conversations). Regarding '%s', let me help you with that.",
-				memories.size(), message);
+		// Format memory content naturally
+		StringBuilder memoryContext = new StringBuilder();
+		for (int i = 0; i < Math.min(memories.size(), 3); i++) {
+			if (i > 0)
+				memoryContext.append(", ");
+			memoryContext.append(memories.get(i).getContent());
+		}
+
+		return String
+			.format("I remember we've talked before (%d previous conversations). Based on our history about %s,"
+					+ " how can I help you today?", memories.size(), memoryContext.toString());
+	}
+
+	private boolean shouldStoreAsMemory(String message) {
+		// 不存储查询类消息
+		String lowerMessage = message.toLowerCase();
+
+		// 中文查询词和请求词
+		String[] chineseQuestionWords = { "什么", "怎么", "为什么", "哪里", "谁", "何时", "如何", "吗", "呢", "介绍", "告诉我", "说说", "讲讲",
+				"描述", "解释", "帮我", "给我" };
+
+		// 英文查询词和请求词
+		String[] englishQuestionWords = { "what", "how", "why", "where", "who", "when", "which", "do you", "can you",
+				"?", "tell me", "show me", "describe", "explain", "introduce", "help me", "give me" };
+
+		// 检查是否包含疑问词或请求词
+		for (String word : chineseQuestionWords) {
+			if (lowerMessage.contains(word)) {
+				return false;
+			}
+		}
+
+		for (String word : englishQuestionWords) {
+			if (lowerMessage.contains(word)) {
+				return false;
+			}
+		}
+
+		// 如果不包含疑问词或请求词，认为是陈述性信息，应该存储
+		return true;
 	}
 
 	// Request/Response DTOs
