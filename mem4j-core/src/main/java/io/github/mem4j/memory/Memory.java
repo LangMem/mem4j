@@ -20,16 +20,13 @@ import io.github.mem4j.config.MemoryConfigurable;
 import io.github.mem4j.embeddings.EmbeddingService;
 import io.github.mem4j.llms.LLMService;
 import io.github.mem4j.vectorstores.VectorStoreService;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-/**
- * Core memory management class for Java Mem4j
- */
+/** Core memory management class for Java Mem4j */
 @Service
 public class Memory {
 
@@ -52,16 +49,12 @@ public class Memory {
 		this.embeddingService = embeddingService;
 	}
 
-	/**
-	 * Add memories from a conversation
-	 */
+	/** Add memories from a conversation */
 	public void add(List<Message> messages, String userId) {
 		add(messages, userId, null, true, MemoryType.FACTUAL);
 	}
 
-	/**
-	 * Add memories with custom parameters
-	 */
+	/** Add memories with custom parameters */
 	public void add(List<Message> messages, String userId, Map<String, Object> metadata, boolean infer,
 			MemoryType memoryType) {
 
@@ -88,34 +81,53 @@ public class Memory {
 			logger.error("Error adding memories for user {}", userId, e);
 			throw new RuntimeException("Failed to add memories", e);
 		}
-
 	}
 
-	/**
-	 * Search for relevant memories
-	 */
+	/** Search for relevant memories */
 	public List<MemoryItem> search(String query, String userId) {
 		return search(query, userId, null, 10, null);
 	}
 
-	/**
-	 * Search with custom parameters
-	 */
+	/** Search with custom parameters */
 	public List<MemoryItem> search(String query, String userId, Map<String, Object> filters, int limit,
 			Double threshold) {
 
 		try {
 			// Generate embedding for query
 			Double[] queryEmbedding = embeddingService.embed(query);
+			logger.debug("Generated query embedding with {} dimensions for query: '{}'", queryEmbedding.length, query);
 
 			// Build search filters
 			Map<String, Object> searchFilters = buildSearchFilters(userId, filters);
+			logger.debug("Search filters: {}", searchFilters);
+
+			// Log the threshold being used
+			Double actualThreshold = threshold != null ? threshold : config.getSimilarityThreshold();
+			logger.debug("Using similarity threshold: {}", actualThreshold);
 
 			// Search vector store
-			List<MemoryItem> results = vectorStoreService.search(queryEmbedding, searchFilters, limit,
-					threshold != null ? threshold : config.getSimilarityThreshold());
+			List<MemoryItem> results = vectorStoreService.search(queryEmbedding, searchFilters, limit, actualThreshold);
 
-			logger.info("Found {} memories for query: {}", results.size(), query);
+			// If no results found and threshold > 0.2, try with lower threshold
+			if (results.isEmpty() && actualThreshold > 0.2) {
+				logger.debug("No results with threshold {}, retrying with 0.2", actualThreshold);
+				results = vectorStoreService.search(queryEmbedding, searchFilters, limit, 0.2);
+				actualThreshold = 0.2; // Update for logging
+			}
+
+			logger.info("Found {} memories for query: '{}' with threshold: {}", results.size(), query, actualThreshold);
+
+			// Log found results for debugging
+			if (!results.isEmpty()) {
+				for (MemoryItem item : results) {
+					logger.debug("Found memory: '{}' with score: {}", item.getContent(), item.getScore());
+				}
+			}
+			else {
+				logger.warn("No memories found for query: '{}' with user_id: '{}' and threshold: {}", query, userId,
+						actualThreshold);
+			}
+
 			return results;
 		}
 		catch (Exception e) {
@@ -123,12 +135,9 @@ public class Memory {
 			logger.error("Error searching memories for query: {}", query, e);
 			throw new RuntimeException("Failed to search memories", e);
 		}
-
 	}
 
-	/**
-	 * Get all memories for a user
-	 */
+	/** Get all memories for a user */
 	public List<MemoryItem> getAll(String userId, Map<String, Object> filters, int limit) {
 
 		try {
@@ -139,12 +148,9 @@ public class Memory {
 			logger.error("Error getting all memories for user {}", userId, e);
 			throw new RuntimeException("Failed to get memories", e);
 		}
-
 	}
 
-	/**
-	 * Update a memory item
-	 */
+	/** Update a memory item */
 	public void update(String memoryId, Map<String, Object> data) {
 
 		try {
@@ -170,12 +176,9 @@ public class Memory {
 			logger.error("Error updating memory: {}", memoryId, e);
 			throw new RuntimeException("Failed to update memory", e);
 		}
-
 	}
 
-	/**
-	 * Delete a memory item
-	 */
+	/** Delete a memory item */
 	public void delete(String memoryId) {
 
 		try {
@@ -186,12 +189,9 @@ public class Memory {
 			logger.error("Error deleting memory: {}", memoryId, e);
 			throw new RuntimeException("Failed to delete memory", e);
 		}
-
 	}
 
-	/**
-	 * Delete all memories for a user
-	 */
+	/** Delete all memories for a user */
 	public void deleteAll(String userId) {
 
 		try {
@@ -203,12 +203,9 @@ public class Memory {
 			logger.error("Error deleting all memories for user {}", userId, e);
 			throw new RuntimeException("Failed to delete memories", e);
 		}
-
 	}
 
-	/**
-	 * Extract memories from conversation using LLM
-	 */
+	/** Extract memories from conversation using LLM */
 	private List<String> extractMemories(List<Message> messages, boolean infer) {
 
 		if (!infer) {
@@ -226,8 +223,6 @@ public class Memory {
 
 		String prompt = String.format("""
 				Extract key memories from this conversation. Focus on:
-				- Keep the original language and tone
-				- Be concise and specific
 				- Important facts about the user
 				- User preferences and behaviors
 				- Significant events or experiences
@@ -250,9 +245,7 @@ public class Memory {
 			.collect(Collectors.toList());
 	}
 
-	/**
-	 * Create a memory item from content
-	 */
+	/** Create a memory item from content */
 	private MemoryItem createMemoryItem(String content, String userId, Map<String, Object> metadata,
 			MemoryType memoryType) {
 
@@ -263,9 +256,7 @@ public class Memory {
 		return item;
 	}
 
-	/**
-	 * Build search filters
-	 */
+	/** Build search filters */
 	private Map<String, Object> buildSearchFilters(String userId, Map<String, Object> additionalFilters) {
 
 		Map<String, Object> filters = new HashMap<>();
@@ -278,9 +269,7 @@ public class Memory {
 		return filters;
 	}
 
-	/**
-	 * Get memory by ID
-	 */
+	/** Get memory by ID */
 	public MemoryItem get(String memoryId) {
 
 		try {
@@ -292,9 +281,7 @@ public class Memory {
 		}
 	}
 
-	/**
-	 * Reset all memories (for testing)
-	 */
+	/** Reset all memories (for testing) */
 	public void reset() {
 
 		try {
