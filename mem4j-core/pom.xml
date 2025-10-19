@@ -15,6 +15,35 @@
     <artifactId>mem4j-core</artifactId>
     <name>Mem4j Core</name>
     <description>Core functionality for Mem4j - memory, embeddings, LLMs, and vector stores</description>
+    <url>https://github.com/mem4j/mem4j</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/mem4j/mem4j.git</connection>
+        <developerConnection>scm:git:https://github.com/mem4j/mem4j.git</developerConnection>
+        <url>https://github.com/mem4j/mem4j</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Aias00</name>
+            <email>liuhongyu@apache.org</email>
+            <url>https://github.com/Aias00</url>
+        </developer>
+        <developer>
+            <name>Shown</name>
+            <email>shown@apache.org</email>
+            <url>https://github.com/yuluo-yx</url>
+        </developer>
+    </developers>
 
     <dependencies>
 
