@@ -23,9 +23,10 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/langMem/mem4j.git</connection>
-        <developerConnection>scm:git:https://github.com/langMem/mem4j.git</developerConnection>
-        <url>https://github.com/langMem/mem4j</url>
+        <connection>scm:git:https://github.com/mem4j/mem4j.git</connection>
+        <developerConnection>scm:git:https://github.com/mem4j/mem4j.git</developerConnection>
+        <url>https://github.com/mem4j/mem4j</url>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
@@ -60,10 +61,8 @@
 
     <properties>
         <!-- Project version -->
-        <revision>0.1.0.RC1</revision>
+        <revision>1.0.0-M1</revision>
 
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
@@ -86,6 +85,16 @@
         <mockito.version>5.7.0</mockito.version>
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.11</logback.version>
+
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
+        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+
+        <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
     <dependencyManagement>
@@ -124,31 +133,58 @@
 
     <build>
         <plugins>
-            <!-- Maven Flatten Plugin for ${revision} support -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <flattenMode>oss</flattenMode>
-                </configuration>
+                <version>${flatten-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>flatten</id>
-                        <phase>process-resources</phase>
                         <goals>
                             <goal>flatten</goal>
                         </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <updatePomFile>true</updatePomFile>
+                            <flattenMode>ossrh</flattenMode>
+                            <pomElements>
+                                <distributionManagement>remove</distributionManagement>
+                                <dependencyManagement>remove</dependencyManagement>
+                                <repositories>remove</repositories>
+                                <scm>keep</scm>
+                                <url>keep</url>
+                                <organization>resolve</organization>
+                                <developers>keep</developers>
+                            </pomElements>
+                        </configuration>
                     </execution>
                     <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
+                        <id>clean</id>
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                        <phase>clean</phase>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <configuration>
+                    <skip>${maven.deploy.skip}</skip>
+                </configuration>
             </plugin>
         </plugins>
 
@@ -207,5 +243,91 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>langmem-mvn</id>
+            <url>https://central.sonatype.com/</url>
+        </snapshotRepository>
+        <repository>
+            <id>langmem-mvn</id>
+            <url>https://central.sonatype.com/</url>
+        </repository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+
+            <id>release</id>
+
+            <build>
+                <plugins>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <source>${maven.compiler.source}</source>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.4.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <!-- Passphrase consumed from MAVEN_GPG_PASSPHRASE environment variable. -->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
