@@ -68,47 +68,177 @@ public class Memory {
 				.map(memory -> createMemoryItem(memory, userId, metadata, memoryType))
 				.collect(Collectors.toList());
 
-			// Filter out duplicate memories before adding
-			List<MemoryItem> newMemories = new ArrayList<>();
-			int duplicateCount = 0;
+			// Process each memory intelligently
+			int insertCount = 0;
+			int updateCount = 0;
+			int deleteCount = 0;
+			int skipCount = 0;
 
 			for (MemoryItem item : memoryItems) {
 				Double[] embedding = embeddingService.embed(item.getContent());
 				item.setEmbedding(embedding);
 
-				// Check for similar existing memories (high similarity threshold for
-				// deduplication)
+				// Search for similar existing memories with moderate threshold
 				List<MemoryItem> similarMemories = vectorStoreService.search(embedding,
-						buildSearchFilters(userId, null), 5, 0.85);
+						buildSearchFilters(userId, null), 5, 0.7);
 
-				boolean isDuplicate = false;
-				for (MemoryItem existing : similarMemories) {
-					if (existing.getScore() > 0.85) {
-						logger.debug("Skipping duplicate memory: '{}' (similar to existing: '{}')", item.getContent(),
-								existing.getContent());
-						isDuplicate = true;
-						duplicateCount++;
+				// Make intelligent decision about what to do with this memory
+				MemoryDecision decision = decideMemoryAction(item, similarMemories);
+
+				// Execute the decision
+				switch (decision.getAction()) {
+					case INSERT:
+						vectorStoreService.add(item);
+						insertCount++;
+						logger.debug("Inserting new memory: '{}' - Reason: {}", item.getContent(),
+								decision.getReason());
 						break;
-					}
-				}
 
-				if (!isDuplicate) {
-					newMemories.add(item);
+					case UPDATE:
+						MemoryItem existingItem = decision.getExistingMemory();
+						existingItem.setContent(decision.getNewContent());
+						existingItem.setEmbedding(embeddingService.embed(decision.getNewContent()));
+						existingItem.setUpdatedAt(java.time.Instant.now());
+						vectorStoreService.update(existingItem);
+						updateCount++;
+						logger.debug("Updating existing memory '{}' -> '{}' - Reason: {}", existingItem.getContent(),
+								decision.getNewContent(), decision.getReason());
+						break;
+
+					case DELETE:
+						vectorStoreService.delete(decision.getExistingMemory().getId());
+						deleteCount++;
+						logger.debug("Deleting obsolete memory: '{}' - Reason: {}",
+								decision.getExistingMemory().getContent(), decision.getReason());
+						break;
+
+					case SKIP:
+						skipCount++;
+						logger.debug("Skipping memory: '{}' - Reason: {}", item.getContent(), decision.getReason());
+						break;
 				}
 			}
 
-			// Store only new memories
-			for (MemoryItem item : newMemories) {
-				vectorStoreService.add(item);
-			}
-
-			logger.info("Added {} new memories for user {} (skipped {} duplicates)", newMemories.size(), userId,
-					duplicateCount);
+			logger.info(
+					"Memory operations for user {}: {} inserted, {} updated, {} deleted, {} skipped (total extracted: {})",
+					userId, insertCount, updateCount, deleteCount, skipCount, memoryItems.size());
 		}
 		catch (Exception e) {
 			logger.error("Error adding memories for user {}", userId, e);
 			throw new RuntimeException("Failed to add memories", e);
 		}
+	}
+
+	/**
+	 * Intelligently decide what action to take on a memory by comparing with similar
+	 * existing memories Uses LLM to make nuanced decisions about insert/update/delete
+	 */
+	private MemoryDecision decideMemoryAction(MemoryItem newMemory, List<MemoryItem> similarMemories) {
+
+		// If no similar memories exist, insert the new memory
+		if (similarMemories.isEmpty()) {
+			return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null,
+					"No similar memories found, inserting new memory");
+		}
+
+		// Find the most similar memory
+		MemoryItem mostSimilar = similarMemories.get(0);
+		double highestScore = mostSimilar.getScore();
+
+		// If similarity is very high (>0.95), consider it a duplicate and skip
+		if (highestScore > 0.95) {
+			return new MemoryDecision(MemoryAction.SKIP, null, mostSimilar,
+					"Memory is nearly identical to existing memory (score: " + String.format("%.2f", highestScore)
+							+ ")");
+		}
+
+		// If similarity is high (0.85-0.95), use LLM to decide if update is needed
+		if (highestScore > 0.85) {
+			String llmDecision = getLLMMemoryDecision(newMemory.getContent(), mostSimilar.getContent());
+
+			if (llmDecision.contains("UPDATE")) {
+				// Extract merged content from LLM response
+				String mergedContent = extractMergedContent(llmDecision);
+				if (mergedContent != null && !mergedContent.isEmpty()) {
+					return new MemoryDecision(MemoryAction.UPDATE, mergedContent, mostSimilar,
+							"LLM decided to merge memories with updated information");
+				}
+			}
+			else if (llmDecision.contains("DELETE")) {
+				return new MemoryDecision(MemoryAction.DELETE, null, mostSimilar,
+						"LLM decided old memory is obsolete or contradicted");
+			}
+			else if (llmDecision.contains("SKIP")) {
+				return new MemoryDecision(MemoryAction.SKIP, null, mostSimilar, "LLM decided new memory adds no value");
+			}
+		}
+
+		// If similarity is moderate (0.7-0.85), insert as separate memory
+		if (highestScore > 0.7) {
+			return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null,
+					"Memory is related but sufficiently different to keep separate (score: "
+							+ String.format("%.2f", highestScore) + ")");
+		}
+
+		// Default: insert as new memory
+		return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null,
+				"Memory is distinct enough to insert separately");
+	}
+
+	/**
+	 * Use LLM to decide whether to update, delete, or skip a memory
+	 */
+	private String getLLMMemoryDecision(String newMemory, String existingMemory) {
+
+		String prompt = String.format(
+				"""
+						You are a memory management system. Compare these two memories and decide what action to take:
+
+						EXISTING MEMORY: %s
+						NEW MEMORY: %s
+
+						Analyze and decide:
+						1. If the new memory contains UPDATED information that contradicts or improves the existing memory, respond with:
+						   UPDATE: [merged content combining both memories with the most accurate/recent information]
+
+						2. If the new memory makes the existing memory OBSOLETE or CONTRADICTS it completely, respond with:
+						   DELETE
+
+						3. If the new memory adds NO NEW value (it's essentially the same), respond with:
+						   SKIP
+
+						4. If they are COMPLEMENTARY but distinct enough to keep separate, respond with:
+						   INSERT
+
+						Consider:
+						- Temporal context (newer information may supersede older)
+						- Specificity (more specific information may update general information)
+						- Contradictions (direct contradictions should trigger DELETE of old + INSERT of new)
+						- Redundancy (avoid storing the same information twice)
+
+						Respond with ONLY one of: UPDATE: [content], DELETE, SKIP, or INSERT
+						""",
+				existingMemory, newMemory);
+
+		try {
+			return llmService.generate(prompt);
+		}
+		catch (Exception e) {
+			logger.warn("Error getting LLM decision for memory action, defaulting to INSERT", e);
+			return "INSERT";
+		}
+	}
+
+	/**
+	 * Extract merged content from LLM response
+	 */
+	private String extractMergedContent(String llmResponse) {
+		// Look for content after "UPDATE:"
+		String[] parts = llmResponse.split("UPDATE:", 2);
+		if (parts.length > 1) {
+			return parts[1].trim();
+		}
+		return null;
 	}
 
 	/** Search for relevant memories */
