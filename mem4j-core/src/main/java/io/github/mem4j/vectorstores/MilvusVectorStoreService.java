@@ -38,7 +38,6 @@ import io.milvus.param.index.CreateIndexParam;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -51,7 +50,6 @@ import org.springframework.stereotype.Service;
  * operations like adding, searching, updating, and deleting memory items.
  */
 @Service
-@AllArgsConstructor
 public class MilvusVectorStoreService implements VectorStoreService {
 
 	private static final Logger logger = LoggerFactory.getLogger(MilvusVectorStoreService.class);
