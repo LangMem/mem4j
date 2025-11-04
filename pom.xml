@@ -78,7 +78,7 @@
         <elasticsearch.version>8.11.0</elasticsearch.version>
         <weaviate.version>5.4.0</weaviate.version>
         <neo4j.version>5.28.9</neo4j.version>
-        <milvus.version>2.3.4</milvus.version>
+        <milvus.version>2.6.6</milvus.version>
 
         <!-- Test versions -->
         <junit.version>5.10.0</junit.version>
