@@ -35,6 +35,7 @@ import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.param.dml.SearchParam;
 import io.milvus.param.index.CreateIndexParam;
+import io.milvus.param.index.DescribeIndexParam;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -207,7 +208,24 @@ public class MilvusVectorStoreService implements VectorStoreService {
 
 	private void ensureIndexExists() {
 		try {
-			// 为向量字段创建索引
+			// 先检查索引是否已存在
+			DescribeIndexParam describeIndexParam = DescribeIndexParam.newBuilder()
+				.withCollectionName(collectionName)
+				.withFieldName("vector")
+				.build();
+			
+			R<DescribeIndexResponse> indexDesc = client.describeIndex(describeIndexParam);
+			
+			// 如果索引已存在，直接返回
+			if (indexDesc.getStatus() == R.Status.Success.getCode() && indexDesc.getData() != null) {
+				DescribeIndexResponse response = indexDesc.getData();
+				if (response != null && response.getIndexDescriptionsCount() > 0) {
+					logger.info("Milvus 向量索引已存在: {}", collectionName);
+					return;
+				}
+			}
+			
+			// 索引不存在，创建新索引
 			CreateIndexParam indexParam = CreateIndexParam.newBuilder()
 				.withCollectionName(collectionName)
 				.withFieldName("vector")
@@ -220,8 +238,16 @@ public class MilvusVectorStoreService implements VectorStoreService {
 			logger.info("Milvus 向量索引已创建: {}", collectionName);
 		}
 		catch (Exception e) {
-			// 如果索引已存在，Milvus会抛出异常，但这是正常的
-			logger.debug("索引可能已存在: {}", e.getMessage());
+			// 如果索引已存在或其他错误，记录日志
+			String errorMessage = e.getMessage();
+			if (errorMessage != null && errorMessage.contains("at most one distinct index")) {
+				// 索引已存在，这是正常情况
+				logger.info("Milvus 向量索引已存在（通过异常检测）: {}", collectionName);
+			}
+			else {
+				// 其他错误，记录警告
+				logger.warn("检查或创建 Milvus 向量索引时出错: {}", e.getMessage());
+			}
 		}
 	}
 
