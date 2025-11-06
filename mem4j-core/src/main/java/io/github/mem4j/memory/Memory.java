@@ -20,13 +20,16 @@ import io.github.mem4j.config.MemoryConfigurable;
 import io.github.mem4j.embeddings.EmbeddingService;
 import io.github.mem4j.llms.LLMService;
 import io.github.mem4j.vectorstores.VectorStoreService;
-import java.util.*;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/** Core memory management class for Java Mem4j */
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Core memory management class for Java Mem4j
+ */
 @Service
 public class Memory {
 
@@ -40,8 +43,7 @@ public class Memory {
 
 	private final EmbeddingService embeddingService;
 
-	public Memory(MemoryConfigurable config, VectorStoreService vectorStoreService, LLMService llmService,
-			EmbeddingService embeddingService) {
+	public Memory(MemoryConfigurable config, VectorStoreService vectorStoreService, LLMService llmService, EmbeddingService embeddingService) {
 
 		this.config = config;
 		this.vectorStoreService = vectorStoreService;
@@ -49,14 +51,17 @@ public class Memory {
 		this.embeddingService = embeddingService;
 	}
 
-	/** Add memories from a conversation */
+	/**
+	 * Add memories from a conversation
+	 */
 	public void add(List<Message> messages, String userId) {
 		add(messages, userId, null, true, MemoryType.FACTUAL);
 	}
 
-	/** Add memories with custom parameters */
-	public void add(List<Message> messages, String userId, Map<String, Object> metadata, boolean infer,
-			MemoryType memoryType) {
+	/**
+	 * Add memories with custom parameters
+	 */
+	public void add(List<Message> messages, String userId, Map<String, Object> metadata, boolean infer, MemoryType memoryType) {
 
 		try {
 
@@ -64,9 +69,7 @@ public class Memory {
 			List<String> extractedMemories = extractMemories(messages, infer);
 
 			// Create memory items
-			List<MemoryItem> memoryItems = extractedMemories.stream()
-				.map(memory -> createMemoryItem(memory, userId, metadata, memoryType))
-				.collect(Collectors.toList());
+			List<MemoryItem> memoryItems = extractedMemories.stream().map(memory -> createMemoryItem(memory, userId, metadata, memoryType)).collect(Collectors.toList());
 
 			// Process each memory intelligently
 			int insertCount = 0;
@@ -79,8 +82,7 @@ public class Memory {
 				item.setEmbedding(embedding);
 
 				// Search for similar existing memories with moderate threshold
-				List<MemoryItem> similarMemories = vectorStoreService.search(embedding,
-						buildSearchFilters(userId, null), 5, 0.7);
+				List<MemoryItem> similarMemories = vectorStoreService.search(embedding, buildSearchFilters(userId, null), 5, 0.7);
 
 				// Make intelligent decision about what to do with this memory
 				MemoryDecision decision = decideMemoryAction(item, similarMemories);
@@ -90,8 +92,7 @@ public class Memory {
 					case INSERT:
 						vectorStoreService.add(item);
 						insertCount++;
-						logger.debug("Inserting new memory: '{}' - Reason: {}", item.getContent(),
-								decision.getReason());
+						logger.debug("Inserting new memory: '{}' - Reason: {}", item.getContent(), decision.getReason());
 						break;
 
 					case UPDATE:
@@ -101,15 +102,13 @@ public class Memory {
 						existingItem.setUpdatedAt(java.time.Instant.now());
 						vectorStoreService.update(existingItem);
 						updateCount++;
-						logger.debug("Updating existing memory '{}' -> '{}' - Reason: {}", existingItem.getContent(),
-								decision.getNewContent(), decision.getReason());
+						logger.debug("Updating existing memory '{}' -> '{}' - Reason: {}", existingItem.getContent(), decision.getNewContent(), decision.getReason());
 						break;
 
 					case DELETE:
 						vectorStoreService.delete(decision.getExistingMemory().getId());
 						deleteCount++;
-						logger.debug("Deleting obsolete memory: '{}' - Reason: {}",
-								decision.getExistingMemory().getContent(), decision.getReason());
+						logger.debug("Deleting obsolete memory: '{}' - Reason: {}", decision.getExistingMemory().getContent(), decision.getReason());
 						break;
 
 					case SKIP:
@@ -119,11 +118,8 @@ public class Memory {
 				}
 			}
 
-			logger.info(
-					"Memory operations for user {}: {} inserted, {} updated, {} deleted, {} skipped (total extracted: {})",
-					userId, insertCount, updateCount, deleteCount, skipCount, memoryItems.size());
-		}
-		catch (Exception e) {
+			logger.info("Memory operations for user {}: {} inserted, {} updated, {} deleted, {} skipped (total extracted: {})", userId, insertCount, updateCount, deleteCount, skipCount, memoryItems.size());
+		} catch (Exception e) {
 			logger.error("Error adding memories for user {}", userId, e);
 			throw new RuntimeException("Failed to add memories", e);
 		}
@@ -137,8 +133,7 @@ public class Memory {
 
 		// If no similar memories exist, insert the new memory
 		if (similarMemories.isEmpty()) {
-			return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null,
-					"No similar memories found, inserting new memory");
+			return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null, "No similar memories found, inserting new memory");
 		}
 
 		// Find the most similar memory
@@ -147,9 +142,7 @@ public class Memory {
 
 		// If similarity is very high (>0.95), consider it a duplicate and skip
 		if (highestScore > 0.95) {
-			return new MemoryDecision(MemoryAction.SKIP, null, mostSimilar,
-					"Memory is nearly identical to existing memory (score: " + String.format("%.2f", highestScore)
-							+ ")");
+			return new MemoryDecision(MemoryAction.SKIP, null, mostSimilar, "Memory is nearly identical to existing memory (score: " + String.format("%.2f", highestScore) + ")");
 		}
 
 		// If similarity is high (0.85-0.95), use LLM to decide if update is needed
@@ -160,29 +153,22 @@ public class Memory {
 				// Extract merged content from LLM response
 				String mergedContent = extractMergedContent(llmDecision);
 				if (mergedContent != null && !mergedContent.isEmpty()) {
-					return new MemoryDecision(MemoryAction.UPDATE, mergedContent, mostSimilar,
-							"LLM decided to merge memories with updated information");
+					return new MemoryDecision(MemoryAction.UPDATE, mergedContent, mostSimilar, "LLM decided to merge memories with updated information");
 				}
-			}
-			else if (llmDecision.contains("DELETE")) {
-				return new MemoryDecision(MemoryAction.DELETE, null, mostSimilar,
-						"LLM decided old memory is obsolete or contradicted");
-			}
-			else if (llmDecision.contains("SKIP")) {
+			} else if (llmDecision.contains("DELETE")) {
+				return new MemoryDecision(MemoryAction.DELETE, null, mostSimilar, "LLM decided old memory is obsolete or contradicted");
+			} else if (llmDecision.contains("SKIP")) {
 				return new MemoryDecision(MemoryAction.SKIP, null, mostSimilar, "LLM decided new memory adds no value");
 			}
 		}
 
 		// If similarity is moderate (0.7-0.85), insert as separate memory
 		if (highestScore > 0.7) {
-			return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null,
-					"Memory is related but sufficiently different to keep separate (score: "
-							+ String.format("%.2f", highestScore) + ")");
+			return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null, "Memory is related but sufficiently different to keep separate (score: " + String.format("%.2f", highestScore) + ")");
 		}
 
 		// Default: insert as new memory
-		return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null,
-				"Memory is distinct enough to insert separately");
+		return new MemoryDecision(MemoryAction.INSERT, newMemory.getContent(), null, "Memory is distinct enough to insert separately");
 	}
 
 	/**
@@ -190,40 +176,37 @@ public class Memory {
 	 */
 	private String getLLMMemoryDecision(String newMemory, String existingMemory) {
 
-		String prompt = String.format(
-				"""
-						You are a memory management system. Compare these two memories and decide what action to take:
-
-						EXISTING MEMORY: %s
-						NEW MEMORY: %s
-
-						Analyze and decide:
-						1. If the new memory contains UPDATED information that contradicts or improves the existing memory, respond with:
-						   UPDATE: [merged content combining both memories with the most accurate/recent information]
-
-						2. If the new memory makes the existing memory OBSOLETE or CONTRADICTS it completely, respond with:
-						   DELETE
-
-						3. If the new memory adds NO NEW value (it's essentially the same), respond with:
-						   SKIP
-
-						4. If they are COMPLEMENTARY but distinct enough to keep separate, respond with:
-						   INSERT
-
-						Consider:
-						- Temporal context (newer information may supersede older)
-						- Specificity (more specific information may update general information)
-						- Contradictions (direct contradictions should trigger DELETE of old + INSERT of new)
-						- Redundancy (avoid storing the same information twice)
-
-						Respond with ONLY one of: UPDATE: [content], DELETE, SKIP, or INSERT
-						""",
-				existingMemory, newMemory);
+		String prompt = String.format("""
+			You are a memory management system. Compare these two memories and decide what action to take:
+			
+			EXISTING MEMORY: %s
+			NEW MEMORY: %s
+			
+			Analyze and decide:
+			1. If the new memory contains UPDATED information that contradicts or improves the existing memory, respond with:
+			   UPDATE: [merged content combining both memories with the most accurate/recent information]
+			
+			2. If the new memory makes the existing memory OBSOLETE or CONTRADICTS it completely, respond with:
+			   DELETE
+			
+			3. If the new memory adds NO NEW value (it's essentially the same), respond with:
+			   SKIP
+			
+			4. If they are COMPLEMENTARY but distinct enough to keep separate, respond with:
+			   INSERT
+			
+			Consider:
+			- Temporal context (newer information may supersede older)
+			- Specificity (more specific information may update general information)
+			- Contradictions (direct contradictions should trigger DELETE of old + INSERT of new)
+			- Redundancy (avoid storing the same information twice)
+			
+			Respond with ONLY one of: UPDATE: [content], DELETE, SKIP, or INSERT
+			""", existingMemory, newMemory);
 
 		try {
 			return llmService.generate(prompt);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.warn("Error getting LLM decision for memory action, defaulting to INSERT", e);
 			return "INSERT";
 		}
@@ -241,14 +224,17 @@ public class Memory {
 		return null;
 	}
 
-	/** Search for relevant memories */
+	/**
+	 * Search for relevant memories
+	 */
 	public List<MemoryItem> search(String query, String userId) {
 		return search(query, userId, null, 10, null);
 	}
 
-	/** Search with custom parameters */
-	public List<MemoryItem> search(String query, String userId, Map<String, Object> filters, int limit,
-			Double threshold) {
+	/**
+	 * Search with custom parameters
+	 */
+	public List<MemoryItem> search(String query, String userId, Map<String, Object> filters, int limit, Double threshold) {
 
 		try {
 			// Generate embedding for query
@@ -283,35 +269,35 @@ public class Memory {
 				for (MemoryItem item : filteredResults) {
 					logger.debug("Found relevant memory: '{}' with score: {}", item.getContent(), item.getScore());
 				}
-			}
-			else {
-				logger.warn("No relevant memories found for query: '{}' with user_id: '{}' and threshold: {}", query,
-						userId, actualThreshold);
+			} else {
+				logger.warn("No relevant memories found for query: '{}' with user_id: '{}' and threshold: {}", query, userId, actualThreshold);
 			}
 
 			return filteredResults;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 
 			logger.error("Error searching memories for query: {}", query, e);
 			throw new RuntimeException("Failed to search memories", e);
 		}
 	}
 
-	/** Get all memories for a user */
+	/**
+	 * Get all memories for a user
+	 */
 	public List<MemoryItem> getAll(String userId, Map<String, Object> filters, int limit) {
 
 		try {
 			Map<String, Object> searchFilters = buildSearchFilters(userId, filters);
 			return vectorStoreService.getAll(searchFilters, limit);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("Error getting all memories for user {}", userId, e);
 			throw new RuntimeException("Failed to get memories", e);
 		}
 	}
 
-	/** Update a memory item */
+	/**
+	 * Update a memory item
+	 */
 	public void update(String memoryId, Map<String, Object> data) {
 
 		try {
@@ -332,94 +318,89 @@ public class Memory {
 				vectorStoreService.update(item);
 				logger.info("Updated memory: {}", memoryId);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("Error updating memory: {}", memoryId, e);
 			throw new RuntimeException("Failed to update memory", e);
 		}
 	}
 
-	/** Delete a memory item */
+	/**
+	 * Delete a memory item
+	 */
 	public void delete(String memoryId) {
 
 		try {
 			vectorStoreService.delete(memoryId);
 			logger.info("Deleted memory: {}", memoryId);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("Error deleting memory: {}", memoryId, e);
 			throw new RuntimeException("Failed to delete memory", e);
 		}
 	}
 
-	/** Delete all memories for a user */
+	/**
+	 * Delete all memories for a user
+	 */
 	public void deleteAll(String userId) {
 
 		try {
 			Map<String, Object> filters = Map.of("user_id", userId);
 			vectorStoreService.deleteAll(filters);
 			logger.info("Deleted all memories for user: {}", userId);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("Error deleting all memories for user {}", userId, e);
 			throw new RuntimeException("Failed to delete memories", e);
 		}
 	}
 
-	/** Extract memories from conversation using LLM */
+	/**
+	 * Extract memories from conversation using LLM
+	 */
 	private List<String> extractMemories(List<Message> messages, boolean infer) {
 
 		if (!infer) {
 			// Return raw conversation as single memory
-			String conversation = messages.stream()
-				.map(msg -> msg.getRole() + ": " + msg.getContent())
-				.collect(Collectors.joining("\n"));
+			String conversation = messages.stream().map(msg -> msg.getRole() + ": " + msg.getContent()).collect(Collectors.joining("\n"));
 			return List.of(conversation);
 		}
 
 		// Use LLM to extract meaningful memories
-		String conversation = messages.stream()
-			.map(msg -> msg.getRole() + ": " + msg.getContent())
-			.collect(Collectors.joining("\n"));
+		String conversation = messages.stream().map(msg -> msg.getRole() + ": " + msg.getContent()).collect(Collectors.joining("\n"));
 
 		String prompt = String.format("""
-				Extract key memories from this conversation. Focus ONLY on:
-				- Important facts about the user (name, age, profession, etc.)
-				- User preferences and behaviors (likes, dislikes, habits)
-				- Significant events or experiences mentioned by the user
-				- Useful information for future personalized interactions
-
-				DO NOT extract:
-				- Generic system messages or responses
-				- Conversation metadata or status messages
-				- General greetings or pleasantries
-				- Assistant responses unless they contain user-specific information
-
-				Only extract memories that have real value for understanding the user.
-
-				Conversation:
-				%s
-
-				Return each memory as a separate line, starting with "- ".
-				If no valuable memories exist, return nothing.
-				""", conversation);
+			Extract key memories from this conversation. Focus ONLY on:
+			- Important facts about the user (name, age, profession, etc.)
+			- User preferences and behaviors (likes, dislikes, habits)
+			- Significant events or experiences mentioned by the user
+			- Useful information for future personalized interactions
+			
+			DO NOT extract:
+			- Generic system messages or responses
+			- Conversation metadata or status messages
+			- General greetings or pleasantries
+			- Assistant responses unless they contain user-specific information
+			
+			Only extract memories that have real value for understanding the user.
+			
+			Conversation:
+			%s
+			
+			Return each memory as a separate line, starting with "- ".
+			If no valuable memories exist, return nothing.
+			""", conversation);
 
 		String response = llmService.generate(prompt);
 
 		// Parse response into individual memories and filter out system-like content
-		List<String> memories = Arrays.stream(response.split("\n"))
-			.map(String::trim)
-			.filter(line -> line.startsWith("- "))
-			.map(this::cleanMemoryContent)
-			.filter(line -> !line.isEmpty())
-			.filter(this::isValidMemory)
-			.collect(Collectors.toList());
+		List<String> memories = Arrays.stream(response.split("\n")).map(String::trim).filter(line -> line.startsWith("- ")).map(this::cleanMemoryContent).filter(line -> !line.isEmpty()).filter(this::isValidMemory).collect(Collectors.toList());
 
 		logger.debug("Extracted {} valid memories from conversation", memories.size());
 		return memories;
 	}
 
-	/** Clean memory content by removing leading dashes and extra whitespace */
+	/**
+	 * Clean memory content by removing leading dashes and extra whitespace
+	 */
 	private String cleanMemoryContent(String line) {
 		// Remove the initial "- " prefix
 		String content = line.substring(2);
@@ -430,16 +411,15 @@ public class Memory {
 		return content.trim();
 	}
 
-	/** Check if a memory content is valid and worth storing */
+	/**
+	 * Check if a memory content is valid and worth storing
+	 */
 	private boolean isValidMemory(String content) {
 		// Convert to lowercase for case-insensitive matching
 		String lowerContent = content.toLowerCase().trim();
 
 		// Filter out generic system messages
-		String[] invalidPatterns = { "this is the user's first conversation", "this is the first conversation",
-				"hello! this is my first time", "how can i help", "i'm here to help", "what can i do for you",
-				"nice to meet you", "the user is asking", "the assistant responded", "conversation started",
-				"session began", "first interaction" };
+		String[] invalidPatterns = {"this is the user's first conversation", "this is the first conversation", "hello! this is my first time", "how can i help", "i'm here to help", "what can i do for you", "nice to meet you", "the user is asking", "the assistant responded", "conversation started", "session began", "first interaction"};
 
 		for (String pattern : invalidPatterns) {
 			if (lowerContent.contains(pattern)) {
@@ -463,18 +443,49 @@ public class Memory {
 		return true;
 	}
 
-	/** Create a memory item from content */
-	private MemoryItem createMemoryItem(String content, String userId, Map<String, Object> metadata,
-			MemoryType memoryType) {
-
+	/**
+	 * Create a memory item from content
+	 */
+	private MemoryItem createMemoryItem(String content, String userId, Map<String, Object> metadata, MemoryType memoryType) {
 		MemoryItem item = new MemoryItem(content, memoryType.getValue());
 		item.setUserId(userId);
-		item.setMetadata(metadata);
-
+		// Extract fields from metadata and set them to corresponding MemoryItem fields
+		if (metadata != null) {
+			// Create a new metadata map to avoid modifying the original map
+			Map<String, Object> filteredMetadata = new HashMap<>(metadata);
+			// Extract and set agentId
+			if (metadata.containsKey("agentId")) {
+				Object agentIdValue = metadata.get("agentId");
+				if (agentIdValue != null) {
+					item.setAgentId(agentIdValue.toString());
+					filteredMetadata.remove("agentId"); // Remove from metadata to avoid duplicate storage
+				}
+			}
+			// Extract and set runId
+			if (metadata.containsKey("runId")) {
+				Object runIdValue = metadata.get("runId");
+				if (runIdValue != null) {
+					item.setRunId(runIdValue.toString());
+					filteredMetadata.remove("runId"); // Remove from metadata to avoid duplicate storage
+				}
+			}
+			// Extract and set actorId
+			if (metadata.containsKey("actorId")) {
+				Object actorIdValue = metadata.get("actorId");
+				if (actorIdValue != null) {
+					item.setActorId(actorIdValue.toString());
+					filteredMetadata.remove("actorId"); // Remove from metadata to avoid duplicate storage
+				}
+			}
+			// Set filtered metadata (excluding extracted fields)
+			item.setMetadata(filteredMetadata.isEmpty() ? null : filteredMetadata);
+		}
 		return item;
 	}
 
-	/** Build search filters */
+	/**
+	 * Build search filters
+	 */
 	private Map<String, Object> buildSearchFilters(String userId, Map<String, Object> additionalFilters) {
 
 		Map<String, Object> filters = new HashMap<>();
@@ -487,32 +498,36 @@ public class Memory {
 		return filters;
 	}
 
-	/** Get memory by ID */
+	/**
+	 * Get memory by ID
+	 */
 	public MemoryItem get(String memoryId) {
 
 		try {
 			return vectorStoreService.get(memoryId);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("Error getting memory: {}", memoryId, e);
 			throw new RuntimeException("Failed to get memory", e);
 		}
 	}
 
-	/** Reset all memories (for testing) */
+	/**
+	 * Reset all memories (for testing)
+	 */
 	public void reset() {
 
 		try {
 			vectorStoreService.reset();
 			logger.info("Reset all memories");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("Error resetting memories", e);
 			throw new RuntimeException("Failed to reset memories", e);
 		}
 	}
 
-	/** Filter results by semantic relevance using keyword matching */
+	/**
+	 * Filter results by semantic relevance using keyword matching
+	 */
 	private List<MemoryItem> filterBySemanticRelevance(String query, List<MemoryItem> results) {
 		// If similarity threshold is already high (>= 0.4), trust the vector search
 		// results
@@ -526,13 +541,11 @@ public class Memory {
 		String lowerQuery = query.toLowerCase();
 
 		// For comprehensive queries (introduce, tell me about), return all results
-		String[] comprehensiveQueries = { "介绍", "告诉我", "关于我", "我的信息", "我是谁", "说说我", "讲讲我", "describe me",
-				"tell me about", "introduce me", "about me", "who am i", "my information" };
+		String[] comprehensiveQueries = {"介绍", "告诉我", "关于我", "我的信息", "我是谁", "说说我", "讲讲我", "describe me", "tell me about", "introduce me", "about me", "who am i", "my information"};
 
 		for (String pattern : comprehensiveQueries) {
 			if (lowerQuery.contains(pattern)) {
-				logger.debug("Comprehensive query detected, skipping semantic filtering to return all related"
-						+ " memories");
+				logger.debug("Comprehensive query detected, skipping semantic filtering to return all related" + " memories");
 				return results;
 			}
 		}
@@ -558,19 +571,19 @@ public class Memory {
 			boolean isHighSimilarity = item.getScore() > 0.4;
 
 			// More precise filtering - keep if semantic match found OR high similarity
-			boolean isRelevant = hasRelevantKeywords || hasCrossLanguageMatch || isHighSimilarity
-					|| item.getScore() > 0.35;
+			boolean isRelevant = hasRelevantKeywords || hasCrossLanguageMatch || isHighSimilarity || item.getScore() > 0.35;
 
 			if (!isRelevant) {
-				logger.debug("Filtered out irrelevant memory: '{}' (score: {}, keywords: {})", item.getContent(),
-						item.getScore(), queryKeywords);
+				logger.debug("Filtered out irrelevant memory: '{}' (score: {}, keywords: {})", item.getContent(), item.getScore(), queryKeywords);
 			}
 
 			return isRelevant;
 		}).collect(java.util.stream.Collectors.toList());
 	}
 
-	/** Extract keywords from query for relevance checking */
+	/**
+	 * Extract keywords from query for relevance checking
+	 */
 	private List<String> extractKeywords(String query) {
 		// Remove common words and extract meaningful keywords
 		List<String> keywords = new ArrayList<>();
@@ -590,13 +603,12 @@ public class Memory {
 		return keywords;
 	}
 
-	/** Check if a word is a common word that should be ignored */
+	/**
+	 * Check if a word is a common word that should be ignored
+	 */
 	private boolean isCommonWord(String word) {
 		// Chinese and English common words
-		String[] commonWords = { "我", "你", "他", "她", "它", "的", "是", "在", "有", "和", "与", "了", "吗", "呢", "吧", "啊", "什么",
-				"怎么", "为什么", "哪里", "谁", "when", "where", "what", "how", "why", "who", "i", "you", "he", "she", "it",
-				"is", "are", "was", "were", "am", "be", "been", "being", "a", "an", "the", "and", "or", "but", "if",
-				"then", "that", "this", "these", "those" };
+		String[] commonWords = {"我", "你", "他", "她", "它", "的", "是", "在", "有", "和", "与", "了", "吗", "呢", "吧", "啊", "什么", "怎么", "为什么", "哪里", "谁", "when", "where", "what", "how", "why", "who", "i", "you", "he", "she", "it", "is", "are", "was", "were", "am", "be", "been", "being", "a", "an", "the", "and", "or", "but", "if", "then", "that", "this", "these", "those"};
 
 		for (String common : commonWords) {
 			if (word.equals(common)) {
@@ -606,7 +618,9 @@ public class Memory {
 		return false;
 	}
 
-	/** Determine appropriate similarity threshold based on query type */
+	/**
+	 * Determine appropriate similarity threshold based on query type
+	 */
 	private Double determineThreshold(String query, Double customThreshold) {
 		// If custom threshold is provided, use it
 		if (customThreshold != null) {
@@ -617,8 +631,7 @@ public class Memory {
 
 		// For comprehensive queries (like "introduce me", "tell me about myself"),
 		// use a lower threshold to capture more related information
-		String[] comprehensiveQueries = { "介绍", "告诉我", "关于我", "我的信息", "我是谁", "说说我", "讲讲我", "describe me",
-				"tell me about", "introduce me", "about me", "who am i", "my information" };
+		String[] comprehensiveQueries = {"介绍", "告诉我", "关于我", "我的信息", "我是谁", "说说我", "讲讲我", "describe me", "tell me about", "introduce me", "about me", "who am i", "my information"};
 
 		for (String pattern : comprehensiveQueries) {
 			if (lowerQuery.contains(pattern)) {
@@ -628,9 +641,7 @@ public class Memory {
 		}
 
 		// For specific queries, use medium threshold to balance precision and recall
-		String[] specificQueries = { "喜欢喝", "喜欢吃", "喜欢玩", "喜欢看", "爱好", "什么食物", "什么运动", "什么饮料", "like to", "love to",
-				"enjoy", "favorite", "what food", "what sport", "what drink", "my favorite", "i like", "i love",
-				"i enjoy" };
+		String[] specificQueries = {"喜欢喝", "喜欢吃", "喜欢玩", "喜欢看", "爱好", "什么食物", "什么运动", "什么饮料", "like to", "love to", "enjoy", "favorite", "what food", "what sport", "what drink", "my favorite", "i like", "i love", "i enjoy"};
 
 		for (String pattern : specificQueries) {
 			if (lowerQuery.contains(pattern)) {
@@ -644,7 +655,9 @@ public class Memory {
 		return config.getSimilarityThreshold();
 	}
 
-	/** Check cross-language semantic relevance */
+	/**
+	 * Check cross-language semantic relevance
+	 */
 	private boolean checkCrossLanguageRelevance(String query, String memoryContent) {
 		String lowerQuery = query.toLowerCase();
 		String lowerMemory = memoryContent.toLowerCase();
@@ -653,18 +666,18 @@ public class Memory {
 		Map<String, String[]> semanticMappings = new HashMap<>();
 
 		// Food-related mappings
-		semanticMappings.put("food", new String[] { "食物", "吃", "喜欢吃", "爱吃" });
-		semanticMappings.put("favorite", new String[] { "喜欢", "最爱", "偏爱", "钟爱" });
-		semanticMappings.put("drink", new String[] { "喝", "饮料", "喜欢喝", "爱喝" });
-		semanticMappings.put("sport", new String[] { "运动", "体育", "喜欢玩", "锻炼" });
-		semanticMappings.put("hobby", new String[] { "爱好", "兴趣", "喜欢" });
+		semanticMappings.put("food", new String[]{"食物", "吃", "喜欢吃", "爱吃"});
+		semanticMappings.put("favorite", new String[]{"喜欢", "最爱", "偏爱", "钟爱"});
+		semanticMappings.put("drink", new String[]{"喝", "饮料", "喜欢喝", "爱喝"});
+		semanticMappings.put("sport", new String[]{"运动", "体育", "喜欢玩", "锻炼"});
+		semanticMappings.put("hobby", new String[]{"爱好", "兴趣", "喜欢"});
 
 		// Reverse mappings (Chinese to English)
-		semanticMappings.put("食物", new String[] { "food", "eat", "favorite food" });
-		semanticMappings.put("喜欢吃", new String[] { "like to eat", "love eating", "favorite food" });
-		semanticMappings.put("喜欢喝", new String[] { "like to drink", "love drinking", "favorite drink" });
-		semanticMappings.put("运动", new String[] { "sport", "exercise", "activity" });
-		semanticMappings.put("爱好", new String[] { "hobby", "interest", "favorite" });
+		semanticMappings.put("食物", new String[]{"food", "eat", "favorite food"});
+		semanticMappings.put("喜欢吃", new String[]{"like to eat", "love eating", "favorite food"});
+		semanticMappings.put("喜欢喝", new String[]{"like to drink", "love drinking", "favorite drink"});
+		semanticMappings.put("运动", new String[]{"sport", "exercise", "activity"});
+		semanticMappings.put("爱好", new String[]{"hobby", "interest", "favorite"});
 
 		// Check if query contains concepts that map to memory content
 		// Use more precise matching - require both concept and mapping to be present
@@ -677,9 +690,7 @@ public class Memory {
 					if (lowerMemory.contains(mapping)) {
 						// Additional check: ensure the match is contextually relevant
 						if (isContextuallyRelevant(concept, mapping, lowerQuery, lowerMemory)) {
-							logger.debug(
-									"Cross-language match found: query '{}' contains '{}', memory '{}' contains '{}'",
-									query, concept, memoryContent, mapping);
+							logger.debug("Cross-language match found: query '{}' contains '{}', memory '{}' contains '{}'", query, concept, memoryContent, mapping);
 							return true;
 						}
 					}
@@ -690,26 +701,25 @@ public class Memory {
 		return false;
 	}
 
-	/** Check if the cross-language match is contextually relevant */
+	/**
+	 * Check if the cross-language match is contextually relevant
+	 */
 	private boolean isContextuallyRelevant(String concept, String mapping, String query, String memory) {
 		// For food-related queries, ensure both query and memory are about food
 		if ((concept.equals("food") || concept.equals("食物")) && (mapping.contains("吃") || mapping.contains("食物"))) {
 			// Query should contain food-related terms and memory should contain
 			// eating-related terms
-			return (query.contains("food") || query.contains("favorite"))
-					&& (memory.contains("吃") || memory.contains("食物"));
+			return (query.contains("food") || query.contains("favorite")) && (memory.contains("吃") || memory.contains("食物"));
 		}
 
 		// For drink-related queries
 		if ((concept.equals("drink") || concept.equals("饮料")) && (mapping.contains("喝") || mapping.contains("饮料"))) {
-			return (query.contains("drink") || query.contains("favorite"))
-					&& (memory.contains("喝") || memory.contains("饮料"));
+			return (query.contains("drink") || query.contains("favorite")) && (memory.contains("喝") || memory.contains("饮料"));
 		}
 
 		// For sport-related queries
 		if ((concept.equals("sport") || concept.equals("运动")) && (mapping.contains("运动") || mapping.contains("打"))) {
-			return (query.contains("sport") || query.contains("exercise"))
-					&& (memory.contains("运动") || memory.contains("打") || memory.contains("球"));
+			return (query.contains("sport") || query.contains("exercise")) && (memory.contains("运动") || memory.contains("打") || memory.contains("球"));
 		}
 
 		// For general favorite queries, be more permissive but still contextual
