@@ -61,7 +61,7 @@
 
     <properties>
         <!-- Project version -->
-        <revision>1.0.0-M2-SNAPSHOT</revision>
+        <revision>1.0.0-M2</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
